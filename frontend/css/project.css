@@ -1,0 +1,210 @@
+
+.project-page {
+    display: flex;
+    flex-direction: column;
+    gap: 18px 28px;
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+    color: #000;
+}
+
+.project-page .process-container {
+    display: grid;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.project-page .header-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+    min-height: 40px;
+    padding: 0;
+}
+
+.project-page .header-box h3 {
+    min-width: 0;
+    margin: 0;
+    color: #000;
+    font-size: clamp(20px, 6vw, 40px);
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.project-page #createGroupIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    color: #000;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.project-page #createGroupIcon:active {
+    transform: translateY(1px);
+}
+
+.project-page #createGroupIcon:focus-visible {
+    outline: 3px solid #9bd4c8;
+    outline-offset: 2px;
+}
+
+.project-page #createGroupIcon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.project-page #completeTaskList {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+}
+
+.project-page #processTaskList,
+.project-page #completeTaskList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.project-page #processTaskList > *,
+.project-page #completeTaskList > * {
+    padding: 16px;
+    background: #f8faf9;
+    border: 1px solid ;
+    border-radius: 20px;
+}
+
+.project-page #processTaskList:empty::before,
+.project-page #completeTaskList:empty::before {
+    display: grid;
+    min-height: 120px;
+    place-items: center;
+    padding: 20px;
+    background: #f8faf9;
+    font-size: 14px;
+    text-align: center;
+}
+
+.project-page #processTaskList:empty::before {
+    content: "No tasks in progress";
+}
+
+.project-page #completeTaskList:empty::before {
+    content: "No completed tasks";
+}
+
+.project-page .project-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+    min-width: 0;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 1px solid #dfe8e4;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px -8px #000;
+    cursor: pointer;
+}
+
+.project-page .project-card__details {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.project-page .project-card__subject {
+    overflow-wrap: anywhere;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.project-page .project-card__name {
+    overflow-wrap: anywhere;
+    margin: 0;
+    color: #687772;
+    font-size: 14px;
+}
+
+.project-page .project-card__progress {
+    display: flex;
+    align-items: center;
+    flex: 0 1 350px;
+    flex-direction: row;
+    gap: 7px;
+    min-width: 0;
+}
+
+.project-page .project-card__progress-label {
+    flex: 0 0 auto;
+    color: #41544f;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.project-page .project-card__progress-track {
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 15px;
+    background: #e8efec;
+    border: 1px solid;
+    border-radius: 999px;
+}
+
+.project-page .project-card__progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 300ms ease;
+}
+
+.project-page .project-card__progress-fill[data-progress-band="red"] {
+    background: linear-gradient(89deg,rgba(191, 48, 38, 1) 0%, rgba(247, 42, 27, 1) 50%);
+}
+
+.project-page .project-card__progress-fill[data-progress-band="orange"] {
+    background: linear-gradient(89deg,rgba(247, 42, 27, 1) 0%, rgba(255, 132, 56, 1) 50%);
+}
+
+.project-page .project-card__progress-fill[data-progress-band="yellow"] {
+    background: linear-gradient(89deg,rgba(255, 132, 56, 1) 0%, rgba(253, 210, 61, 1) 50%);
+}
+
+.project-page .project-card__progress-fill[data-progress-band="green"] {
+    background: linear-gradient(89deg,rgba(253, 240, 65, 1) 0%, rgba(137, 255, 69, 1) 50%);
+}
+
+@media (max-width: 500px) {
+    .project-page .project-card {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .project-page .project-card__progress {
+        flex: 0 1 auto;
+        width: 100%;
+    }
+}

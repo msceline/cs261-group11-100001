@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -83,6 +84,10 @@ class ProjectServiceTest {
         projectService = new ProjectService(projectRepository, memberRepository, userRepository);
     }
 
+    private static CreateProjectRequest req(String name, String subject) {
+        return new CreateProjectRequest(name, subject, LocalDate.of(2026, 2, 1));
+    }
+
     private static HttpStatus statusOf(ResponseStatusException e) {
         return HttpStatus.valueOf(e.getStatusCode().value());
     }
@@ -96,13 +101,14 @@ class ProjectServiceTest {
 
     @Test
     void createMakesCallerTheHostAndMember() {
-        ProjectResponse created = projectService.create(3, new CreateProjectRequest("  My Group ", " CS300 "));
+        ProjectResponse created = projectService.create(3, req("  My Group ", " CS300 "));
 
         assertEquals(10, created.projectId());
         assertEquals("My Group", created.projectName());
         assertEquals("CS300", created.subjectCode());
         assertEquals(3, created.hostId());
         assertEquals(0, created.progress());
+        assertEquals(LocalDateTime.of(2026, 2, 1, 0, 0), created.createdAt());
 
         ArgumentCaptor<ProjectMember> saved = ArgumentCaptor.forClass(ProjectMember.class);
         verify(memberRepository).save(saved.capture());
@@ -113,29 +119,35 @@ class ProjectServiceTest {
 
     @Test
     void createRejectsBlankOrMissingName() {
-        assertBadRequest(1, new CreateProjectRequest("   ", "CS261"));
-        assertBadRequest(1, new CreateProjectRequest(null, "CS261"));
+        assertBadRequest(1, req("   ", "CS261"));
+        assertBadRequest(1, req(null, "CS261"));
         assertBadRequest(1, null);
         verify(projectRepository, never()).save(any());
     }
 
     @Test
     void createRejectsBlankOrMissingSubjectCode() {
-        assertBadRequest(1, new CreateProjectRequest("ok", null));
-        assertBadRequest(1, new CreateProjectRequest("ok", "   "));
+        assertBadRequest(1, req("ok", null));
+        assertBadRequest(1, req("ok", "   "));
+        verify(projectRepository, never()).save(any());
+    }
+
+    @Test
+    void createRejectsMissingCreatedAt() {
+        assertBadRequest(1, new CreateProjectRequest("ok", "CS261", null));
         verify(projectRepository, never()).save(any());
     }
 
     @Test
     void createRejectsTooLongFields() {
-        assertBadRequest(1, new CreateProjectRequest("x".repeat(101), "CS261"));
-        assertBadRequest(1, new CreateProjectRequest("ok", "x".repeat(21)));
+        assertBadRequest(1, req("x".repeat(101), "CS261"));
+        assertBadRequest(1, req("ok", "x".repeat(21)));
     }
 
     @Test
     void createAcceptsFieldsAtMaxLength() {
         ProjectResponse created = projectService.create(1,
-                new CreateProjectRequest("x".repeat(100), "z".repeat(20)));
+                req("x".repeat(100), "z".repeat(20)));
 
         assertEquals(100, created.projectName().length());
     }

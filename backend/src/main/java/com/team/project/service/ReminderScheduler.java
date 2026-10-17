@@ -1,160 +1,76 @@
 package com.team.project.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.team.project.entity.Task;
 
 @Component
 public class ReminderScheduler {
 
-        private static final ZoneId ZONE = ZoneId.of("Asia/Bangkok");
+    private static final Logger log = LoggerFactory.getLogger(ReminderScheduler.class);
+    private static final ZoneId ZONE = ZoneId.of("Asia/Bangkok");
+    private static final LocalTime DAILY_REMINDER_TIME = LocalTime.of(9, 0);
+    private static final String DONE_STATUS = "done";
 
-        private final TaskService taskService;
-        private final NotificationService notificationService;
+    private final TaskService taskService;
+    private final NotificationService notificationService;
 
-        private final Set<String> sentEvents = new HashSet<>();
+    private final Set<String> sentEvents = new HashSet<>();
+    private LocalDateTime lastCheckAt;
 
-        private LocalDateTime lastCheckAt;
+    public ReminderScheduler(TaskService taskService, NotificationService notificationService) {
+        this.taskService = taskService;
+        this.notificationService = notificationService;
+    }
 
-        public ReminderScheduler(
-                        TaskService taskService,
-                        NotificationService notificationService) {
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void checkReminders() {
+        LocalDateTime now = LocalDateTime.now(ZONE);
+        LocalDateTime previousCheck = lastCheckAt == null ? now.minusMinutes(1) : lastCheckAt;
+        lastCheckAt = now;
 
-                this.taskService = taskService;
-                this.notificationService = notificationService;
+        for (Task task : taskService.getAllTasks()) {
+            LocalDateTime dueDate = task.getDueDate();
+            if (dueDate == null || task.getAssignee() == null
+                    || DONE_STATUS.equalsIgnoreCase(task.getStatus()) || !now.isBefore(dueDate)) {
+                continue;
+            }
+
+            LocalDateTime dailyTime = LocalDateTime.of(now.toLocalDate(), DAILY_REMINDER_TIME);
+            if (dueDate.isAfter(dailyTime)) {
+                sendIfDue(task, "DAILY", dailyTime, previousCheck, now, "Daily task reminder");
+            }
+            sendIfDue(task, "1_HOUR", dueDate.minusMinutes(60), previousCheck, now, "Task deadline in 1 hour");
+            sendIfDue(task, "30_MINUTES", dueDate.minusMinutes(30), previousCheck, now, "Task deadline in 30 minutes");
+            sendIfDue(task, "10_MINUTES", dueDate.minusMinutes(10), previousCheck, now, "Task deadline in 10 minutes");
+        }
+    }
+
+    /** Sends the reminder once, when its time falls inside the window since the previous check. */
+    private void sendIfDue(Task task, String eventType, LocalDateTime reminderTime,
+                           LocalDateTime previousCheck, LocalDateTime now, String title) {
+        if (reminderTime.isBefore(previousCheck) || reminderTime.isAfter(now)) {
+            return;
+        }
+        String eventKey = task.getTaskId() + "_" + eventType + "_" + reminderTime;
+        if (!sentEvents.add(eventKey)) {
+            return;
         }
 
-        @Scheduled(fixedRate = 60000)
-        public void checkReminders() {
-
-                LocalDateTime now = LocalDateTime.now(ZONE);
-
-                LocalDateTime previousCheck = (lastCheckAt == null)
-                                ? now.minusMinutes(1)
-                                : lastCheckAt;
-
-                lastCheckAt = now;
-
-                System.out.println(
-                                "ReminderScheduler is running: " + now);
-
-                for (Task task : taskService.getAllTasks()) {
-
-                        System.out.println(
-                                        "Checking task: " + task.getTaskId()
-                                                        + ", dueDate: " + task.getDueDate()
-                                                        + ", status: " + task.getStatus());
-
-                        if (task.getDueDate() == null) {
-                                continue;
-                        }
-
-                        String status = task.getStatus();
-
-                        if (status != null
-                                        && status.equalsIgnoreCase("COMPLETED")) {
-                                continue;
-                        }
-
-                        LocalDateTime dueDate = task.getDueDate();
-
-                        if (!now.isBefore(dueDate)) {
-                                continue;
-                        }
-
-                        LocalDate today = now.toLocalDate();
-
-                        LocalDateTime dailyTime = LocalDateTime.of(
-                                        today, LocalTime.of(9, 0));
-
-                        if (dueDate.isAfter(dailyTime)
-                                        && !dailyTime.isBefore(previousCheck)
-                                        && !dailyTime.isAfter(now)) {
-                                sendOnce(
-                                                task,
-                                                "DAILY",
-                                                dailyTime,
-                                                "Daily task reminder",
-                                                "Task \"" + task.getTaskTitle()
-                                                                + "\" is due on " + dueDate);
-                        }
-
-                        sendDeadlineReminder(
-                                        task, dueDate, now, previousCheck,
-                                        60, "1_HOUR",
-                                        "Task deadline in 1 hour");
-
-                        sendDeadlineReminder(
-                                        task, dueDate, now, previousCheck,
-                                        30, "30_MINUTES",
-                                        "Task deadline in 30 minutes");
-
-                        sendDeadlineReminder(
-                                        task, dueDate, now, previousCheck,
-                                        10, "10_MINUTES",
-                                        "Task deadline in 10 minutes");
-
-                }
-        }
-
-        private void sendDeadlineReminder(
-                        Task task,
-                        LocalDateTime dueDate,
-                        LocalDateTime now,
-                        LocalDateTime previousCheck,
-                        int minutesBefore,
-                        String eventType,
-                        String title) {
-
-                LocalDateTime reminderTime = dueDate.minusMinutes(minutesBefore);
-
-                if (!reminderTime.isBefore(previousCheck)
-                                && !reminderTime.isAfter(now)) {
-                        sendOnce(
-                                        task,
-                                        eventType,
-                                        reminderTime,
-                                        title,
-                                        "Task \"" + task.getTaskTitle()
-                                                        + "\" is due on " + dueDate);
-                }
-        }
-
-        private void sendOnce(
-                        Task task,
-                        String eventType,
-                        LocalDateTime eventTime,
-                        String title,
-                        String message) {
-
-                String eventKey = task.getTaskId()
-                                + "_" + eventType
-                                + "_" + eventTime;
-
-                if (sentEvents.contains(eventKey)) {
-                        return;
-                }
-
-                notificationService.createNotification(
-                                title,
-                                message,
-                                "TASK_REMINDER",
-                                task.getAssigneeId());
-
-                sentEvents.add(eventKey);
-
-                System.out.println(
-                                "Notification created for task "
-                                                + task.getTaskId()
-                                                + ", type: " + eventType
-                                                + ", userId: " + task.getAssigneeId());
-        }
+        int userId = task.getAssignee().getUserId();
+        notificationService.createSystemNotification(title,
+                "Task \"" + task.getTitle() + "\" is due on " + task.getDueDate(), "TASK_REMINDER", userId);
+        log.info("Reminder {} sent for task {} to user {}", eventType, task.getTaskId(), userId);
+    }
 }

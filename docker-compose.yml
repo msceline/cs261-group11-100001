@@ -27,11 +27,36 @@ services:
       SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=${DB_NAME:-master};encrypt=true;trustServerCertificate=true
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: ${MSSQL_SA_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (at least 32 characters)}
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     depends_on:
       db:
         condition: service_healthy
+
+  # One-shot: loads the sample data in database/init.sql once the backend has created the tables.
+  db-seed:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db-seed
+    restart: "no"
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      DB_NAME: ${DB_NAME:-master}
+    volumes:
+      - ./database/init.sql:/seed/init.sql:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        sql() { /opt/mssql-tools18/bin/sqlcmd -C -S db -U sa -P "$$MSSQL_SA_PASSWORD" -d "$$DB_NAME" "$$@"; }
+        until [ "$$(sql -h -1 -W -Q "SET NOCOUNT ON; SELECT COUNT(*) FROM sys.tables WHERE name IN ('users','projects','project_members','tasks','notifications')" | tr -d '[:space:]')" = "5" ]; do
+          echo "Waiting for the backend to create the tables..."
+          sleep 5
+        done
+        sed '/^USE \[master\];/d' /seed/init.sql > /tmp/init.sql
+        sql -b -i /tmp/init.sql && echo "Seed data loaded."
 
   frontend:
     build:

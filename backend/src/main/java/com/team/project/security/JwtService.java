@@ -23,9 +23,15 @@ public class JwtService {
     private final byte[] secret;
     private final long expirationSeconds;
 
-    public JwtService(@Value("${jwt.secret:change-me-change-me-change-me-change-me}") String secret,
+    private static final int MIN_SECRET_BYTES = 32;
+
+    /** The secret has no default: set JWT_SECRET (at least 32 characters) in the environment. */
+    public JwtService(@Value("${jwt.secret}") String secret,
                       @Value("${jwt.expiration-seconds:86400}") long expirationSeconds) {
         this.secret = secret.getBytes(StandardCharsets.UTF_8);
+        if (this.secret.length < MIN_SECRET_BYTES) {
+            throw new IllegalStateException("jwt.secret must be at least " + MIN_SECRET_BYTES + " characters");
+        }
         this.expirationSeconds = expirationSeconds;
     }
 

@@ -111,13 +111,13 @@ class MemberServiceTest {
     // ---------- add ----------
 
     @Test
-    void hostCanAddMemberWithRole() {
-        MemberResponse added = memberService.add(2, 2, new AddMemberRequest(1, "visitor"));
+    void hostCanAddUserAsMember() {
+        MemberResponse added = memberService.add(2, 2, new AddMemberRequest(1));
 
         assertEquals(100, added.id());
         assertEquals(1, added.userId());
         assertEquals(2, added.projectId());
-        assertEquals("visitor", added.roleInProject());
+        assertEquals("member", added.roleInProject());
 
         ArgumentCaptor<ProjectMember> saved = ArgumentCaptor.forClass(ProjectMember.class);
         verify(memberRepository).save(saved.capture());
@@ -126,32 +126,20 @@ class MemberServiceTest {
     }
 
     @Test
-    void roleDefaultsToMemberAndIsCaseInsensitive() {
-        assertEquals("member", memberService.add(1, 1, new AddMemberRequest(3, null)).roleInProject());
-        assertEquals("visitor", memberService.add(2, 2, new AddMemberRequest(3, " VISITOR ")).roleInProject());
-    }
-
-    @Test
-    void roleHostOrUnknownRoleIsRejected() {
-        assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest(3, "host"));
-        assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest(3, "admin"));
-    }
-
-    @Test
     void nonHostCannotAddMember() {
-        assertAddFails(HttpStatus.FORBIDDEN, 2, 1, new AddMemberRequest(3, "member"));
+        assertAddFails(HttpStatus.FORBIDDEN, 2, 1, new AddMemberRequest(3));
     }
 
     @Test
     void addRejectsUnknownUserDuplicateAndMissingId() {
-        assertAddFails(HttpStatus.NOT_FOUND, 1, 1, new AddMemberRequest(999, "member"));
-        assertAddFails(HttpStatus.CONFLICT, 1, 1, new AddMemberRequest(2, "member"));
-        assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest(null, "member"));
+        assertAddFails(HttpStatus.NOT_FOUND, 1, 1, new AddMemberRequest(999));
+        assertAddFails(HttpStatus.CONFLICT, 1, 1, new AddMemberRequest(2));
+        assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest(null));
         assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, null);
     }
 
     @Test
     void addToUnknownProjectIsNotFound() {
-        assertAddFails(HttpStatus.NOT_FOUND, 1, 999, new AddMemberRequest(2, "member"));
+        assertAddFails(HttpStatus.NOT_FOUND, 1, 999, new AddMemberRequest(2));
     }
 }

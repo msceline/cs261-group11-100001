@@ -37,9 +37,11 @@ public class ProjectService {
         if (name.isEmpty() || name.length() > 100) throw bad("projectName must be 1-100 characters");
         String subject = req.subjectCode() == null ? "" : req.subjectCode().trim();
         if (subject.isEmpty() || subject.length() > 20) throw bad("subjectCode must be 1-20 characters");
+        if (req.createdAt() == null) throw bad("createdAt is required");
         User host = userRepository.getReferenceById(userId);
-        Project project = projectRepository.save(new Project(null, name, subject, host, 0, null, null));
-        memberRepository.save(new ProjectMember(null, host, project, ProjectMember.HOST, null));
+        Project project = projectRepository.save(
+                new Project(null, name, subject, host, 0, null, req.createdAt().atStartOfDay()));
+        memberRepository.save(new ProjectMember(null, host, project, "host", null));
         return ProjectResponse.from(project);
     }
 

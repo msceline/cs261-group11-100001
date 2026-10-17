@@ -1,4 +1,4 @@
 package com.team.project.dto.member;
 
-/** roleInProject is "member" or "visitor"; defaults to "member" when null. */
-public record AddMemberRequest(Integer userId, String roleInProject) {}
+/** The added user always joins the project with role "member". */
+public record AddMemberRequest(Integer userId) {}

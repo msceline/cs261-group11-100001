@@ -39,23 +39,19 @@ public class MemberService {
                 .toList();
     }
 
-    /** Host only. The host role itself comes from the project's host_id, so only member/visitor can be assigned. */
+    /** Host only. The added user always becomes a "member". */
     public MemberResponse add(int userId, int projectId, AddMemberRequest req) {
         Project project = findProject(projectId);
         if (!project.getHost().getUserId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can add members");
         }
         if (req == null || req.userId() == null) throw bad("userId is required");
-        String role = req.roleInProject() == null ? ProjectMember.MEMBER : req.roleInProject().trim().toLowerCase();
-        if (!role.equals(ProjectMember.MEMBER) && !role.equals(ProjectMember.VISITOR)) {
-            throw bad("roleInProject must be 'member' or 'visitor'");
-        }
         User user = userService.findById(req.userId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (memberRepository.existsByProject_ProjectIdAndUser_UserId(projectId, user.getUserId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a member");
         }
-        return MemberResponse.from(memberRepository.save(new ProjectMember(null, user, project, role, null)), user);
+        return MemberResponse.from(memberRepository.save(new ProjectMember(null, user, project, "member", null)), user);
     }
 
     private Project findProject(int projectId) {

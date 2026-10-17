@@ -21,10 +21,6 @@ import jakarta.persistence.UniqueConstraint;
 )
 public class ProjectMember {
 
-    public static final String HOST = "host";
-    public static final String MEMBER = "member";
-    public static final String VISITOR = "visitor";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

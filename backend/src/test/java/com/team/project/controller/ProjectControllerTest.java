@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class ProjectControllerTest {
     }
 
     private static ProjectResponse project(int id, String name, int hostId) {
-        return new ProjectResponse(id, name, "CS261", hostId, 12);
+        return new ProjectResponse(id, name, "CS261", hostId, 12, LocalDateTime.of(2026, 2, 1, 0, 0));
     }
 
     @Test
@@ -43,7 +44,7 @@ class ProjectControllerTest {
 
         mockMvc.perform(post("/api/projects").requestAttr("userId", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"projectName\":\"New\",\"subjectCode\":\"CS261\"}"))
+                        .content("{\"projectName\":\"New\",\"subjectCode\":\"CS261\",\"createdAt\":\"2026-02-01\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.projectId").value(3))
                 .andExpect(jsonPath("$.hostId").value(1))

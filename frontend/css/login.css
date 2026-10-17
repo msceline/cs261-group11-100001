@@ -1,0 +1,104 @@
+body {
+    background-image: url('../asset/image/login-background.jpg');
+    background-size: cover;
+    align-items: center;
+    justify-content: center;
+
+} 
+
+.my-logo {
+  display: block;     
+  margin: 30px auto 20px auto; 
+  width: 130px;           
+  height: auto;
+}
+
+.sign-in-card {
+    font-family: "League Spartan", sans-serif;
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 28px;
+  padding: 44px 36px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  margin: 0 auto;
+  transform: translateY(-5px);
+}
+
+.title {
+    font-family: "League Spartan", sans-serif;
+    font-size: 3.0rem;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-family: "League Spartan", sans-serif;
+    font-size: 1.0rem;
+    color: #2b2b2b;
+    line-height: 1.45;
+    margin-bottom: 28px;
+}
+
+.input-field {
+  display: flex;
+  align-items: center;
+  background-color: #e5e5e5;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.input-icon {
+  font-size: 1.1rem;
+  color: #6e6e6e;
+  margin-right: 14px;
+  width: 18px;
+  text-align: center;
+}
+
+.input-field input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  color: #333333;
+}
+
+.input-field input::placeholder {
+  color: #6e6e6e;
+}
+
+.btn-signin {
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transition: background-color 0.2s ease;
+}
+
+.btn-signin:hover {
+  background-color: #222222;
+}
+
+.shake-error {
+  animation: shake 0.4s ease-in-out;
+  border: 1.5px solid #ef4444 !important;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+

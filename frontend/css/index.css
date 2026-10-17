@@ -9,10 +9,12 @@ html::-webkit-scrollbar,body::-webkit-scrollbar {
 
 body {
   min-width: 320px;
-  min-height: calc(100vh - 50px);
+  height: calc(100vh - 50px);
+  height: calc(100dvh - 50px);
   margin: 25px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   color: var(--text-primary);
   background-image: url(../asset/login-background.jpg);
   background-position: center center;
@@ -26,8 +28,10 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 86px;
   min-height: 86px;
   flex-shrink: 0;
+  overflow: hidden;
   padding: 0 32px;
   background: #FFFFFF;
   border-radius: 20px;
@@ -40,12 +44,14 @@ nav {
   min-width: 0;
 }
 
-.logo img {
+.logo svg {
   display: block;
-  width: 148px;
-  max-height: 44px;
+  width: 76px;
+  height: 76px;
+  flex: 0 0 76px;
   object-fit: contain;
   cursor: pointer;
+  transform: scale(2);
 }
 
 .right-nav {
@@ -128,7 +134,7 @@ nav {
 }
 
 aside {
-  padding: 24px 16px;
+  padding: 15px 4px;
   background: #ffffff;
   border-radius: 20px;
   box-shadow: 0 5px 15px -9px #000000;
@@ -136,8 +142,58 @@ aside {
 }
 
 #slideBarMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   width: 100%;
   min-height: 1px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 5px;
+  color: black;
+  background: #DBF3FF;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.sidebar-link svg {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar-link span {
+  overflow: hidden;
+  width: 0;
+  opacity: 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  transition: width 250ms ease, opacity 150ms ease;
+}
+
+.main-container.is-expanded .sidebar-link {
+  justify-content: flex-start;
+  padding: 0 10px;
+}
+
+.main-container.is-expanded .sidebar-link span {
+  width: auto;
+  opacity: 1;
+}
+
+.sidebar-link:focus-visible {
+  outline: 2px solid #DBF3FF;
+  outline-offset: 2px;
 }
 
 #contentBox {
@@ -151,7 +207,7 @@ aside {
   box-shadow: 0 5px 15px -9px #000000;
 }
 
-#contentBox::-webkit-scrollbar {
+#contentBox::-webkit-scrollbar{
   display: none;
 }
 
@@ -166,33 +222,4 @@ aside {
   background: #ffffff;
   border: 1px dashed #c9d8d3;
   border-radius: 20px;
-}
-
-@media (max-width: 700px) {
-  nav {
-    min-height: 64px;
-    padding: 0 18px;
-  }
-
-  .logo img {
-    width: 120px;
-  }
-
-  .right-nav {
-    gap: 10px;
-  }
-
-  .noti-icon,
-  .user-profile {
-    width: 36px;
-    height: 36px;
-  }
-
-  aside {
-    padding: 18px 10px;
-  }
-
-  #contentBox {
-    padding: 22px 16px;
-  }
 }

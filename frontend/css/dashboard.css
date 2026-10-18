@@ -1,6 +1,6 @@
 .dashBoardpage {
 	display: grid;
-	grid-template-rows: auto auto minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr);
 	gap: 20px;
 	width: 100%;
 	height: 100%;
@@ -11,22 +11,27 @@
 }
 
 .dashBoardpage .header-container {
-	display: grid;
-	gap: 8px;
-	padding: 8px 0 20px;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 20px;
+	min-width: 0;
 }
 
 .dashBoardpage .subject-head {
 	margin: 0;
 	color: #000;
-	font-size: 72px;
+	font-size: 30px;
 	font-weight: bolder;
 	text-transform: uppercase;
+	overflow-wrap: anywhere;
 }
 
 .dashBoardpage .group-name-head {
 	margin: 0;
-	font-size: 36px;
+	padding-left: 16px;
+	border-left: 3px solid #000;
+	font-size: 30px;
 	font-weight: normal;
 	line-height: 1.15;
 	overflow-wrap: anywhere;
@@ -38,9 +43,9 @@
 	min-width: 0;
 	padding: 20px;
 	background: #fff;
-	border: 1px solid #000;
+	border: none;
 	border-radius: 20px;
-	box-shadow: 0 4px 14px -12px #000;
+	box-shadow: 0 4px 14px -9px #000;
 }
 
 .dashBoardpage .progress-head,
@@ -51,13 +56,29 @@
 	gap: 12px;
 }
 
+.dashBoardpage .progress-head,
+.dashBoardpage .progress-row {
+	width: 100%;
+	min-width: 0;
+}
+
+.dashBoardpage .progress-container {
+	display: grid;
+	gap: 18px;
+}
+
+.dashBoardpage .progress-row {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
 .dashBoardpage .head-list {
 	height: 40px;
 	min-height: 40px;
 	flex: 0 0 40px;
 }
 
-.dashBoardpage .progress-head h3,
 .dashBoardpage .head-title {
 	margin: 0;
 	font-size: 48px;
@@ -70,16 +91,19 @@
 }
 
 .dashBoardpage .percent {
+	flex: 0 0 auto;
 	margin: 0;
 	color: #000;
-	font-size: 48px;
+	font-size: 30px;
 	font-weight: 700;
 }
 
 .dashBoardpage .progress-track {
-	width: 100%;
+	flex: 1 1 auto;
+	width: auto;
+	min-width: 0;
 	height: 15px;
-	margin-top: 16px;
+	margin-top: 0;
 	overflow: hidden;
 	background: #e8efec;
 	border: 1px solid;
@@ -119,6 +143,7 @@
 	grid-template-rows: minmax(0, 1fr);
 	gap: 10px;
 	width: 100%;
+	height: 100%;
 	min-height: 0;
 }
 
@@ -156,19 +181,17 @@
 	.dashBoardpage {
 		gap: 14px;
 		padding: 8px;
+        height: fit-content;
 	}
 
 	.dashBoardpage .list-container {
 		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: repeat(2, minmax(160px, 1fr));
+		grid-template-rows: repeat(2, minmax(0, 1fr));
 	}
 
 	.dashBoardpage .progress-container,
 	.dashBoardpage .upcoming-list,
 	.dashBoardpage .your-task-list {
 		padding: 16px;
-	}
-	.dashBoardpage .group-name-head {
-		font-size: 28px;
 	}
 }

@@ -40,7 +40,7 @@ public class ProjectService {
         if (req.createdAt() == null) throw bad("createdAt is required");
         User host = userRepository.getReferenceById(userId);
         Project project = projectRepository.save(
-                new Project(null, name, subject, host, 0, null, req.createdAt().atStartOfDay()));
+                new Project(null, name, subject, host, 0, req.createdAt().atStartOfDay()));
         memberRepository.save(new ProjectMember(null, host, project, "host", null));
         return ProjectResponse.from(project);
     }

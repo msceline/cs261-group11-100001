@@ -46,7 +46,7 @@ class TaskControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(new TaskController(taskService)).build();
         User host = new User(1, "6609650001", "student", "Host", "h@x.com", "hash", null);
         assignee = new User(2, "6609650002", "student", "Two", "t@x.com", "hash", null);
-        project = new Project(1, "P1", "CS261", host, 0, null, null);
+        project = new Project(1, "P1", "CS261", host, 0, null);
     }
 
     private Task task(int id, String title) {

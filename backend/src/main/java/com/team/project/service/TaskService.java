@@ -2,6 +2,7 @@ package com.team.project.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team.project.dto.task.CreateTaskRequest;
 import com.team.project.entity.Project;
-import com.team.project.entity.ProjectMember;
 import com.team.project.entity.Task;
 import com.team.project.entity.User;
 import com.team.project.repository.ProjectMemberRepository;
@@ -17,11 +17,12 @@ import com.team.project.repository.ProjectRepository;
 import com.team.project.repository.TaskRepository;
 import com.team.project.repository.UserRepository;
 
-/** Members of a project can read its tasks; members other than visitors can create and edit them. */
+/** Members of a project can read, create and edit its tasks. */
 @Service
 public class TaskService {
 
-    private static final String VISITOR = "visitor";
+    private static final String DONE = "done";
+    private static final Set<String> STATUSES = Set.of("todo", "doing", DONE);
 
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
@@ -50,36 +51,45 @@ public class TaskService {
 
     public Optional<Task> getTaskById(int userId, int taskId) {
         Optional<Task> task = taskRepository.findById(taskId);
-        task.ifPresent(t -> requireMember(userId, t.getProject().getProjectId(), false));
+        task.ifPresent(t -> requireMember(userId, t.getProject().getProjectId()));
         return task;
     }
 
     public Task createTask(int userId, CreateTaskRequest req) {
         Project project = projectRepository.findById(req.projectId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
-        requireMember(userId, project.getProjectId(), true);
+        requireMember(userId, project.getProjectId());
         Task task = new Task();
         task.setProject(project);
         apply(task, req);
-        return taskRepository.save(task);
+        Task saved = taskRepository.save(task);
+        refreshProgress(project);
+        return saved;
     }
 
     /** Updates the editable fields of an existing task; empty when the task does not exist. */
     public Optional<Task> updateTask(int userId, int taskId, CreateTaskRequest req) {
         return taskRepository.findById(taskId).map(task -> {
-            requireMember(userId, task.getProject().getProjectId(), true);
+            requireMember(userId, task.getProject().getProjectId());
             apply(task, req);
-            return taskRepository.save(task);
+            Task saved = taskRepository.save(task);
+            refreshProgress(task.getProject());
+            return saved;
         });
     }
 
-    private void requireMember(int userId, int projectId, boolean write) {
-        ProjectMember member = memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
+    /** Project progress = done tasks / all tasks * 100 (rounded down), recalculated whenever a task changes. */
+    private void refreshProgress(Project project) {
+        long total = taskRepository.countByProject_ProjectId(project.getProjectId());
+        long done = taskRepository.countByProject_ProjectIdAndStatus(project.getProjectId(), DONE);
+        project.setProgress(total == 0 ? 0 : (int) (done * 100 / total));
+        projectRepository.save(project);
+    }
+
+    private void requireMember(int userId, int projectId) {
+        memberRepository.findByProject_ProjectIdAndUser_UserId(projectId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
                         "You are not a member of this project"));
-        if (write && VISITOR.equals(member.getRoleInProject())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Visitors cannot modify tasks");
-        }
     }
 
     private void apply(Task task, CreateTaskRequest req) {
@@ -91,6 +101,9 @@ public class TaskService {
         task.setTaskDescription(req.taskDescription());
         task.setDueDate(req.dueDate());
         if (req.status() != null) {
+            if (!STATUSES.contains(req.status())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "status must be todo, doing or done");
+            }
             task.setStatus(req.status());
         }
         task.setAssignee(req.assigneeId() == null ? null : findAssignee(task.getProject(), req.assigneeId()));

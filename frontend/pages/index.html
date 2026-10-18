@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../css/index.css">
   <link rel="stylesheet" href="../css/project.css">
+  <link rel="stylesheet" href="../css/creategroup.css">
   <title>Document</title>
 </head>
 <body>
@@ -23,11 +24,17 @@
   <div class="main-container">
     <aside>
       <div id="slideBarMenu">
-        <button class="sidebar-link sidebar-link-active" type="button" aria-current="page" aria-label="Home" title="Home">
+        <button class="sidebar-link sidebar-link-active" type="button" data-page="project" aria-current="page" aria-label="Home" title="Home">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
           </svg>
           <span>Home</span>
+        </button>
+        <button class="sidebar-link" type="button" data-page="creategroup" aria-label="Create Group" title="Create Group">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
+          </svg>
+          <span>Create Group</span>
         </button>
       </div>
     </aside>

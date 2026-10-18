@@ -58,6 +58,7 @@ class MemberServiceTest {
         when(projectRepository.findById(2)).thenReturn(Optional.of(project2));
         for (User u : new User[] {user1, user2, user3}) {
             when(userRepository.findById(u.getUserId())).thenReturn(Optional.of(u));
+            when(userRepository.findByStudentId(u.getStudentId())).thenReturn(Optional.of(u));
         }
 
         when(memberRepository.findByProject_ProjectId(1)).thenReturn(List.of(
@@ -112,7 +113,7 @@ class MemberServiceTest {
 
     @Test
     void hostCanAddUserAsMember() {
-        MemberResponse added = memberService.add(2, 2, new AddMemberRequest(1));
+        MemberResponse added = memberService.add(2, 2, new AddMemberRequest("6609650001"));
 
         assertEquals(100, added.id());
         assertEquals(1, added.userId());
@@ -127,19 +128,20 @@ class MemberServiceTest {
 
     @Test
     void nonHostCannotAddMember() {
-        assertAddFails(HttpStatus.FORBIDDEN, 2, 1, new AddMemberRequest(3));
+        assertAddFails(HttpStatus.FORBIDDEN, 2, 1, new AddMemberRequest("6609650003"));
     }
 
     @Test
     void addRejectsUnknownUserDuplicateAndMissingId() {
-        assertAddFails(HttpStatus.NOT_FOUND, 1, 1, new AddMemberRequest(999));
-        assertAddFails(HttpStatus.CONFLICT, 1, 1, new AddMemberRequest(2));
+        assertAddFails(HttpStatus.NOT_FOUND, 1, 1, new AddMemberRequest("0000000000"));
+        assertAddFails(HttpStatus.CONFLICT, 1, 1, new AddMemberRequest("6609650002"));
         assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest(null));
+        assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest("  "));
         assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, null);
     }
 
     @Test
     void addToUnknownProjectIsNotFound() {
-        assertAddFails(HttpStatus.NOT_FOUND, 1, 999, new AddMemberRequest(2));
+        assertAddFails(HttpStatus.NOT_FOUND, 1, 999, new AddMemberRequest("6609650002"));
     }
 }

@@ -46,8 +46,8 @@ class MemberServiceTest {
         User user1 = user(1);
         User user2 = user(2);
         User user3 = user(3);
-        Project project1 = new Project(1, "P1", "CS261", user1, 0, null, null);
-        Project project2 = new Project(2, "P2", "CS284", user2, 0, null, null);
+        Project project1 = new Project(1, "P1", "CS261", user1, 0, null);
+        Project project2 = new Project(2, "P2", "CS284", user2, 0, null);
         LocalDateTime now = LocalDateTime.of(2026, 1, 1, 0, 0);
 
         ProjectRepository projectRepository = mock(ProjectRepository.class);

@@ -45,7 +45,7 @@ class ProjectServiceTest {
     }
 
     private static Project project(int id, User host) {
-        return new Project(id, "Project " + id, "CS261", host, 0, null, LocalDateTime.of(2026, 1, 1, 0, 0));
+        return new Project(id, "Project " + id, "CS261", host, 0, LocalDateTime.of(2026, 1, 1, 0, 0));
     }
 
     private static ProjectMember member(int id, User user, Project project, String role) {

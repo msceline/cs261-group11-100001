@@ -43,7 +43,7 @@ class NotificationServiceTest {
         User user1 = user(1);
         user2 = user(2);
         User user3 = user(3);
-        Project project1 = new Project(1, "P1", "CS261", user1, 0, null, null);
+        Project project1 = new Project(1, "P1", "CS261", user1, 0, null);
 
         notificationRepository = mock(NotificationRepository.class);
         UserRepository userRepository = mock(UserRepository.class);

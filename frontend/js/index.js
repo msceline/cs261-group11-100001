@@ -8,11 +8,13 @@ const pageUrls = {
 	project: new URL('../pages/project.html', scriptUrl),
 	creategroup: new URL('../pages/creategroup.html', scriptUrl),
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
+	members: new URL('../pages/members.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
 	dashboard: new URL('../js/dashboard.js', scriptUrl),
 	creategroup: new URL('../js/creategroup.js', scriptUrl),
+	members: new URL('../js/members.js', scriptUrl),
 };
 const pageScriptPromises = {};
 let selectedProject = null;
@@ -83,6 +85,11 @@ async function loadPage(page, pageData = null) {
 		} else if (page === 'creategroup') {
 			await loadPageScript('creategroup');
 			document.dispatchEvent(new Event('creategroup:loaded'));
+		} else if (page === 'members') {
+			await loadPageScript('members');
+			document.dispatchEvent(new CustomEvent('member:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		}
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;

@@ -2,10 +2,10 @@
 // Object Project
 const projects = [
 	{ projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 20 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 55 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 75 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 85 },
-	{ projectName: 'เว็บไซต์จองห้องเรียน', subjectCode: 'CS210', progress: 100 },
+    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS213', progress: 55 },
+    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS221', progress: 75 },
+    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'TU109', progress: 85 },
+	{ projectName: 'เว็บไซต์จองห้องเรียน', subjectCode: 'CS331', progress: 100 },
 ];
 
 function createProjectCard(project) {
@@ -13,6 +13,12 @@ function createProjectCard(project) {
 	const card = document.createElement('article');
 	card.className = 'project-card';
 	card.dataset.projectId = project.projectId ?? '';
+	card.dataset.projectName = project.projectName || '';
+	card.dataset.subjectCode = project.subjectCode || '';
+	card.dataset.progress = String(progress);
+	card.tabIndex = 0;
+	card.setAttribute('role', 'button');
+	card.setAttribute('aria-label', `เปิด dashboard ของ ${project.projectName || 'โปรเจกต์'}`);
 
 	const details = document.createElement('div');
 	details.className = 'project-card__details';

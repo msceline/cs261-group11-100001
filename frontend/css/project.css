@@ -125,6 +125,11 @@
     cursor: pointer;
 }
 
+.project-page .project-card:focus-visible {
+    outline: 3px solid #28745e;
+    outline-offset: 3px;
+}
+
 .project-page .project-card__details {
     display: flex;
     flex: 1 1 auto;

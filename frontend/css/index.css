@@ -164,6 +164,10 @@ aside {
   cursor: pointer;
 }
 
+.sidebar-link[hidden] {
+  display: none;
+}
+
 .sidebar-link-active {
   background: #DBF3FF;
 }

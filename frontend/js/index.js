@@ -2,33 +2,49 @@ const mainContainer = document.querySelector('.main-container');
 const sidebar = mainContainer?.querySelector('aside');
 const contentBox = document.querySelector('#contentBox');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
+const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
 const pageUrls = {
 	project: new URL('../pages/project.html', scriptUrl),
 	creategroup: new URL('../pages/creategroup.html', scriptUrl),
+	dashboard: new URL('../pages/dashboard.html', scriptUrl),
 };
-const projectScriptUrl = new URL('../js/project.js', scriptUrl);
-let projectScriptPromise = null;
+const pageScriptUrls = {
+	project: new URL('../js/project.js', scriptUrl),
+	dashboard: new URL('../js/dashboard.js', scriptUrl),
+	creategroup: new URL('../js/creategroup.js', scriptUrl),
+};
+const pageScriptPromises = {};
+let selectedProject = null;
 
-function loadProjectScript() {
-	if (!projectScriptPromise) {
-		projectScriptPromise = new Promise((resolve, reject) => {
-			const projectScript = document.createElement('script');
-			projectScript.src = projectScriptUrl.href;
-			projectScript.onload = resolve;
-			projectScript.onerror = () => {
-				projectScriptPromise = null;
-				reject(new Error('Unable to load project script'));
+function setProjectContextLinksVisible(visible) {
+	projectContextLinks.forEach((link) => {
+		link.hidden = !visible;
+	});
+}
+
+function loadPageScript(page) {
+	if (!pageScriptPromises[page]) {
+		pageScriptPromises[page] = new Promise((resolve, reject) => {
+			const pageScript = document.createElement('script');
+			pageScript.src = pageScriptUrls[page].href;
+			pageScript.onload = resolve;
+			pageScript.onerror = () => {
+				pageScriptPromises[page] = null;
+				reject(new Error(`Unable to load ${page} script`));
 			};
-			document.body.append(projectScript);
+			document.body.append(pageScript);
 		});
 	}
 
-	return projectScriptPromise;
+	return pageScriptPromises[page];
 }
 
-async function loadPage(page) {
+async function loadPage(page, pageData = null) {
 	if (!contentBox) return;
+	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page);
+	if (requiresProject && !pageData && !selectedProject) return;
+
 	const pageUrl = pageUrls[page];
 	if (!pageUrl) return;
 
@@ -39,16 +55,12 @@ async function loadPage(page) {
 		}
 
 		contentBox.innerHTML = await response.text();
-		if (page === 'creategroup') {
-			const dueDateInput = contentBox.querySelector('#dueDate');
-			if (dueDateInput) {
-				const today = new Date();
-				const year = today.getFullYear();
-				const month = String(today.getMonth() + 1).padStart(2, '0');
-				const day = String(today.getDate()).padStart(2, '0');
-				dueDateInput.value = `${year}-${month}-${day}`;
-			}
+		if (page === 'project' || page === 'creategroup') {
+			selectedProject = null;
+		} else if (pageData) {
+			selectedProject = pageData;
 		}
+		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup');
 
 		pageButtons.forEach((button) => {
 			const isActive = button.dataset.page === page;
@@ -61,8 +73,16 @@ async function loadPage(page) {
 		});
 
 		if (page === 'project') {
-			await loadProjectScript();
+			await loadPageScript('project');
 			document.dispatchEvent(new Event('project:loaded'));
+		} else if (page === 'dashboard') {
+			await loadPageScript('dashboard');
+			document.dispatchEvent(new CustomEvent('dashboard:loaded', {
+				detail: pageData || {},
+			}));
+		} else if (page === 'creategroup') {
+			await loadPageScript('creategroup');
+			document.dispatchEvent(new Event('creategroup:loaded'));
 		}
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
@@ -70,15 +90,40 @@ async function loadPage(page) {
 }
 
 pageButtons.forEach((button) => {
-	button.addEventListener('click', () => loadPage(button.dataset.page));
+	button.addEventListener('click', () => {
+		const pageData = button.hasAttribute('data-project-context') ? selectedProject : null;
+		loadPage(button.dataset.page, pageData);
+	});
 });
 
 contentBox?.addEventListener('click', (event) => {
 	if (event.target.closest('#createGroupIcon')) {
 		loadPage('creategroup');
+		return;
+	}
+
+	const projectCard = event.target.closest('.project-card');
+	if (projectCard) {
+		loadPage('dashboard', {
+			groupName: projectCard.dataset.projectName,
+			subject: projectCard.dataset.subjectCode,
+			progress: projectCard.dataset.progress,
+		});
 	}
 });
 
+contentBox?.addEventListener('keydown', (event) => {
+	const projectCard = event.target.closest('.project-card');
+	if (!projectCard || (event.key !== 'Enter' && event.key !== ' ')) return;
+	event.preventDefault();
+	loadPage('dashboard', {
+		groupName: projectCard.dataset.projectName,
+		subject: projectCard.dataset.subjectCode,
+		progress: projectCard.dataset.progress,
+	});
+});
+
+setProjectContextLinksVisible(false);
 loadPage('project');
 
 if (mainContainer && sidebar) {

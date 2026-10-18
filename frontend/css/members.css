@@ -1,0 +1,94 @@
+.course-container {
+    background: linear-gradient(to right, #f6fbfa, #cfebf8);
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 850px;
+    margin: 20px auto;
+    font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+.course-code {
+    color: #204ed8;
+    font-size: 38px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.course-group-name {
+    font-family: 'Kanit', sans-serif, -apple-system;
+    color: #111;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 3px 0 0 0;
+    margin-top: px;
+}
+
+.members-card {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 24px 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  
+}
+
+.members-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 16px 0;
+}
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1.5px solid #222;
+  border-radius: 9999px;
+  padding: 6px 20px 6px 8px;
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.member-row:hover {
+  background-color: #f9f9f9;
+}
+
+.member-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.member-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+
+.member-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+}
+
+.member-role {
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+}

@@ -21,5 +21,10 @@ jwt:
   # No default on purpose: the app refuses to start without JWT_SECRET (min 32 characters).
   secret: ${JWT_SECRET}
 
+tu:
+  api:
+    url: https://restapi.tu.ac.th/api/v1
+    key: ${TU_API_KEY:}
+
 server:
   port: 8080

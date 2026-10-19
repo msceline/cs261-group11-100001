@@ -19,9 +19,9 @@
             </div>
         </header>
 
-        <article class="task-card">
+        <form class="task-card" id="create-task-form">
             <div class="task-card-header">
-                <h3 class="task-title">Task name</h3>
+                <h3 class="task-title" id="task-title-input" contenteditable="true" role="textbox" aria-label="Task name" aria-multiline="false">Task name</h3>
                 <div class="due-date">
                     <label for="due-date-input">Due Date:</label>
                     <div class="date-picker">
@@ -35,16 +35,25 @@
             <div class="task-details">
                 <section class="section description-section">
                     <label class="field-label" for="description-input">Description:</label>
-                    <input class="text-input description-input" id="description-input" name="description" type="text" placeholder="-">
+                    <textarea class="text-input description-input" id="description-input" name="description" placeholder="-" required></textarea>
+                </section>
+                <section class="section assignment-section">
+                    <label class="field-label" id="assign-label">Assign:</label>
+                    <button class="assignment-toggle" id="assignment-toggle" type="button" aria-expanded="false" aria-controls="assignment-list">
+                        Select member <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="assignment-list" id="assignment-list" hidden></div>
                 </section>
             </div>
 
             <div class="action-footer">
-                <button type="button" class="btn-submit" id="submit-btn">Submit</button>
+                <p class="form-message" id="form-message" role="alert" aria-live="polite"></p>
+                <button type="submit" class="btn-submit" id="submit-btn">Submit</button>
             </div>
-        </article>
+        </form>
     </main>
 
+    <script src="../api/task-api.js"></script>
     <script src="../js/createTask.js"></script>
 </body>
 </html>

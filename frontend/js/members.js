@@ -7,7 +7,7 @@ const sampleMembers = [
     {
         name: 'ศิวดล อานามวัฒน์',
         studentId: '6809617431',
-        role: 'Host',
+        role: 'Leader',
         avatarText: 'SA'
     },
     {
@@ -73,30 +73,26 @@ function createMemberItem(member) {
     return item;
 }
 
-function renderMembers(data = courseData) {
-    const contentBox = document.getElementById('contentBox');
-    const container = contentBox || document; 
+function renderMembers(data = {}) {
+    const memberPage = document.querySelector('#contentBox .course-container');
+    if (!memberPage) return;
 
-    const courseCodeElem = container.querySelector('#course-code');
-    const courseGroupElem = container.querySelector('#course-group');
-    const membersListContainer = container.querySelector('#members-list');
+    const courseCodeElem = memberPage.querySelector('#course-code');
+    const courseGroupElem = memberPage.querySelector('#course-group');
+    const membersListContainer = memberPage.querySelector('#members-list');
 
-    if (courseCodeElem && data.code) {
-        courseCodeElem.textContent = data.code;
+    if (courseCodeElem) {
+        courseCodeElem.textContent = data.code || data.subject || data.subjectCode || courseData.code;
     }
-    if (courseGroupElem && data.groupName) {
-        courseGroupElem.textContent = data.groupName;
+    if (courseGroupElem) {
+        courseGroupElem.textContent = data.groupName || courseData.groupName;
     }
 
     if (membersListContainer) {
-        membersListContainer.replaceChildren(
-            ...sampleMembers.map(createMemberItem)
-        );
+        membersListContainer.replaceChildren(...sampleMembers.map(createMemberItem));
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => renderMembers());
-
 document.addEventListener('member:loaded', (event) => {
-    renderMembers(event.detail || courseData);
+    renderMembers(event.detail || {});
 });

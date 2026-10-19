@@ -7,15 +7,22 @@ const scriptUrl = document.currentScript?.src || window.location.href;
 const pageUrls = {
 	project: new URL('../pages/project.html', scriptUrl),
 	creategroup: new URL('../pages/creategroup.html', scriptUrl),
+	addmember: new URL('../pages/addmember.html', scriptUrl),
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
+	members: new URL('../pages/members.html', scriptUrl),
+	task: new URL('../pages/task.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
 	dashboard: new URL('../js/dashboard.js', scriptUrl),
 	creategroup: new URL('../js/creategroup.js', scriptUrl),
+	addmember: new URL('../js/addmember.js', scriptUrl),
+	members: new URL('../js/members.js', scriptUrl),
+	task: new URL('../js/task.js', scriptUrl),
 };
 const pageScriptPromises = {};
 let selectedProject = null;
+let projectDraft = null;
 
 function setProjectContextLinksVisible(visible) {
 	projectContextLinks.forEach((link) => {
@@ -55,12 +62,20 @@ async function loadPage(page, pageData = null) {
 		}
 
 		contentBox.innerHTML = await response.text();
-		if (page === 'project' || page === 'creategroup') {
+		if (page === 'project') {
 			selectedProject = null;
-		} else if (pageData) {
+			projectDraft = null;
+		} else if (page === 'creategroup') {
+			selectedProject = null;
+			projectDraft = pageData || null;
+		} else if (page === 'dashboard' && pageData) {
 			selectedProject = pageData;
+		} else if (page === 'members' && pageData) {
+			selectedProject = pageData;
+		} else if (page === 'addmember') {
+			projectDraft = pageData || projectDraft;
 		}
-		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup');
+		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup' && page !== 'addmember');
 
 		pageButtons.forEach((button) => {
 			const isActive = button.dataset.page === page;
@@ -82,12 +97,49 @@ async function loadPage(page, pageData = null) {
 			}));
 		} else if (page === 'creategroup') {
 			await loadPageScript('creategroup');
-			document.dispatchEvent(new Event('creategroup:loaded'));
+			document.dispatchEvent(new CustomEvent('creategroup:loaded', {
+				detail: projectDraft || {},
+			}));
+		} else if (page === 'addmember') {
+			await loadPageScript('addmember');
+			document.dispatchEvent(new CustomEvent('addmember:loaded', {
+				detail: projectDraft || {},
+			}));
+		} else if (page === 'members') {
+			await loadPageScript('members');
+			document.dispatchEvent(new CustomEvent('member:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		}
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
 	}
 }
+
+document.addEventListener('creategroup:next', (event) => {
+	projectDraft = event.detail;
+	loadPage('addmember', projectDraft);
+});
+
+document.addEventListener('addmember:back', () => {
+	loadPage('creategroup', projectDraft);
+});
+
+document.addEventListener('addmember:create', async (event) => {
+	const project = {
+		projectName: event.detail.groupName,
+		subjectCode: event.detail.subject,
+		progress: 0,
+	};
+
+	try {
+		await loadPageScript('project');
+		document.dispatchEvent(new CustomEvent('project:create', { detail: project }));
+		await loadPage('project');
+	} catch {
+		contentBox.textContent = 'ไม่สามารถสร้าง project ได้';
+	}
+});
 
 pageButtons.forEach((button) => {
 	button.addEventListener('click', () => {

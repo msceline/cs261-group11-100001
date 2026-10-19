@@ -23,9 +23,19 @@ const pageScriptUrls = {
 	members: new URL('../js/members.js', scriptUrl),
 	task: new URL('../js/task.js', scriptUrl),
 };
+const pageTitles = {
+	project: 'Projects',
+	creategroup: 'Create Group',
+	addmember: 'Add Members',
+	dashboard: 'Dashboard',
+	members: 'Members',
+	task: 'Tasks',
+};
 const pageScriptPromises = {};
 let selectedProject = null;
 let projectDraft = null;
+
+document.title = pageTitles.project;
 
 function setProjectContextLinksVisible(visible) {
 	projectContextLinks.forEach((link) => {
@@ -65,6 +75,8 @@ async function loadPage(page, pageData = null) {
 		}
 
 		contentBox.innerHTML = await response.text();
+		document.title = pageTitles[page] || 'App';
+
 		if (page === 'project') {
 			selectedProject = null;
 			projectDraft = null;
@@ -206,5 +218,4 @@ if (mainContainer && sidebar) {
 		}, 1000);
 	});
 }
-
 

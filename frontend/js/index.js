@@ -10,6 +10,7 @@ const pageUrls = {
 	addmember: new URL('../pages/addmember.html', scriptUrl),
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
 	members: new URL('../pages/members.html', scriptUrl),
+	task: new URL('../pages/task.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
@@ -17,6 +18,7 @@ const pageScriptUrls = {
 	creategroup: new URL('../js/creategroup.js', scriptUrl),
 	addmember: new URL('../js/addmember.js', scriptUrl),
 	members: new URL('../js/members.js', scriptUrl),
+	task: new URL('../js/task.js', scriptUrl),
 };
 const pageScriptPromises = {};
 let selectedProject = null;

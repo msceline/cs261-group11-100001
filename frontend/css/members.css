@@ -96,9 +96,10 @@
 .member-item {
     display: flex;
     flex: 0 0 auto;
-    height: 60px;
     align-items: center;
-    padding: 14px 18px;
+    gap: 12px;
+    min-height: 32px;
+    padding: 5px 12px;
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.55);
     backdrop-filter: blur(10px);
@@ -115,8 +116,8 @@
 }
 
 .member-avatar {
-    width: 44px;
-    height: 44px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background: linear-gradient(135deg, #f8a238 0%, #f6703b 100%);
     color: #ffffff;
@@ -135,11 +136,13 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    min-width: 0;
 }
 
 .member-name {
     font-weight: 600;
     color: #1f2937;
+    overflow-wrap: anywhere;
 }
 
 .member-id {
@@ -148,12 +151,59 @@
 }
 
 .member-role {
-    font-size: 1.1rem;
+    flex-shrink: 0;
+    font-size: 0.9rem;
     font-weight: 600;
-    padding: 6px 14px;
+    padding: 4px 10px;
     border-radius: 30px;
     background: rgba(255, 255, 255, 0.85);
     color: #000000;
     border: 1px solid rgba(255, 255, 255, 0.9);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .course-header {
+        margin-bottom: 16px;
+    }
+
+    .members-card {
+        padding: 20px 16px;
+        border-radius: 20px;
+    }
+
+    .member-item {
+        gap: 10px;
+        padding: 5px 10px;
+    }
+
+    .member-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+
+    .member-role {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+    }
+}
+
+@media (max-width: 380px) {
+    .course-container {
+        padding: 12px;
+    }
+
+    .members-card {
+        padding: 16px 12px;
+    }
+
+    .course-code {
+        font-size: 1.75rem;
+    }
+
+    .course-group-name {
+        font-size: 18px;
+    }
 }

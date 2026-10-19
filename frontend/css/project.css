@@ -87,7 +87,7 @@
 .project-page #completeTaskList > * {
     padding: 16px;
     background: #f8faf9;
-    border: 1px solid ;
+    border: none;
     border-radius: 20px;
 }
 

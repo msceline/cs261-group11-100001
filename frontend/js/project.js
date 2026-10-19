@@ -80,3 +80,15 @@ function renderProjectCards(projectItems) {
 }
 
 document.addEventListener('project:loaded', () => renderProjectCards(projects));
+
+document.addEventListener('project:create', (event) => {
+	const project = event.detail || {};
+	if (!project.projectName || !project.subjectCode) return;
+
+	projects.push({
+		projectId: Date.now(),
+		projectName: project.projectName,
+		subjectCode: project.subjectCode,
+		progress: 0,
+	});
+});

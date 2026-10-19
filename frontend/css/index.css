@@ -8,6 +8,7 @@ html::-webkit-scrollbar,body::-webkit-scrollbar {
 }
 
 body {
+<<<<<<< HEAD
   min-width: 320px;
   height: calc(100vh - 50px);
   height: calc(100dvh - 50px);
@@ -232,3 +233,9 @@ aside {
   border: 1px dashed #c9d8d3;
   border-radius: 20px;
 }
+=======
+    background-image: url('../asset/image/login-background.jpg');
+    background-size: cover;
+} 
+
+>>>>>>> setup-members-page

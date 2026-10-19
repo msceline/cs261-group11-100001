@@ -2,24 +2,43 @@ const API_BASE_URL = '/api';
 
 async function requestMembers(url, options = {}) {
   const response = await fetch(url, options);
+  const responseText = await response.text();
+  let responseBody;
+
+  if (responseText) {
+    try {
+      responseBody = JSON.parse(responseText);
+    } catch {
+      responseBody = responseText;
+    }
+  }
 
   if (!response.ok) {
-    const detail = await response.text();
+    const detail = typeof responseBody === 'string'
+      ? responseBody
+      : responseBody?.detail || responseBody?.message || responseBody?.error;
     throw new Error(
-      `Member API request failed with status ${response.status}${detail ? `: ${detail}` : ''}`,
+      `คำขอไม่สำเร็จ (${response.status})${detail ? `: ${detail}` : ''}`,
     );
   }
 
-  return response.json();
+  return responseBody;
 }
 
 function authorizationHeaders(token) {
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return token ? { Authorization: ['Bearer', token].join(' ') } : {};
+}
+
+function projectMembersUrl(projectId) {
+  if (!Number.isInteger(Number(projectId)) || Number(projectId) < 1) {
+    throw new Error('Project ID ต้องเป็นจำนวนเต็มบวก');
+  }
+
+  return `${API_BASE_URL}/projects/${encodeURIComponent(projectId)}/members`;
 }
 
 async function getProjectMembers(projectId, token) {
-  const url = `${API_BASE_URL}/projects/${encodeURIComponent(projectId)}/members`;
-  return requestMembers(url, {
+  return requestMembers(projectMembersUrl(projectId), {
     headers: authorizationHeaders(token),
   });
 }

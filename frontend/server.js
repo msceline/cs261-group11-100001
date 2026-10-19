@@ -9,8 +9,8 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080';
 // Forward /api/* to the Spring Boot backend (prefix is kept)
 app.use('/api', createProxyMiddleware({ target: BACKEND_URL, changeOrigin: true, pathRewrite: (p) => '/api' + p }));
 
-// Serve the page (put other static assets in frontend/public/)
-app.use(express.static(path.join(__dirname, 'public')));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+// Serve static assets (pages, css, js, asset, api)
+app.use(express.static(__dirname));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'pages', 'login.html')));
 
 app.listen(PORT, () => console.log(`Frontend running on port ${PORT}, backend -> ${BACKEND_URL}`));

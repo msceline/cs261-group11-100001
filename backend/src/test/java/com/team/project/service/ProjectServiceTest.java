@@ -133,9 +133,14 @@ class ProjectServiceTest {
     }
 
     @Test
-    void createRejectsMissingCreatedAt() {
-        assertBadRequest(1, new CreateProjectRequest("ok", "CS261", null));
-        verify(projectRepository, never()).save(any());
+    void createAcceptsMissingCreatedAt() {
+        ProjectResponse created = projectService.create(1, new CreateProjectRequest("ok", "CS261", null));
+
+        assertEquals("ok", created.projectName());
+        assertEquals("CS261", created.subjectCode());
+        assertEquals(1, created.hostId());
+        assertTrue(created.createdAt() != null);
+        verify(projectRepository).save(any(Project.class));
     }
 
     @Test

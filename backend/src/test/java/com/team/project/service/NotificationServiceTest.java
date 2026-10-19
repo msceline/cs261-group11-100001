@@ -43,7 +43,7 @@ class NotificationServiceTest {
         User user1 = user(1);
         user2 = user(2);
         User user3 = user(3);
-        Project project1 = new Project(1, "P1", "CS261", user1, 0, null, null);
+        Project project1 = new Project(1, "P1", "CS261", user1, 0, null);
 
         notificationRepository = mock(NotificationRepository.class);
         UserRepository userRepository = mock(UserRepository.class);
@@ -142,5 +142,35 @@ class NotificationServiceTest {
 
         assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(assertThrows(ResponseStatusException.class,
                 () -> notificationService.getNotificationById(1, 1)).getStatusCode().value()));
+    }
+
+    // ---------- markAsRead ----------
+
+    @Test
+    void markAsReadUpdatesNotificationToRead() {
+        Notification n = new Notification(1, user2, "T", "m", "t", false, null);
+        when(notificationRepository.findById(1)).thenReturn(Optional.of(n));
+
+        Notification updated = notificationService.markAsRead(2, 1);
+
+        assertTrue(updated.getIsRead());
+        verify(notificationRepository).save(n);
+    }
+
+    @Test
+    void markAsReadIsForbiddenForOtherUser() {
+        Notification n = new Notification(1, user2, "T", "m", "t", false, null);
+        when(notificationRepository.findById(1)).thenReturn(Optional.of(n));
+
+        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(assertThrows(ResponseStatusException.class,
+                () -> notificationService.markAsRead(1, 1)).getStatusCode().value()));
+    }
+
+    @Test
+    void markAsReadUnknownReturnsNotFound() {
+        when(notificationRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertEquals(HttpStatus.NOT_FOUND, HttpStatus.valueOf(assertThrows(ResponseStatusException.class,
+                () -> notificationService.markAsRead(2, 999)).getStatusCode().value()));
     }
 }

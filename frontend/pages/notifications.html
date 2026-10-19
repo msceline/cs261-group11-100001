@@ -1,0 +1,36 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/notifications.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+<body>
+    <div class="noti-icon" id="notiIconContainer">
+  <!-- กล่อง Notification Dropdown ซ้อนอยู่ด้านใน -->
+  <div class="noti-dropdown hidden" id="notiDropdown">
+    <!-- ส่วนหัว -->
+    <div class="noti-header">
+      <div class="noti-header-left">
+        <h3>Notifications</h3>
+      </div>
+      
+
+    <!-- รายการแจ้งเตือน (JS จะนำ mock data มาเรนเดอร์ใส่ตรงนี้) -->
+    <div class="noti-list" id="notiList"></div>
+
+    <!-- ปุ่มด้านล่างสุด -->
+    <div class="noti-footer">
+      <button type="button" class="noti-show-all-btn" id="showAllNotiBtn">Show all notification</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/notifications.js"></script>
+</body>
+</html>

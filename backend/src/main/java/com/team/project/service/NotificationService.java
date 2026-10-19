@@ -63,6 +63,17 @@ public class NotificationService {
         return notification;
     }
 
+    /** Marks a notification as read. Only the owner can mark their own notification. */
+    public Notification markAsRead(int requesterId, int id) {
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notification not found"));
+        if (notification.getUser().getUserId() != requesterId) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own notifications");
+        }
+        notification.setIsRead(true);
+        return notificationRepository.save(notification);
+    }
+
     private boolean shareProject(int userId, int otherUserId) {
         return memberRepository.findByUser_UserId(userId).stream()
                 .anyMatch(m -> memberRepository.existsByProject_ProjectIdAndUser_UserId(m.getProjectId(), otherUserId));

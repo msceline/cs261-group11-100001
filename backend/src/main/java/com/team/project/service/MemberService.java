@@ -20,12 +20,14 @@ public class MemberService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository memberRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     public MemberService(ProjectRepository projectRepository, ProjectMemberRepository memberRepository,
-                         UserService userService) {
+                         UserService userService, NotificationService notificationService) {
         this.projectRepository = projectRepository;
         this.memberRepository = memberRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     /** Members only. */
@@ -45,13 +47,21 @@ public class MemberService {
         if (!project.getHost().getUserId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can add members");
         }
-        if (req == null || req.userId() == null) throw bad("userId is required");
-        User user = userService.findById(req.userId())
+        if (req == null || req.tu_id() == null || req.tu_id().isBlank()) throw bad("tu_id is required");
+        User user = userService.findByTu_id(req.tu_id().trim())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (memberRepository.existsByProject_ProjectIdAndUser_UserId(projectId, user.getUserId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a member");
         }
-        return MemberResponse.from(memberRepository.save(new ProjectMember(null, user, project, "member", null)), user);
+        ProjectMember saved = memberRepository.save(new ProjectMember(null, user, project, "member", null));
+        if (notificationService != null) {
+            notificationService.createSystemNotification(
+                    "คำเชิญเข้าร่วมกลุ่มโปรเจกต์",
+                    "คุณได้เข้าร่วมกลุ่มโปรเจกต์ \"" + project.getProjectName() + "\"",
+                    "invite",
+                    user.getUserId());
+        }
+        return MemberResponse.from(saved, user);
     }
 
     private Project findProject(int projectId) {

@@ -5,6 +5,8 @@ const logo = document.querySelector('.logo');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
 const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
+
+// Page URL html & js
 const pageUrls = {
 	project: new URL('../pages/project.html', scriptUrl),
 	creategroup: new URL('../pages/creategroup.html', scriptUrl),

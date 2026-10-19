@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create task - CS261</title>
+    <link rel="stylesheet" href="../css/createTask.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <main class="main-container">
+        <header class="task-header">
+            <div>
+                <h1 class="course-code">CS261</h1>
+                <h2 class="course-name">ซอฟต์แวร์ซอฟต์แวร์ซอฟต์แวร์เป็น</h2>
+            </div>
+        </header>
+
+        <article class="task-card">
+            <div class="task-card-header">
+                <h3 class="task-title">Task name</h3>
+                <div class="due-date">
+                    <label for="due-date-input">Due Date:</label>
+                    <div class="date-picker">
+                        <input class="date-input" id="due-date-input" type="text" placeholder="xx/xx/xxxx" readonly aria-haspopup="dialog">
+                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                        <input class="native-date-input" id="due-date-picker" name="dueDate" type="date" tabindex="-1" aria-hidden="true">
+                    </div>
+                </div>
+            </div>
+
+            <div class="task-details">
+                <section class="section description-section">
+                    <label class="field-label" for="description-input">Description:</label>
+                    <input class="text-input description-input" id="description-input" name="description" type="text" placeholder="-">
+                </section>
+            </div>
+
+            <div class="action-footer">
+                <button type="button" class="btn-submit" id="submit-btn">Submit</button>
+            </div>
+        </article>
+    </main>
+
+    <script src="../js/createTask.js"></script>
+</body>
+</html>

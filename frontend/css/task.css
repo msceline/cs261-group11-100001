@@ -112,9 +112,18 @@ body {
     width: 100%;
     max-width: 904px;
     padding: 18px 29px 23px;
-    background: #fff;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.68),
+        rgba(255, 255, 255, 0.32)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.72);
     border-radius: 16px;
-    box-shadow: 0 5px 13px rgba(0, 0, 0, 0.2);
+    box-shadow:
+        0 8px 24px rgba(31, 38, 135, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
 }
 
 .course-header {
@@ -159,7 +168,6 @@ body {
 .tasks-panel {
     min-height: 418px;
     padding: 21px 33px;
-    background: #fff;
     border: 2px solid #999;
     border-radius: 15px;
 }
@@ -203,9 +211,7 @@ body {
 
 .task-row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 137px 137px;
-    gap: 8px;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
 }
 
 .task-name {
@@ -213,37 +219,37 @@ body {
     min-width: 0;
     min-height: 55px;
     align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     padding: 9px 34px;
-    overflow-wrap: anywhere;
-    color: #080808;
-    background: #e95e5b;
+    color: #000000;
+    background: linear-gradient(90deg, #ffc37e 0%, #ffdfba 100%);
     border-radius: 14px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 600;
+}
+
+.task-title {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .task-deadline {
     display: flex;
-    min-height: 55px;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 4px 8px;
-    color: #fff;
-    background: #555;
-    border-radius: 14px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
+    flex: 0 0 auto;
+    gap: 5px;
+    color: #111;
     font-size: 14px;
-    font-weight: 500;
-    line-height: 1.12;
-    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .task-deadline strong {
-    color: #edff55;
-    font-size: 20px;
-    font-weight: 500;
+    color: #111;
+    font-size: 16px;
+    font-weight: 600;
     white-space: nowrap;
 }
 
@@ -297,22 +303,22 @@ body {
     }
 
     .task-row {
-        grid-template-columns: minmax(0, 1fr) minmax(90px, 0.45fr);
-        gap: 8px;
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .task-name {
-        grid-column: 1 / -1;
         min-height: 50px;
+        gap: 8px;
         padding: 8px 16px;
         font-size: 18px;
     }
 
     .task-deadline {
-        min-height: 54px;
+        gap: 3px;
+        font-size: 11px;
     }
 
     .task-deadline strong {
-        font-size: 18px;
+        font-size: 13px;
     }
 }

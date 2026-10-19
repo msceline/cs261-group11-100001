@@ -26,7 +26,6 @@
                     <label for="due-date-input">Due Date:</label>
                     <div class="date-picker">
                         <input class="date-input" id="due-date-input" type="text" placeholder="xx/xx/xxxx" readonly aria-haspopup="dialog">
-                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
                         <input class="native-date-input" id="due-date-picker" name="dueDate" type="date" tabindex="-1" aria-hidden="true">
                     </div>
                 </div>
@@ -35,16 +34,25 @@
             <div class="task-details">
                 <section class="section description-section">
                     <label class="field-label" for="description-input">Description:</label>
-                    <input class="text-input description-input" id="description-input" name="description" type="text" placeholder="-">
+                    <textarea class="text-input description-input" id="description-input" name="description" placeholder="-" rows="7"></textarea>
                 </section>
             </div>
 
             <div class="action-footer">
+                <div class="assignment-picker">
+                    <span class="assignment-label">ASSIGN:</span>
+                    <button class="assignment-toggle" id="assignment-toggle" type="button" aria-label="Choose group members" aria-expanded="false" aria-controls="assignment-menu">
+                        <span id="assigned-members">Select members</span>
+                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div class="assignment-menu" id="assignment-menu" role="group" aria-label="Group members" hidden></div>
+                </div>
                 <button type="button" class="btn-submit" id="submit-btn">Submit</button>
             </div>
         </article>
     </main>
 
+    <script src="../js/members.js"></script>
     <script src="../js/createTask.js"></script>
 </body>
 </html>

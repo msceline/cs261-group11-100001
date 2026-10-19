@@ -21,18 +21,63 @@ dueDatePicker.addEventListener('change', () => {
     dueDateDisplay.value = formatDueDate(dueDatePicker.value);
 });
 
+const assignmentPicker = document.querySelector('.assignment-picker');
+const assignmentToggle = document.getElementById('assignment-toggle');
+const assignmentMenu = document.getElementById('assignment-menu');
+const assignedMembers = document.getElementById('assigned-members');
+const selectedMemberIds = new Set();
+
+window.groupMembers.forEach((member) => {
+    const option = document.createElement('label');
+    option.className = 'assignment-option';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = member.studentId;
+    checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+            selectedMemberIds.add(member.studentId);
+        } else {
+            selectedMemberIds.delete(member.studentId);
+        }
+
+        const selectedNames = window.groupMembers
+            .filter((groupMember) => selectedMemberIds.has(groupMember.studentId))
+            .map((groupMember) => groupMember.name);
+        assignedMembers.textContent = selectedNames.length
+            ? selectedNames.join(', ')
+            : 'Select members';
+    });
+
+    const name = document.createElement('span');
+    name.textContent = member.name;
+    option.append(checkbox, name);
+    assignmentMenu.append(option);
+});
+
+assignmentToggle.addEventListener('click', () => {
+    const isExpanded = assignmentToggle.getAttribute('aria-expanded') === 'true';
+    assignmentToggle.setAttribute('aria-expanded', String(!isExpanded));
+    assignmentMenu.hidden = isExpanded;
+});
+
+document.addEventListener('click', (event) => {
+    if (!assignmentPicker.contains(event.target)) {
+        assignmentMenu.hidden = true;
+        assignmentToggle.setAttribute('aria-expanded', 'false');
+    }
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !assignmentMenu.hidden) {
+        assignmentMenu.hidden = true;
+        assignmentToggle.setAttribute('aria-expanded', 'false');
+        assignmentToggle.focus();
+    }
+});
+
 const submitBtn = document.getElementById('submit-btn');
 
-submitBtn.addEventListener('click', function() {
-    // เปลี่ยนปุ่มเป็นสถานะโหลด คล้ายกับหน้า login
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Submitting...';
-    submitBtn.style.opacity = '0.85';
-
-    // จำลองเวลาหน่วง 1.5 วินาที สำหรับการส่งไฟล์
-    setTimeout(() => {
-        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Submitted';
-        submitBtn.style.backgroundColor = '#16a34a'; // เปลี่ยนเป็นสีเขียวเมื่อส่งสำเร็จ
-        submitBtn.style.opacity = '1';
-    }, 1500);
+submitBtn.addEventListener('click', () => {
+    window.location.href = 'task.html';
 });

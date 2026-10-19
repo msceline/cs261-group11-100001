@@ -7,6 +7,7 @@
     min-width: 0;
     min-height: 100%;
     color: #000;
+    font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
 }
 
 .project-page .process-container {
@@ -34,8 +35,8 @@
     min-width: 0;
     margin: 0;
     color: #000;
-    font-size: clamp(20px, 6vw, 40px);
-    font-weight: bold;
+    font-size: 2rem;
+    font-weight: 800;
     overflow-wrap: anywhere;
 }
 

@@ -1,9 +1,10 @@
 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sign In | TU-WorkSpace</title>
     <link rel="stylesheet" href="../css/login.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
@@ -17,20 +18,24 @@
         <h1 class="title">Sign In</h1>
         <p class="subtitle">Hey, Enter your detail to get sign in<br>to your account</p>
         
-        <form id="sign-in-form">
+        <form id="sign-in-form" novalidate>
             <div class="input-field">
                 <i class="fa-solid fa-user input-icon"></i>
-                <input type="text" id="username" name="username" placeholder="Username" required autocomplete="off">
+                <input type="text" id="studentId" name="studentId" placeholder="Student ID" required autocomplete="username" aria-label="Student ID">
             </div>
 
             <div class="input-field">
                 <i class="fa-solid fa-lock input-icon"></i>
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password" aria-label="Password">
             </div>
 
+            <p id="login-message" class="login-message" role="alert" aria-live="polite"></p>
             <button type="submit" class="btn-signin">Sign In</button>
         </form>
     </div>
+
+    <script src="../client-api/auth-api.js"></script>
+    <script src="../js/login.js"></script>
 
 </body>
 </html>

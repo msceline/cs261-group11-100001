@@ -1,0 +1,142 @@
+.create-group-card {
+    width: 505px;
+    height: 557px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 30px 60px;
+    color: #000;
+    background: #fff;
+    border: 1px solid #dbe7e2;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.50);
+    animation: create-group-enter 240ms ease-out both;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 40px;
+}
+
+.create-group-card .title {
+    width: 100%;
+    margin: 0;
+    color: #000;
+    text-align: center;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+#create-group-form {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    gap: 18px;
+}
+
+.create-group-card .input-field {
+    display: grid;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.create-group-card .input-field label, .create-group-card .duedate-input label{
+    width: 171px;
+    height: 30px;
+    color: #000;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.create-group-card .input-field input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 30px;
+    border: none;
+    background: #f5f8f6;
+    border-radius: 20px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+    color: #000;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.create-group-card .input-field input:focus-visible {
+    border-color: #000;
+    box-shadow: 0 0 0 3px rgba(36, 118, 90, 0.16);
+}
+
+.create-group-card .create-group-next-btn {
+    min-height: 48px;
+    margin-top: 43px;
+    color: #ffffff;
+    background: #000;
+    border: 0;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 650;
+    transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.create-group-card .create-group-next-btn:hover {
+    background: #202020;
+}
+
+.create-group-card .create-group-next-btn:active {
+    transform: translateY(1px);
+}
+
+.create-group-card .create-group-next-btn:focus-visible {
+    outline: 3px solid #000;
+    outline-offset: 3px;
+}
+
+.create-group-card .duedate-input input{
+    text-align: right;
+}
+
+@keyframes create-group-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .create-group-card {
+        animation: none;
+    }
+}
+
+.create-group-card .duedate-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.create-group-card .duedate-input label {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    white-space: nowrap;
+}
+
+.create-group-card .duedate-input input {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+}

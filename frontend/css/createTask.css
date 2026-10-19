@@ -13,7 +13,8 @@
     width: 100%;
     max-width: 904px;
     margin: 0 auto;
-    padding: 14px 24px 16px;
+    min-height: 553px;
+    padding: 18px 29px 23px;
     background: linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.68),
@@ -29,26 +30,31 @@
 }
 
 .create-task-page .task-header {
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 17px;
 }
 
 .create-task-page .course-code {
     color: #4148e9;
     font-family: "League Spartan", sans-serif;
-    font-size: 38px;
+    font-size: 50px;
     font-weight: 800;
-    letter-spacing: -1px;
+    letter-spacing: -1.5px;
     line-height: 0.95;
 }
 
 .create-task-page .course-name {
-    margin-top: 2px;
-    font-size: 18px;
+    margin-top: 3px;
+    font-size: 22px;
     font-weight: 700;
     line-height: 1.2;
 }
 
 .create-task-page .task-card {
+    min-height: 418px;
     padding: 12px 28px 14px;
     background: #fff;
     border: 2px solid #969696;
@@ -187,6 +193,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
 }
 
 .create-task-page .assignment-label {
@@ -260,7 +267,8 @@
     font-size: 14px;
 }
 
-.create-task-page .btn-submit {
+.create-task-page .btn-submit,
+.create-task-page .back-to-tasks {
     width: 198px;
     min-height: 36px;
     padding: 5px 24px;
@@ -275,20 +283,32 @@
     transition: background-color 0.2s, transform 0.1s;
 }
 
+.create-task-page .back-to-tasks {
+    color: #111;
+    background: #e5e5e5;
+}
+
 .create-task-page .btn-submit:hover {
     background: #333;
 }
 
-.create-task-page .btn-submit:active {
+.create-task-page .back-to-tasks:hover {
+    background: #d1d1d1;
+}
+
+.create-task-page .btn-submit:active,
+.create-task-page .back-to-tasks:active {
     transform: scale(0.98);
 }
 
-.create-task-page .btn-submit:disabled {
+.create-task-page .btn-submit:disabled,
+.create-task-page .back-to-tasks:disabled {
     cursor: wait;
     opacity: 0.65;
 }
 
 .create-task-page .btn-submit:focus-visible,
+.create-task-page .back-to-tasks:focus-visible,
 .create-task-page .assignment-toggle:focus-visible {
     outline: 3px solid #575df0;
     outline-offset: 3px;
@@ -343,7 +363,8 @@
         align-items: stretch;
     }
 
-    .create-task-page .btn-submit {
+    .create-task-page .btn-submit,
+    .create-task-page .back-to-tasks {
         width: 100%;
     }
 }

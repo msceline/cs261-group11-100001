@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await window.authApi.login(studentId, password);
       localStorage.setItem('authToken', result.token);
       localStorage.setItem('authUser', JSON.stringify(result.user));
-      window.location.assign('dashboard.html');
+      window.location.assign('/pages/index.html');
     } catch (error) {
       message.textContent = error instanceof TypeError
         ? 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองอีกครั้ง'

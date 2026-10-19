@@ -30,8 +30,8 @@ class AuthServiceTest {
     private TuAuthClient tuAuthClient;
     private AuthService authService;
 
-    private static User user(int id, String tuId, String role) {
-        return new User(id, tuId, role, "User " + id, tuId + "@dome.tu.ac.th", null,
+    private static User user(int id, String studentId, String role) {
+        return new User(id, studentId, role, "User " + id, studentId + "@dome.tu.ac.th", null,
                 LocalDateTime.of(2026, 1, 1, 0, 0));
     }
 

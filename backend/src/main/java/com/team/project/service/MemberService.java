@@ -47,8 +47,8 @@ public class MemberService {
         if (!project.getHost().getUserId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can add members");
         }
-        if (req == null || req.tuId() == null || req.tuId().isBlank()) throw bad("tuId is required");
-        User user = userService.findByStudentId(req.tuId().trim())
+        if (req == null || req.studentId() == null || req.studentId().isBlank()) throw bad("studentId is required");
+        User user = userService.findByStudentId(req.studentId().trim())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (memberRepository.existsByProject_ProjectIdAndUser_UserId(projectId, user.getUserId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a member");

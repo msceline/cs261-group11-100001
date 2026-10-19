@@ -38,7 +38,7 @@ public class AuthService {
     private User findOrCreate(TuAuthClient.TuUser tu) {
         return userService.findByStudentId(tu.username()).orElseGet(() -> {
             User u = new User();
-            u.setTuId(tu.username());
+            u.setStudentId(tu.username());
             u.setRole("employee".equalsIgnoreCase(tu.type()) ? "teacher" : "student");
             u.setDisplayName(tu.displayName());
             u.setEmail(tu.email());

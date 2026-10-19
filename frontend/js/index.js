@@ -203,7 +203,7 @@ if (mainContainer && sidebar) {
 		collapseTimer = window.setTimeout(() => {
 			mainContainer.classList.remove('is-expanded');
 			collapseTimer = null;
-		}, 2000);
+		}, 1000);
 	});
 }
 

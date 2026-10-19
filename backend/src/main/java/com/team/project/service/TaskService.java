@@ -56,12 +56,15 @@ public class TaskService {
     }
 
     public Task createTask(int userId, CreateTaskRequest req) {
+        if (req == null || req.projectId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "projectId is required");
+        }
         Project project = projectRepository.findById(req.projectId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
         requireMember(userId, project.getProjectId());
         Task task = new Task();
         task.setProject(project);
-        apply(task, req);
+        applyCreate(task, req);
         Task saved = taskRepository.save(task);
         refreshProgress(project);
         return saved;
@@ -71,7 +74,7 @@ public class TaskService {
     public Optional<Task> updateTask(int userId, int taskId, CreateTaskRequest req) {
         return taskRepository.findById(taskId).map(task -> {
             requireMember(userId, task.getProject().getProjectId());
-            apply(task, req);
+            applyUpdate(task, req);
             Task saved = taskRepository.save(task);
             refreshProgress(task.getProject());
             return saved;
@@ -92,7 +95,7 @@ public class TaskService {
                         "You are not a member of this project"));
     }
 
-    private void apply(Task task, CreateTaskRequest req) {
+    private void applyCreate(Task task, CreateTaskRequest req) {
         String title = req.taskTitle() == null ? "" : req.taskTitle().trim();
         if (title.isEmpty() || title.length() > 200) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "taskTitle must be 1-200 characters");
@@ -107,6 +110,37 @@ public class TaskService {
             task.setStatus(req.status());
         }
         task.setAssignee(req.assigneeId() == null ? null : findAssignee(task.getProject(), req.assigneeId()));
+    }
+
+    private void applyUpdate(Task task, CreateTaskRequest req) {
+        if (req == null) return;
+
+        if (req.taskTitle() != null) {
+            String title = req.taskTitle().trim();
+            if (title.isEmpty() || title.length() > 200) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "taskTitle must be 1-200 characters");
+            }
+            task.setTitle(title);
+        }
+        if (req.taskDescription() != null) {
+            task.setTaskDescription(req.taskDescription());
+        }
+        if (req.dueDate() != null) {
+            task.setDueDate(req.dueDate());
+        }
+        if (req.status() != null) {
+            if (!STATUSES.contains(req.status())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "status must be todo, doing or done");
+            }
+            task.setStatus(req.status());
+        }
+        if (req.assigneeId() != null) {
+            if (req.assigneeId() <= 0) {
+                task.setAssignee(null);
+            } else {
+                task.setAssignee(findAssignee(task.getProject(), req.assigneeId()));
+            }
+        }
     }
 
     private User findAssignee(Project project, int assigneeId) {

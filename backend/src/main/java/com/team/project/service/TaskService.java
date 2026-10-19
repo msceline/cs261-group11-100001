@@ -28,13 +28,16 @@ public class TaskService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final ProjectMemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository,
-                       UserRepository userRepository, ProjectMemberRepository memberRepository) {
+                       UserRepository userRepository, ProjectMemberRepository memberRepository,
+                       NotificationService notificationService) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.memberRepository = memberRepository;
+        this.notificationService = notificationService;
     }
 
     /** Tasks of every project the user belongs to. */
@@ -67,6 +70,14 @@ public class TaskService {
         applyCreate(task, req);
         Task saved = taskRepository.save(task);
         refreshProgress(project);
+        if (notificationService != null && saved.getAssignee() != null
+                && !saved.getAssignee().getUserId().equals(userId)) {
+            notificationService.createSystemNotification(
+                    "คุณได้รับมอบหมายงานใหม่",
+                    "คุณได้รับมอบหมายงาน \"" + saved.getTitle() + "\" ในโปรเจกต์ \"" + project.getProjectName() + "\"",
+                    "task_assigned",
+                    saved.getAssignee().getUserId());
+        }
         return saved;
     }
 
@@ -74,9 +85,20 @@ public class TaskService {
     public Optional<Task> updateTask(int userId, int taskId, CreateTaskRequest req) {
         return taskRepository.findById(taskId).map(task -> {
             requireMember(userId, task.getProject().getProjectId());
+            Integer oldAssigneeId = task.getAssignee() != null ? task.getAssignee().getUserId() : null;
             applyUpdate(task, req);
             Task saved = taskRepository.save(task);
             refreshProgress(task.getProject());
+            Integer newAssigneeId = saved.getAssignee() != null ? saved.getAssignee().getUserId() : null;
+            if (notificationService != null && newAssigneeId != null
+                    && !newAssigneeId.equals(oldAssigneeId)
+                    && !newAssigneeId.equals(userId)) {
+                notificationService.createSystemNotification(
+                        "คุณได้รับมอบหมายงานใหม่",
+                        "คุณได้รับมอบหมายงาน \"" + saved.getTitle() + "\" ในโปรเจกต์ \"" + task.getProject().getProjectName() + "\"",
+                        "task_assigned",
+                        newAssigneeId);
+            }
             return saved;
         });
     }

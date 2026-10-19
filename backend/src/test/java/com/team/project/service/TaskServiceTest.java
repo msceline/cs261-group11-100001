@@ -38,6 +38,7 @@ class TaskServiceTest {
     private static final LocalDateTime DUE = LocalDateTime.of(2026, 12, 1, 10, 0);
 
     private TaskRepository taskRepository;
+    private NotificationService notificationService;
     private TaskService taskService;
     private Project project1;
     private User user2;
@@ -58,6 +59,7 @@ class TaskServiceTest {
         ProjectRepository projectRepository = mock(ProjectRepository.class);
         UserRepository userRepository = mock(UserRepository.class);
         ProjectMemberRepository memberRepository = mock(ProjectMemberRepository.class);
+        notificationService = mock(NotificationService.class);
 
         when(projectRepository.findById(1)).thenReturn(Optional.of(project1));
         for (User u : new User[] {user1, user2, user3, user4}) {
@@ -76,7 +78,8 @@ class TaskServiceTest {
 
         when(taskRepository.save(any(Task.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        taskService = new TaskService(taskRepository, projectRepository, userRepository, memberRepository);
+        taskService = new TaskService(taskRepository, projectRepository, userRepository, memberRepository,
+                notificationService);
     }
 
     private static HttpStatus statusOf(ResponseStatusException e) {
@@ -107,6 +110,7 @@ class TaskServiceTest {
         assertEquals(DUE, task.getDueDate());
         assertEquals(project1, task.getProject());
         assertEquals(user2, task.getAssignee());
+        verify(notificationService).createSystemNotification(any(), any(), org.mockito.ArgumentMatchers.eq("task_assigned"), org.mockito.ArgumentMatchers.eq(2));
     }
 
     @Test
@@ -214,6 +218,16 @@ class TaskServiceTest {
                 .orElseThrow();
 
         assertNull(updated.getAssignee());
+    }
+
+    @Test
+    void updateAssigneeTriggersNotification() {
+        Task existing = storedTask(5);
+        existing.setAssignee(null);
+
+        taskService.updateTask(1, 5, new CreateTaskRequest(1, null, null, 2, null, null));
+
+        verify(notificationService).createSystemNotification(any(), any(), org.mockito.ArgumentMatchers.eq("task_assigned"), org.mockito.ArgumentMatchers.eq(2));
     }
 
     @Test

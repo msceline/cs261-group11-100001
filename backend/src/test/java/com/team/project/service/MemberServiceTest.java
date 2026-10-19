@@ -34,6 +34,7 @@ import com.team.project.repository.UserRepository;
 class MemberServiceTest {
 
     private ProjectMemberRepository memberRepository;
+    private NotificationService notificationService;
     private MemberService memberService;
 
     private static User user(int id) {
@@ -53,6 +54,7 @@ class MemberServiceTest {
         ProjectRepository projectRepository = mock(ProjectRepository.class);
         memberRepository = mock(ProjectMemberRepository.class);
         UserRepository userRepository = mock(UserRepository.class);
+        notificationService = mock(NotificationService.class);
 
         when(projectRepository.findById(1)).thenReturn(Optional.of(project1));
         when(projectRepository.findById(2)).thenReturn(Optional.of(project2));
@@ -73,7 +75,8 @@ class MemberServiceTest {
             return m;
         });
 
-        memberService = new MemberService(projectRepository, memberRepository, new UserService(userRepository));
+        memberService = new MemberService(projectRepository, memberRepository, new UserService(userRepository),
+                notificationService);
     }
 
     private static HttpStatus statusOf(ResponseStatusException e) {
@@ -124,6 +127,7 @@ class MemberServiceTest {
         verify(memberRepository).save(saved.capture());
         assertEquals(1, saved.getValue().getUserId());
         assertEquals(2, saved.getValue().getProjectId());
+        verify(notificationService).createSystemNotification(any(), any(), org.mockito.ArgumentMatchers.eq("invite"), org.mockito.ArgumentMatchers.eq(1));
     }
 
     @Test

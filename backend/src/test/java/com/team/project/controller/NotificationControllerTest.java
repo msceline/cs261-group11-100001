@@ -3,7 +3,9 @@ package com.team.project.controller;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -93,5 +95,25 @@ class NotificationControllerTest {
                 .andExpect(jsonPath("$.id").value(5))
                 .andExpect(jsonPath("$.title").value("Title"))
                 .andExpect(jsonPath("$.userId").value(2));
+    }
+
+    @Test
+    void markAsReadReturnsUpdatedNotificationOnPatch() throws Exception {
+        when(notificationService.markAsRead(2, 1)).thenReturn(notification(1, "Old", true));
+
+        mockMvc.perform(patch("/api/notifications/1/read").requestAttr("userId", 2))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.isRead").value(true));
+    }
+
+    @Test
+    void markAsReadReturnsUpdatedNotificationOnPut() throws Exception {
+        when(notificationService.markAsRead(2, 1)).thenReturn(notification(1, "Old", true));
+
+        mockMvc.perform(put("/api/notifications/1/read").requestAttr("userId", 2))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.isRead").value(true));
     }
 }

@@ -188,18 +188,32 @@ class TaskServiceTest {
     }
 
     @Test
-    void updateKeepsStatusWhenNotProvidedAndCanClearAssignee() {
+    void updatePartialFieldsKeepsExistingValues() {
         Task existing = storedTask(5);
         existing.setStatus("doing");
         existing.setAssignee(user2);
         existing.setDueDate(DUE);
+        existing.setTaskDescription("existing description");
 
-        Task updated = taskService.updateTask(1, 5, new CreateTaskRequest(1, "Old", null, null, null, null))
+        Task updated = taskService.updateTask(1, 5, new CreateTaskRequest(1, null, null, null, "done", null))
                 .orElseThrow();
 
-        assertEquals("doing", updated.getStatus());
+        assertEquals("Old", updated.getTitle());
+        assertEquals("existing description", updated.getTaskDescription());
+        assertEquals("done", updated.getStatus());
+        assertEquals(user2, updated.getAssignee());
+        assertEquals(DUE, updated.getDueDate());
+    }
+
+    @Test
+    void updateCanClearAssigneeWithZeroOrNegative() {
+        Task existing = storedTask(5);
+        existing.setAssignee(user2);
+
+        Task updated = taskService.updateTask(1, 5, new CreateTaskRequest(1, null, null, 0, null, null))
+                .orElseThrow();
+
         assertNull(updated.getAssignee());
-        assertNull(updated.getDueDate());
     }
 
     @Test

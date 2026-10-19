@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -124,6 +125,15 @@ class TaskControllerTest {
         when(taskService.updateTask(eq(1), eq(3), any())).thenReturn(Optional.of(task(3, "Report")));
 
         mockMvc.perform(put("/api/tasks/3").requestAttr("userId", 1).contentType(MediaType.APPLICATION_JSON).content(BODY))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.taskId").value(3));
+    }
+
+    @Test
+    void patchReturnsUpdatedTask() throws Exception {
+        when(taskService.updateTask(eq(1), eq(3), any())).thenReturn(Optional.of(task(3, "Report")));
+
+        mockMvc.perform(patch("/api/tasks/3").requestAttr("userId", 1).contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"done\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.taskId").value(3));
     }

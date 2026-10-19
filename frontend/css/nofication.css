@@ -1,4 +1,5 @@
 .notification-card {
+  font-family: "League Spartan", sans-serif ;
   width: 100%;
   max-width: 380px;
   background-color: #ffffff;
@@ -14,8 +15,96 @@
 }
 
 .notification-title {
+
   font-size: 1.5rem;
   font-weight: 800;
   color: #1e293b;
   letter-spacing: -0.02em;
+}
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 6px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+  background-color: #f8fafc;
+  transform: translateX(2px);
+}
+
+.notification-avatar-wrapper {
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
+.notification-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #eb9525; 
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-right: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.notification-message {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.35;
+}
+
+.notification-time {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.notification-footer {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.btn-show-all {
+  background-color: #80b7ff;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-show-all:hover {
+  border-color: #94a3b8;
+  color: #1e293b;
+  background-color: #f8fafc;     
+}
+
+.btn-show-all:active {
+  transform: scale(0.99);
 }

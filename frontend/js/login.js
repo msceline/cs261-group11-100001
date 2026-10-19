@@ -1,18 +1,23 @@
-JavaScript
-const submitBtn = document.querySelector('.btn-signin');
-const signInForm = document.querySelector('#sign-in-form');
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('#sign-in-form');
+  const submitBtn = document.querySelector('.btn-signin');
+  const studentIdInput = document.querySelector('#studentId');
+  const passwordInput = document.querySelector('#password');
+  const message = document.querySelector('#login-message');
+  const defaultButtonText = submitBtn?.textContent;
 
-function showLoadingAndRedirect() {
-  if (!submitBtn) return;
+  function triggerError(inputElement) {
+    const parentField = inputElement.closest('.input-field') || inputElement;
+    parentField.classList.remove('shake-error');
+    void parentField.offsetWidth;
+    parentField.classList.add('shake-error');
 
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังเข้าสู่ระบบ...';
-  submitBtn.style.opacity = '0.85';
+    setTimeout(() => {
+      parentField.classList.remove('shake-error');
+    }, 400);
+  }
 
-  setTimeout(() => {
-    window.location.href = 'index.html';
-  }, 1000);
-}
+  if (!form || !submitBtn || !studentIdInput || !passwordInput || !message) return;
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();

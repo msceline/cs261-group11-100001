@@ -3,12 +3,14 @@ const dueDatePicker = document.getElementById('due-date-picker');
 const taskTitleInput = document.getElementById('task-title-input');
 const taskDescriptionInput = document.getElementById('description-input');
 const assignmentToggle = document.getElementById('assignment-toggle');
-const assignmentList = document.getElementById('assignment-list');
+const assignmentLabel = document.getElementById('assigned-member');
+const assignmentMenu = document.getElementById('assignment-menu');
 const createTaskForm = document.getElementById('create-task-form');
 const submitButton = document.getElementById('submit-btn');
-const formMessage = document.getElementById('form-message');
+const submitMessage = document.getElementById('submit-message');
 
 let projectPromise;
+let membersLoaded = false;
 let selectedAssigneeId = null;
 
 function formatDueDate(dateValue) {
@@ -18,9 +20,9 @@ function formatDueDate(dateValue) {
   return `${day}/${month}/${year}`;
 }
 
-function showFormMessage(message, isError = true) {
-  formMessage.textContent = message;
-  formMessage.classList.toggle('is-error', isError);
+function showSubmitMessage(message) {
+  submitMessage.textContent = message;
+  submitMessage.hidden = !message;
 }
 
 function getCourseProject() {
@@ -44,61 +46,61 @@ function createMemberOption(member) {
   const radio = document.createElement('input');
   radio.type = 'radio';
   radio.name = 'assigneeId';
-  radio.value = member.userId;
-  radio.checked = member.userId === selectedAssigneeId;
+  radio.value = String(member.userId);
 
-  const displayName = document.createElement('span');
-  displayName.textContent = member.displayName || member.studentId || `User ${member.userId}`;
+  const name = document.createElement('span');
+  name.textContent = member.displayName || member.studentId || `User ${member.userId}`;
 
   radio.addEventListener('change', () => {
     selectedAssigneeId = member.userId;
-    assignmentToggle.textContent = displayName.textContent;
+    assignmentLabel.textContent = name.textContent;
+    assignmentMenu.hidden = true;
     assignmentToggle.setAttribute('aria-expanded', 'false');
-    assignmentList.hidden = true;
   });
 
-  label.append(radio, displayName);
+  label.append(radio, name);
   return label;
 }
 
 async function loadMembers() {
-  assignmentList.replaceChildren();
-  const loading = document.createElement('p');
-  loading.className = 'assignment-message';
-  loading.textContent = 'Loading members...';
-  assignmentList.append(loading);
-  assignmentList.hidden = false;
+  assignmentMenu.replaceChildren();
+  const loadingMessage = document.createElement('p');
+  loadingMessage.className = 'assignment-message';
+  loadingMessage.textContent = 'Loading members...';
+  assignmentMenu.append(loadingMessage);
 
   try {
     const project = await getCourseProject();
     const members = await taskApi.getProjectMembers(project.projectId);
-    assignmentList.replaceChildren();
+    assignmentMenu.replaceChildren();
 
-    if (!members.length) {
+    if (members.length === 0) {
       const emptyMessage = document.createElement('p');
       emptyMessage.className = 'assignment-message';
       emptyMessage.textContent = 'No members found.';
-      assignmentList.append(emptyMessage);
+      assignmentMenu.append(emptyMessage);
       return;
     }
 
-    members.forEach((member) => assignmentList.append(createMemberOption(member)));
+    members.forEach((member) => assignmentMenu.append(createMemberOption(member)));
+    membersLoaded = true;
   } catch (error) {
-    assignmentList.replaceChildren();
     const errorMessage = document.createElement('p');
-    errorMessage.className = 'assignment-message is-error';
+    errorMessage.className = 'assignment-message';
     errorMessage.textContent = error.message;
-    assignmentList.append(errorMessage);
+    assignmentMenu.replaceChildren(errorMessage);
   }
 }
+
+dueDatePicker.required = true;
+taskDescriptionInput.required = true;
 
 dueDateDisplay.addEventListener('click', () => {
   if (typeof dueDatePicker.showPicker === 'function') {
     dueDatePicker.showPicker();
-    return;
+  } else {
+    dueDatePicker.click();
   }
-
-  dueDatePicker.click();
 });
 
 dueDatePicker.addEventListener('change', () => {
@@ -112,36 +114,29 @@ taskTitleInput.addEventListener('focus', () => {
 });
 
 assignmentToggle.addEventListener('click', async () => {
-  const opening = assignmentList.hidden;
+  const opening = assignmentMenu.hidden;
+  assignmentMenu.hidden = !opening;
   assignmentToggle.setAttribute('aria-expanded', String(opening));
-  assignmentList.hidden = !opening;
 
-  if (opening) await loadMembers();
+  if (opening && !membersLoaded) await loadMembers();
 });
 
 createTaskForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  showFormMessage('');
+  showSubmitMessage('');
 
   const taskTitle = taskTitleInput.textContent.trim();
   const taskDescription = taskDescriptionInput.value.trim();
   const dueDate = dueDatePicker.value;
 
   if (!taskTitle || taskTitle === 'Task name') {
-    showFormMessage('Enter a task name.');
+    showSubmitMessage('Enter a task name.');
     taskTitleInput.focus();
     return;
   }
 
-  if (!dueDate) {
-    showFormMessage('Choose a due date.');
-    dueDateDisplay.focus();
-    return;
-  }
-
-  if (!taskDescription) {
-    showFormMessage('Enter a description.');
-    taskDescriptionInput.focus();
+  if (!dueDate || !taskDescription) {
+    createTaskForm.reportValidity();
     return;
   }
 
@@ -160,7 +155,7 @@ createTaskForm.addEventListener('submit', async (event) => {
     });
     window.location.assign('task.html');
   } catch (error) {
-    showFormMessage(error.message);
+    showSubmitMessage(error.message);
     submitButton.disabled = false;
     submitButton.textContent = 'Submit';
   }

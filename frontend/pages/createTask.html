@@ -1,59 +1,52 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create task - CS261</title>
-    <link rel="stylesheet" href="../css/createTask.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <main class="main-container">
-        <header class="task-header">
-            <div>
-                <h1 class="course-code">CS261</h1>
-                <h2 class="course-name">ซอฟต์แวร์ซอฟต์แวร์ซอฟต์แวร์เป็น</h2>
-            </div>
-        </header>
+<main class="main-container">
+    <header class="task-header">
+        <div>
+            <h1 class="course-code">CS261</h1>
+            <h2 class="course-name">ซอฟต์แวร์ซอฟต์แวร์ซอฟต์แวร์เป็น</h2>
+        </div>
+    </header>
 
-        <form class="task-card" id="create-task-form">
-            <div class="task-card-header">
-                <label class="task-title" contenteditable="true" role="textbox" aria-label="Task name" aria-multiline="false" spellcheck="false">Task name</label>
-                <div class="due-date">
-                    <label for="due-date-input">Due Date:</label>
-                    <div class="date-picker">
-                        <input class="date-input" id="due-date-input" type="text" placeholder="xx/xx/xxxx" readonly aria-haspopup="dialog">
-                        <input class="native-date-input" id="due-date-picker" name="dueDate" type="date" tabindex="-1" aria-hidden="true">
-                    </div>
+    <form class="task-card" id="create-task-form">
+        <div class="task-card-header">
+            <h3 class="task-title" id="task-title-input" contenteditable="true" role="textbox" aria-label="Task name"
+                aria-multiline="false" spellcheck="false">Task name</h3>
+            <div class="due-date">
+                <label for="due-date-input">Due Date:</label>
+                <div class="date-picker">
+                    <input class="date-input" id="due-date-input" type="text" placeholder="xx/xx/xxxx" readonly
+                        aria-haspopup="dialog">
+                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                    <input class="native-date-input" id="due-date-picker" name="dueDate" type="date" tabindex="-1"
+                        aria-hidden="true">
                 </div>
             </div>
+        </div>
 
-            <div class="task-details">
-                <section class="section description-section">
-                    <label class="field-label" for="description-input">Description:</label>
-                    <textarea class="text-input description-input" id="description-input" name="description" placeholder="-" rows="7"></textarea>
-                </section>
-            </div>
+        <div class="task-details">
+            <section class="section description-section">
+                <label class="field-label" for="description-input">Description:</label>
+                <textarea class="text-input description-input" id="description-input" name="description" placeholder="-"
+                    rows="7"></textarea>
+            </section>
+        </div>
 
-            <div class="action-footer">
-                <div class="assignment-picker">
-                    <span class="assignment-label">ASSIGN:</span>
-                    <button class="assignment-toggle" id="assignment-toggle" type="button" aria-label="Choose group members" aria-expanded="false" aria-controls="assignment-menu">
-                        <span id="assigned-members">Select members</span>
-                        <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                    </button>
-                    <div class="assignment-menu" id="assignment-menu" role="group" aria-label="Group members" hidden></div>
+        <div class="action-footer">
+            <div class="assignment-picker">
+                <span class="assignment-label">ASSIGN:</span>
+                <button class="assignment-toggle" id="assignment-toggle" type="button"
+                    aria-label="Choose a group member" aria-expanded="false" aria-controls="assignment-menu">
+                    <span id="assigned-member">Select member</span>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                </button>
+                <div class="assignment-menu" id="assignment-menu" role="radiogroup" aria-label="Group members" hidden>
                 </div>
-                <button type="button" class="btn-submit" id="submit-btn">Submit</button>
             </div>
-            <p class="submit-message" id="submit-message" role="alert" hidden></p>
-        </article>
-    </main>
+            <button type="submit" class="btn-submit" id="submit-btn">Submit</button>
+        </div>
+        <p class="submit-message" id="submit-message" role="alert" hidden></p>
+    </form>
+</main>
 
-    <script src="../js/members.js"></script>
-    <script src="../js/createTask.js"></script>
-</body>
-</html>
+<script src="../api/task-api.js"></script>
+<script src="../js/members.js"></script>
+<script src="../js/createTask.js"></script>

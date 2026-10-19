@@ -1,38 +1,24 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasks - CS261</title>
-    <link rel="stylesheet" href="../css/task.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <main class="main-container tasks-page">
-        <header class="course-header">
-            <div>
-                <h1 class="course-code">CS261</h1>
-                <h2 class="course-name">ซอฟต์แวร์ซอฟต์แวร์ซอฟต์แวร์เป็น</h2>
-            </div>
-            
-        </header>
+<main class="main-container tasks-page">
+    <header class="course-header">
+        <div>
+            <h1 class="course-code">CS261</h1>
+            <h2 class="course-name">ซอฟต์แวร์ซอฟต์แวร์ซอฟต์แวร์เป็น</h2>
+        </div>
+
+    </header>
 
     <section class="tasks-panel" aria-labelledby="tasks-heading">
-         <div class="tasks-header">
+        <div class="tasks-header">
             <h2 id="tasks-heading">TASKS</h2>
             <a class="add-task" href="createTask.html" aria-label="Create task">
-                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                </a>
-            </div>
-            <div class="task-list" id="task-list" aria-live="polite"></div>
-            <p class="task-list-message" id="task-list-message" role="alert" hidden></p>
-        </section>
-    </main>
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            </a>
+        </div>
+        <div class="task-list" id="task-list" aria-live="polite"></div>
+        <p class="task-list-message" id="task-message" role="status" aria-live="polite" hidden></p>
+    </section>
+</main>
 
-    <script src="../js/members.js"></script>
-    <script src="../js/task.js"></script>
-</body>
-</html>
+<script src="../api/task-api.js"></script>
+<script src="../js/members.js"></script>
+<script src="../js/task.js"></script>

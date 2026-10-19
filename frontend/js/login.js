@@ -1,14 +1,45 @@
-JavaScript
-const submitBtn = document.querySelector('.btn-signin');
+const signInForm = document.getElementById('sign-in-form');
+const signInButton = signInForm.querySelector('.btn-signin');
+const loginMessage = document.getElementById('login-message');
 
-function showLoadingAndRedirect() {
-  // เปลี่ยนปุ่มเป็นสถานะโหลด
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> กำลังเข้าสู่ระบบ...';
-  submitBtn.style.opacity = '0.85';
+signInForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  loginMessage.textContent = '';
+  signInButton.disabled = true;
+  signInButton.textContent = 'Signing in...';
 
-  // จำลองเวลาหน่วง 1 วินาทีแล้วค่อยเปลี่ยนหน้า
-  setTimeout(() => {
-    window.location.href = 'index.html';
-  }, 1000);
-}
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        studentId: document.getElementById('username').value.trim(),
+        password: document.getElementById('password').value,
+      }),
+    });
+    const responseText = await response.text();
+    let result = {};
+
+    if (responseText) {
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = { error: responseText };
+      }
+    }
+
+    if (!response.ok) {
+      throw new Error(result.message || result.error || `Sign in failed (${response.status}).`);
+    }
+    if (!result.token) {
+      throw new Error('The sign-in response did not include an authentication token.');
+    }
+
+    localStorage.setItem('token', result.token);
+    window.location.assign('index.html');
+  } catch (error) {
+    loginMessage.textContent = error.message;
+    signInButton.disabled = false;
+    signInButton.textContent = 'Sign In';
+  }
+});

@@ -1,8 +1,8 @@
-<main class="main-container">
+<section class="create-task-page">
     <header class="task-header">
         <div>
-            <h1 class="course-code">CS261</h1>
-            <h2 class="course-name">ซอฟต์แวร์ซอฟต์แวร์ซอฟต์แวร์เป็น</h2>
+            <h1 class="course-code" id="course-code"></h1>
+            <h2 class="course-name" id="course-name"></h2>
         </div>
     </header>
 
@@ -15,7 +15,7 @@
                 <div class="date-picker">
                     <input class="date-input" id="due-date-input" type="text" placeholder="xx/xx/xxxx" readonly
                         aria-haspopup="dialog">
-                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 3v4m10-4v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
                     <input class="native-date-input" id="due-date-picker" name="dueDate" type="date" tabindex="-1"
                         aria-hidden="true">
                 </div>
@@ -26,7 +26,7 @@
             <section class="section description-section">
                 <label class="field-label" for="description-input">Description:</label>
                 <textarea class="text-input description-input" id="description-input" name="description" placeholder="-"
-                    rows="7"></textarea>
+                    rows="4"></textarea>
             </section>
         </div>
 
@@ -36,7 +36,7 @@
                 <button class="assignment-toggle" id="assignment-toggle" type="button"
                     aria-label="Choose a group member" aria-expanded="false" aria-controls="assignment-menu">
                     <span id="assigned-member">Select member</span>
-                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" /></svg>
                 </button>
                 <div class="assignment-menu" id="assignment-menu" role="radiogroup" aria-label="Group members" hidden>
                 </div>
@@ -45,8 +45,4 @@
         </div>
         <p class="submit-message" id="submit-message" role="alert" hidden></p>
     </form>
-</main>
-
-<script src="../api/task-api.js"></script>
-<script src="../js/members.js"></script>
-<script src="../js/createTask.js"></script>
+</section>

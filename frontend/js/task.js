@@ -1,10 +1,13 @@
-const taskList = document.getElementById('task-list');
-const taskMessage = document.getElementById('task-message');
-const taskRows = [];
+let taskList = null;
+let taskMessage = null;
+let taskRows = [];
 let projectMembers = new Map();
 
-function getProjectForCourse(projects) {
-  return projects.find((project) => project.subjectCode === 'CS261');
+function findSelectedProject(projects, selected) {
+  const byId = projects.find((project) => String(project.projectId) === String(selected.projectId));
+  if (byId) return byId;
+  return projects.find((project) => project.projectName === selected.groupName
+    && project.subjectCode === selected.subject);
 }
 
 function formatDueDate(value) {
@@ -59,9 +62,6 @@ function createTaskRow(task) {
   const row = document.createElement('div');
   row.className = 'task-row';
 
-  const nameArea = document.createElement('div');
-  nameArea.className = 'task-name';
-
   const nameButton = document.createElement('button');
   nameButton.className = 'task-title-button';
   nameButton.type = 'button';
@@ -78,8 +78,7 @@ function createTaskRow(task) {
   if (task.dueDate) deadline.dateTime = task.dueDate;
 
   nameButton.append(title);
-  nameArea.append(nameButton, statusSelect);
-  row.append(nameArea, deadline);
+  row.append(nameButton, statusSelect, deadline);
 
   const details = document.createElement('div');
   details.className = 'task-details';
@@ -150,7 +149,7 @@ async function updateStatus(task, select) {
   }
 }
 
-async function loadTasks() {
+async function loadTasks(selected) {
   setTaskMessage('Loading tasks...');
 
   try {
@@ -158,12 +157,15 @@ async function loadTasks() {
       taskApi.getTasks(),
       taskApi.getProjects(),
     ]);
-    const project = getProjectForCourse(projects);
+    const project = findSelectedProject(projects, selected);
 
     if (!project) {
-      setTaskMessage('No CS261 project is available for this account.', true);
+      setTaskMessage('Project not found for this account.', true);
       return;
     }
+
+    document.getElementById('course-code').textContent = project.subjectCode || '';
+    document.getElementById('course-name').textContent = project.projectName || '';
 
     const projectTasks = tasks.filter((task) => task.projectId === project.projectId);
     let memberWarning = '';
@@ -181,4 +183,12 @@ async function loadTasks() {
   }
 }
 
-loadTasks();
+document.addEventListener('task:loaded', (event) => {
+  taskList = document.getElementById('task-list');
+  taskMessage = document.getElementById('task-message');
+  if (!taskList || !taskMessage) return;
+
+  taskRows = [];
+  projectMembers = new Map();
+  loadTasks(event.detail || {});
+});

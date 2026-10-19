@@ -1,181 +1,85 @@
-* {
+/* Create-task page. Everything is scoped under .create-task-page because it is shown inside the index.html shell. */
+.create-task-page,
+.create-task-page * {
     box-sizing: border-box;
+}
+
+.create-task-page * {
     margin: 0;
     padding: 0;
 }
 
-body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    align-items: center;
-    gap: 36px;
-    padding: 30px 24px 40px;
-    color: #080808;
-    background:
-        radial-gradient(ellipse at 20% 35%, rgba(187, 224, 247, 0.78), transparent 34%),
-        radial-gradient(ellipse at 83% 35%, rgba(255, 216, 187, 0.72), transparent 38%),
-        radial-gradient(ellipse at 88% 88%, rgba(255, 222, 171, 0.78), transparent 32%),
-        linear-gradient(115deg, #f7fbfc 0%, #f6f4f1 48%, #fffaf4 100%);
-    font-family: "Prompt", "League Spartan", sans-serif;
-}
-
-.top-nav {
-    display: flex;
-    width: 100%;
-    max-width: 956px;
-    min-height: 60px;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 20px;
-    background: #fff;
-    border-radius: 17px;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2);
-}
-
-.nav-left,
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-}
-
-.menu-button,
-.icon-button {
-    display: grid;
-    width: 34px;
-    height: 38px;
-    place-items: center;
-    padding: 0;
-    color: #050505;
-    background: none;
-    border: 0;
-    cursor: pointer;
-}
-
-.menu-button {
-    font-size: 27px;
-}
-
-.icon-button {
-    font-size: 27px;
-}
-
-.logo {
-    display: flex;
-    width: 54px;
-    height: 46px;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 3px 5px;
-    color: #fff;
-    background: #050505;
-    border-radius: 6px;
-    font-family: "League Spartan", sans-serif;
-    font-weight: 800;
-    line-height: 0.82;
-    text-decoration: none;
-}
-
-.logo-mark {
-    position: relative;
-    font-size: 21px;
-    letter-spacing: -2px;
-}
-
-.logo-mark i {
-    position: absolute;
-    top: 0;
-    right: -13px;
-    color: #ffe348;
-    font-size: 10px;
-}
-
-.tu-blue {
-    color: #3985ff;
-}
-
-.tu-red {
-    color: #ee4646;
-}
-
-.workspace {
-    font-size: 10px;
-    letter-spacing: 0.2px;
-}
-
-.avatar {
-    display: grid;
-    width: 38px;
-    height: 38px;
-    place-items: center;
-    color: #171717;
-    background: radial-gradient(circle at 35% 30%, #f7b6d2, #a5d9c7 62%, #514259);
-    border: 2px solid #111;
-    border-radius: 50%;
-    font-size: 22px;
-}
-
-.main-container {
+.create-task-page {
     width: 100%;
     max-width: 904px;
-    padding: 18px 29px 22px;
-    background: #fff;
+    margin: 0 auto;
+    padding: 14px 24px 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.68),
+        rgba(255, 255, 255, 0.32)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.72);
     border-radius: 16px;
-    box-shadow: 0 5px 13px rgba(0, 0, 0, 0.2);
+    box-shadow:
+        0 8px 24px rgba(31, 38, 135, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
 }
 
-.task-header {
-    margin-bottom: 11px;
+.create-task-page .task-header {
+    margin-bottom: 8px;
 }
 
-.course-code {
+.create-task-page .course-code {
     color: #4148e9;
     font-family: "League Spartan", sans-serif;
-    font-size: 50px;
+    font-size: 38px;
     font-weight: 800;
-    letter-spacing: -1.5px;
+    letter-spacing: -1px;
     line-height: 0.95;
 }
 
-.course-name {
-    margin-top: 3px;
-    font-size: 22px;
+.create-task-page .course-name {
+    margin-top: 2px;
+    font-size: 18px;
     font-weight: 700;
     line-height: 1.2;
 }
 
-.task-card {
-    padding: 17px 34px 16px;
+.create-task-page .task-card {
+    padding: 12px 28px 14px;
     background: #fff;
     border: 2px solid #969696;
     border-radius: 16px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
 }
 
-.task-card-header {
+.create-task-page .task-card-header {
     display: flex;
     min-height: 35px;
     align-items: center;
     gap: 18px;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 }
 
-.task-title {
-    flex: 0 0 auto;
+.create-task-page .task-title {
+    flex: 1 1 auto;
+    min-width: 0;
     font-family: "League Spartan", sans-serif;
     font-size: 24px;
     font-weight: 800;
     cursor: text;
+    overflow-wrap: anywhere;
 }
 
-.task-title:focus {
+.create-task-page .task-title:focus {
     outline: 2px solid #575df0;
     outline-offset: 3px;
 }
 
-.due-date {
+.create-task-page .due-date {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -186,8 +90,8 @@ body {
     white-space: nowrap;
 }
 
-.due-date input,
-.text-input {
+.create-task-page .due-date input,
+.create-task-page .text-input {
     min-width: 0;
     padding: 0;
     color: inherit;
@@ -197,36 +101,37 @@ body {
     font: inherit;
 }
 
-.due-date input::placeholder,
-.text-input::placeholder {
+.create-task-page .due-date input::placeholder,
+.create-task-page .text-input::placeholder {
     color: #333;
     opacity: 1;
 }
 
-.due-date input:focus,
-.text-input:focus {
+.create-task-page .due-date input:focus,
+.create-task-page .text-input:focus {
     outline: 2px solid #575df0;
     outline-offset: 2px;
 }
 
-.date-picker {
+.create-task-page .date-picker {
     position: relative;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.date-picker .date-input {
+.create-task-page .date-picker .date-input {
     width: 104px;
     cursor: pointer;
 }
 
-.date-picker > i {
-    font-size: 14px;
+.create-task-page .date-picker > svg {
+    width: 16px;
+    height: 16px;
     pointer-events: none;
 }
 
-.native-date-input {
+.create-task-page .native-date-input {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -235,39 +140,127 @@ body {
     pointer-events: none;
 }
 
-.task-details {
-    padding: 10px 19px 18px;
+.create-task-page .task-details {
+    padding: 8px 18px 12px;
     background: linear-gradient(145deg, #fff 0%, #fffce2 47%, #f8dfc6 100%);
     border: 1px solid #777;
     border-radius: 16px;
 }
 
-.field-label {
+.create-task-page .field-label {
     display: block;
+    font-family: "Prompt", sans-serif;
     margin-bottom: 1px;
     font-size: 19px;
     font-weight: 700;
     line-height: 1.3;
 }
 
-.description-input {
+.create-task-page .description-input {
     display: block;
     width: 100%;
     font-size: 16px;
     line-height: 1.4;
+    resize: vertical;
 }
 
-.description-section {
-    min-height: 96px;
+.create-task-page .description-section {
+    min-height: 70px;
 }
 
-.action-footer {
+.create-task-page .action-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
     display: flex;
-    justify-content: flex-end;
-    margin-top: 17px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+    padding: 8px 0 2px;
+    background: #fff;
 }
 
-.btn-submit {
+/* Assign-member dropdown */
+.create-task-page .assignment-picker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.create-task-page .assignment-label {
+    font-family: "League Spartan", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.create-task-page .assignment-toggle {
+    display: flex;
+    min-width: 180px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 14px;
+    color: #111;
+    background: #fff;
+    border: 1px solid #777;
+    border-radius: 12px;
+    cursor: pointer;
+    font: 500 14px "Prompt", sans-serif;
+}
+
+.create-task-page .assignment-toggle svg {
+    width: 16px;
+    height: 16px;
+}
+
+.create-task-page .assignment-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+.create-task-page .assignment-menu {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    z-index: 5;
+    display: grid;
+    min-width: 260px;
+    max-height: 220px;
+    padding: 6px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #777;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.create-task-page .assignment-menu[hidden] {
+    display: none;
+}
+
+.create-task-page .assignment-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.create-task-page .assignment-option:hover,
+.create-task-page .assignment-option:has(input:checked) {
+    background: #ffe9cf;
+}
+
+.create-task-page .assignment-message {
+    padding: 8px 10px;
+    color: #555;
+    font-size: 14px;
+}
+
+.create-task-page .btn-submit {
     width: 198px;
     min-height: 36px;
     padding: 5px 24px;
@@ -282,72 +275,75 @@ body {
     transition: background-color 0.2s, transform 0.1s;
 }
 
-.btn-submit:hover {
+.create-task-page .btn-submit:hover {
     background: #333;
 }
 
-.btn-submit:active {
+.create-task-page .btn-submit:active {
     transform: scale(0.98);
 }
 
-.btn-submit:focus-visible,
-.menu-button:focus-visible,
-.icon-button:focus-visible,
-.logo:focus-visible {
+.create-task-page .btn-submit:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.create-task-page .btn-submit:focus-visible,
+.create-task-page .assignment-toggle:focus-visible {
     outline: 3px solid #575df0;
     outline-offset: 3px;
 }
 
+.create-task-page .submit-message {
+    margin-top: 12px;
+    color: #b42318;
+    font-size: 14px;
+}
+
+.create-task-page .submit-message[hidden] {
+    display: none;
+}
+
 @media (max-width: 600px) {
-    body {
-        gap: 22px;
-        padding: 18px 14px 28px;
-    }
-
-    .top-nav {
-        min-height: 56px;
-        padding: 7px 13px;
-    }
-
-    .nav-left,
-    .nav-right {
-        gap: 14px;
-    }
-
-    .main-container {
+    .create-task-page {
         padding: 20px 16px;
     }
 
-    .course-code {
+    .create-task-page .course-code {
         font-size: 44px;
     }
 
-    .course-name {
+    .create-task-page .course-name {
         font-size: 18px;
     }
 
-    .task-card {
+    .create-task-page .task-card {
         padding: 17px 14px;
     }
 
-    .task-card-header {
+    .create-task-page .task-card-header {
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
         margin-bottom: 12px;
     }
 
-    .due-date {
+    .create-task-page .due-date {
         flex-wrap: wrap;
         text-align: left;
         white-space: normal;
     }
 
-    .task-details {
+    .create-task-page .task-details {
         padding: 12px;
     }
 
-    .btn-submit {
-        width: min(198px, 100%);
+    .create-task-page .action-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .create-task-page .btn-submit {
+        width: 100%;
     }
 }

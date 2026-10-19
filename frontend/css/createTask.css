@@ -403,6 +403,17 @@ body {
     background: #333;
 }
 
+.submit-message {
+    margin-top: 8px;
+    color: #b42318;
+    font-size: 13px;
+    text-align: right;
+}
+
+.submit-message[hidden] {
+    display: none;
+}
+
 .btn-submit:active {
     transform: scale(0.98);
 }

@@ -1,5 +1,14 @@
 const dueDateDisplay = document.getElementById('due-date-input');
 const dueDatePicker = document.getElementById('due-date-picker');
+const taskTitle = document.querySelector('.task-title');
+const descriptionInput = document.getElementById('description-input');
+const submitMessage = document.getElementById('submit-message');
+const taskStorageKey = 'cs261-tasks';
+
+function showSubmitMessage(message) {
+    submitMessage.textContent = message;
+    submitMessage.hidden = false;
+}
 
 function formatDueDate(dateValue) {
     if (!dateValue) return '';
@@ -79,5 +88,59 @@ document.addEventListener('keydown', (event) => {
 const submitBtn = document.getElementById('submit-btn');
 
 submitBtn.addEventListener('click', () => {
+    const taskName = taskTitle.textContent.trim();
+    const dueDate = dueDateDisplay.value.trim();
+    const description = descriptionInput.value.trim();
+
+    if (!taskName || taskName === 'Task name') {
+        showSubmitMessage('กรุณาระบุ Task name');
+        taskTitle.focus();
+        return;
+    }
+
+    if (!dueDate) {
+        showSubmitMessage('กรุณาเลือก Due Date');
+        dueDateDisplay.focus();
+        return;
+    }
+
+    if (!description) {
+        showSubmitMessage('กรุณากรอก Description');
+        descriptionInput.focus();
+        return;
+    }
+
+    const newTask = {
+        id: `task-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        name: taskName,
+        dueDate,
+        description,
+        memberIds: [...selectedMemberIds],
+        memberNames: window.groupMembers
+            .filter((member) => selectedMemberIds.has(member.studentId))
+            .map((member) => member.name),
+        status: 'To do'
+    };
+
+    let storedTasks;
+    try {
+        storedTasks = JSON.parse(localStorage.getItem(taskStorageKey) || '[]');
+    } catch {
+        showSubmitMessage('ไม่สามารถบันทึก Task ได้ เนื่องจากข้อมูลที่บันทึกไว้ไม่ถูกต้อง');
+        return;
+    }
+
+    if (!Array.isArray(storedTasks)) {
+        showSubmitMessage('ไม่สามารถบันทึก Task ได้ เนื่องจากข้อมูลที่บันทึกไว้ไม่ถูกต้อง');
+        return;
+    }
+
+    try {
+        localStorage.setItem(taskStorageKey, JSON.stringify([...storedTasks, newTask]));
+    } catch {
+        showSubmitMessage('ไม่สามารถบันทึก Task ได้ กรุณาตรวจสอบการตั้งค่าพื้นที่จัดเก็บของเบราว์เซอร์');
+        return;
+    }
+
     window.location.href = 'task.html';
 });

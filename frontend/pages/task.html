@@ -17,9 +17,7 @@
                 <h1 class="course-code">CS261</h1>
                 <h2 class="course-name">ซอฟต์แวร์ซอฟต์แวร์ซอฟต์แวร์เป็น</h2>
             </div>
-            <div class="course-badge" aria-label="TU">
-                <span>TU</span>
-            </div>
+            
         </header>
 
         <section class="tasks-panel" aria-labelledby="tasks-heading">
@@ -30,9 +28,11 @@
                 </a>
             </div>
             <div class="task-list" id="task-list" aria-live="polite"></div>
+            <p class="task-list-message" id="task-list-message" role="alert" hidden></p>
         </section>
     </main>
 
+    <script src="../js/members.js"></script>
     <script src="../js/task.js"></script>
 </body>
 </html>

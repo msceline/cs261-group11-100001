@@ -209,6 +209,16 @@ body {
     gap: 24px;
 }
 
+.task-list-message {
+    margin-top: 12px;
+    color: #b42318;
+    font-size: 14px;
+}
+
+.task-list-message[hidden] {
+    display: none;
+}
+
 .task-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -216,12 +226,11 @@ body {
 
 .task-name {
     display: flex;
+    flex-direction: column;
     min-width: 0;
-    min-height: 55px;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 9px 34px;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
     color: #000000;
     background: linear-gradient(90deg, #ffc37e 0%, #ffdfba 100%);
     border-radius: 14px;
@@ -230,9 +239,46 @@ body {
     font-weight: 600;
 }
 
+.task-summary {
+    display: grid;
+    min-height: 55px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px 9px 34px;
+    cursor: pointer;
+}
+
 .task-title {
+    justify-self: start;
     min-width: 0;
     overflow-wrap: anywhere;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+
+.task-title:focus-visible,
+.task-status:focus-visible {
+    outline: 2px solid #4148e9;
+    outline-offset: 2px;
+}
+
+.task-status {
+    max-width: 90px;
+    padding: 3px 5px;
+    color: #111;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
 }
 
 .task-deadline {
@@ -244,6 +290,29 @@ body {
     font-size: 14px;
     font-weight: 600;
     white-space: nowrap;
+}
+
+.task-details {
+    display: grid;
+    gap: 8px;
+    padding: 0 24px 13px 34px;
+    border-top: 1px solid rgba(0, 0, 0, 0.18);
+    font-size: 14px;
+}
+
+.task-details[hidden] {
+    display: none;
+}
+
+.task-description {
+    padding-top: 9px;
+    overflow-wrap: anywhere;
+}
+
+.task-assigned-members {
+    font-size: 12px;
+    text-align: right;
+    overflow-wrap: anywhere;
 }
 
 .task-deadline strong {
@@ -307,10 +376,32 @@ body {
     }
 
     .task-name {
-        min-height: 50px;
-        gap: 8px;
-        padding: 8px 16px;
         font-size: 18px;
+    }
+
+    .task-summary {
+        min-height: 50px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 6px;
+        padding: 8px 12px 8px 16px;
+    }
+
+    .task-status {
+        grid-column: 2;
+        grid-row: 1;
+        max-width: 82px;
+        font-size: 10px;
+    }
+
+    .task-deadline {
+        grid-column: 1 / -1;
+        justify-self: end;
+        font-size: 11px;
+    }
+
+    .task-details {
+        padding: 0 12px 10px 16px;
+        font-size: 13px;
     }
 
     .task-deadline {

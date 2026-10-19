@@ -1,190 +1,184 @@
-const defaultTasks = [
-    { id: 'sample-git-repository', name: 'Create Git Repository', dueDate: '02/11/2026' },
-    { id: 'sample-spring-boot', name: 'Initial Spring Boot', dueDate: '03/11/2026' }
-];
-const taskStorageKey = 'cs261-tasks';
-const taskListInitializedKey = 'cs261-task-list-initialized';
-const taskStatuses = ['To do', 'Doing', 'Done'];
 const taskList = document.getElementById('task-list');
-const taskListMessage = document.getElementById('task-list-message');
+const taskMessage = document.getElementById('task-message');
+const taskRows = [];
+let projectMembers = new Map();
 
-function normalizeTask(task, index) {
-    return {
-        id: typeof task.id === 'string' ? task.id : `saved-task-${index}`,
-        name: task.name,
-        dueDate: task.dueDate,
-        description: typeof task.description === 'string' ? task.description : '',
-        memberIds: Array.isArray(task.memberIds) ? task.memberIds : [],
-        memberNames: Array.isArray(task.memberNames) ? task.memberNames : [],
-        status: taskStatuses.includes(task.status) ? task.status : 'To do'
-    };
+function getProjectForCourse(projects) {
+  return projects.find((project) => project.subjectCode === 'CS261');
 }
 
-function setTaskListMessage(message) {
-    taskListMessage.textContent = message;
-    taskListMessage.hidden = false;
+function formatDueDate(value) {
+  if (!value) return 'No due date';
+
+  const datePart = value.split('T')[0];
+  const [year, month, day] = datePart.split('-');
+  return year && month && day ? `${day}/${month}/${year}` : value;
 }
 
-function saveTasks(nextTasks) {
-    try {
-        localStorage.setItem(taskStorageKey, JSON.stringify(nextTasks));
-        return true;
-    } catch {
-        setTaskListMessage('ไม่สามารถบันทึกการเปลี่ยนแปลง Task ได้ กรุณาตรวจสอบการตั้งค่าพื้นที่จัดเก็บของเบราว์เซอร์');
-        return false;
-    }
+function getStatusLabel(status) {
+  const labels = {
+    todo: 'To do',
+    doing: 'Doing',
+    done: 'Done',
+  };
+  return labels[status] || status || 'To do';
 }
 
-function getAssignedMemberNames(task) {
-    if (task.memberNames.length > 0) return task.memberNames;
+function setTaskMessage(message, isError = false) {
+  taskMessage.textContent = message;
+  taskMessage.hidden = !message;
+  taskMessage.classList.toggle('is-error', isError);
+}
 
-    return task.memberIds
-        .map((memberId) => window.groupMembers.find((member) => member.studentId === memberId)?.name)
-        .filter(Boolean);
+function createStatusSelect(task) {
+  const select = document.createElement('select');
+  select.className = 'task-status';
+  select.setAttribute('aria-label', `Status for ${task.taskTitle}`);
+
+  [
+    ['todo', 'To do'],
+    ['doing', 'Doing'],
+    ['done', 'Done'],
+  ].forEach(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    select.append(option);
+  });
+
+  select.value = task.status || 'todo';
+  select.addEventListener('click', (event) => event.stopPropagation());
+  select.addEventListener('change', () => updateStatus(task, select));
+  return select;
 }
 
 function createTaskRow(task) {
-    const row = document.createElement('article');
-    row.className = 'task-row';
+  const article = document.createElement('article');
+  article.className = 'task-item';
 
-    const taskCard = document.createElement('div');
-    taskCard.className = 'task-name';
-    taskCard.setAttribute('role', 'group');
+  const row = document.createElement('div');
+  row.className = 'task-row';
 
-    const summary = document.createElement('div');
-    summary.className = 'task-summary';
+  const nameArea = document.createElement('div');
+  nameArea.className = 'task-name';
 
-    const title = document.createElement('button');
-    title.className = 'task-title';
-    title.type = 'button';
-    title.textContent = task.name;
-    title.setAttribute('aria-expanded', 'false');
+  const nameButton = document.createElement('button');
+  nameButton.className = 'task-title-button';
+  nameButton.type = 'button';
+  nameButton.setAttribute('aria-expanded', 'false');
 
-    const status = document.createElement('select');
-    status.className = 'task-status';
-    status.setAttribute('aria-label', `Status for ${task.name}`);
-    taskStatuses.forEach((taskStatus) => {
-        const option = document.createElement('option');
-        option.value = taskStatus;
-        option.textContent = taskStatus;
-        status.append(option);
-    });
-    status.value = task.status;
+  const title = document.createElement('span');
+  title.className = 'task-title-text';
+  title.textContent = task.taskTitle;
 
-    const dueDate = document.createElement('div');
-    dueDate.className = 'task-deadline';
-    const dueDateLabel = document.createElement('span');
-    dueDateLabel.textContent = 'Due Date';
-    const dueDateValue = document.createElement('strong');
-    dueDateValue.textContent = task.dueDate;
-    dueDate.append(dueDateLabel, dueDateValue);
+  const statusSelect = createStatusSelect(task);
+  const deadline = document.createElement('time');
+  deadline.className = 'task-deadline';
+  deadline.textContent = formatDueDate(task.dueDate);
+  if (task.dueDate) deadline.dateTime = task.dueDate;
 
-    const details = document.createElement('div');
-    details.className = 'task-details';
-    details.hidden = true;
+  nameButton.append(title);
+  nameArea.append(nameButton, statusSelect);
+  row.append(nameArea, deadline);
 
-    const description = document.createElement('p');
-    description.className = 'task-description';
-    description.textContent = task.description || '-';
+  const details = document.createElement('div');
+  details.className = 'task-details';
+  details.hidden = true;
 
-    const assignedMembers = document.createElement('p');
-    assignedMembers.className = 'task-assigned-members';
-    const assignedLabel = document.createElement('strong');
-    assignedLabel.textContent = 'Assigned Member: ';
-    const assignedNames = document.createElement('span');
-    assignedNames.textContent = getAssignedMemberNames(task).join(', ') || '-';
-    assignedMembers.append(assignedLabel, assignedNames);
-    details.append(description, assignedMembers);
+  const description = document.createElement('p');
+  description.className = 'task-description';
+  description.textContent = task.taskDescription || 'No description';
 
-    function toggleDetails() {
-        const isExpanded = title.getAttribute('aria-expanded') === 'true';
-        title.setAttribute('aria-expanded', String(!isExpanded));
-        details.hidden = isExpanded;
-        taskCard.classList.toggle('is-expanded', !isExpanded);
+  const assignee = document.createElement('p');
+  assignee.className = 'task-assignee';
+  const member = projectMembers.get(task.assigneeId);
+  assignee.textContent = `Assigned member: ${member ? member.displayName : task.assigneeId ? `User ${task.assigneeId}` : 'Unassigned'}`;
+
+  details.append(description, assignee);
+  article.append(row, details);
+
+  nameButton.addEventListener('click', () => {
+    const isExpanded = !details.hidden;
+    details.hidden = isExpanded;
+    nameButton.setAttribute('aria-expanded', String(!isExpanded));
+    article.classList.toggle('is-expanded', !isExpanded);
+  });
+
+  taskRows.push({ article, task, statusSelect });
+  return article;
+}
+
+function renderTasks(tasks) {
+  taskList.replaceChildren();
+  taskRows.length = 0;
+
+  const visibleTasks = tasks.filter((task) => task.status !== 'done');
+  if (!visibleTasks.length) {
+    setTaskMessage('No tasks yet.');
+    return;
+  }
+
+  setTaskMessage('');
+  visibleTasks.forEach((task) => taskList.append(createTaskRow(task)));
+}
+
+async function updateStatus(task, select) {
+  const previousStatus = task.status || 'todo';
+  const nextStatus = select.value;
+  select.disabled = true;
+  setTaskMessage('');
+
+  try {
+    const updatedTask = await taskApi.updateTaskStatus(task.taskId, nextStatus);
+    task.status = updatedTask?.status || nextStatus;
+
+    if (task.status === 'done') {
+      const row = taskRows.find((item) => item.task === task);
+      row?.article.remove();
+      if (!taskRows.some((item) => item.task.status !== 'done' && item.article.isConnected)) {
+        setTaskMessage('No tasks yet.');
+      }
+      return;
     }
 
-    title.addEventListener('click', toggleDetails);
-    summary.addEventListener('click', (event) => {
-        if (event.target.closest('select, button')) return;
-        toggleDetails();
-    });
-
-    status.addEventListener('click', (event) => event.stopPropagation());
-    status.addEventListener('change', () => {
-        if (status.value === 'Done') {
-            const remainingTasks = activeTasks.filter((activeTask) => activeTask.id !== task.id);
-            if (saveTasks(remainingTasks)) {
-                activeTasks = remainingTasks;
-                renderTasks();
-            } else {
-                status.value = task.status;
-            }
-            return;
-        }
-
-        const updatedTasks = activeTasks.map((activeTask) =>
-            activeTask.id === task.id ? { ...activeTask, status: status.value } : activeTask
-        );
-        if (saveTasks(updatedTasks)) {
-            activeTasks = updatedTasks;
-        } else {
-            status.value = task.status;
-        }
-    });
-
-    summary.append(title, status, dueDate);
-    taskCard.append(summary, details);
-    row.append(taskCard);
-    return row;
+    select.value = task.status;
+  } catch (error) {
+    select.value = previousStatus;
+    setTaskMessage(error.message, true);
+  } finally {
+    select.disabled = false;
+  }
 }
 
-function renderTasks() {
-    taskList.replaceChildren(...activeTasks.map(createTaskRow));
-}
+async function loadTasks() {
+  setTaskMessage('Loading tasks...');
 
-let activeTasks = defaultTasks.map(normalizeTask);
+  try {
+    const [tasks, projects] = await Promise.all([
+      taskApi.getTasks(),
+      taskApi.getProjects(),
+    ]);
+    const project = getProjectForCourse(projects);
 
-if (taskList) {
-    let storageAvailable = true;
-    let storedTasks = [];
-    let taskListInitialized = false;
+    if (!project) {
+      setTaskMessage('No CS261 project is available for this account.', true);
+      return;
+    }
 
+    const projectTasks = tasks.filter((task) => task.projectId === project.projectId);
+    let memberWarning = '';
     try {
-        const storedValue = localStorage.getItem(taskStorageKey);
-        taskListInitialized = localStorage.getItem(taskListInitializedKey) === 'true';
-        if (storedValue !== null) {
-            const parsedTasks = JSON.parse(storedValue);
-            if (!Array.isArray(parsedTasks)) {
-                throw new TypeError('Stored task data must be an array');
-            }
-            storedTasks = parsedTasks
-                .filter((task) => task && typeof task.name === 'string' && typeof task.dueDate === 'string')
-                .map(normalizeTask);
-        }
-    } catch {
-        storageAvailable = false;
-        setTaskListMessage('ไม่สามารถโหลด Task ที่บันทึกไว้ได้ เนื่องจากข้อมูลเสียหายหรือพื้นที่จัดเก็บใช้งานไม่ได้');
+      const members = await taskApi.getProjectMembers(project.projectId);
+      projectMembers = new Map(members.map((member) => [member.userId, member]));
+    } catch (error) {
+      memberWarning = `Could not load project members: ${error.message}`;
     }
 
-    if (storageAvailable) {
-        if (taskListInitialized) {
-            activeTasks = storedTasks;
-        } else {
-            const storedById = new Map(storedTasks.map((task) => [task.id, task]));
-            activeTasks = [
-                ...defaultTasks.map((task, index) => storedById.get(task.id) || normalizeTask(task, index)),
-                ...storedTasks.filter((task) => !defaultTasks.some((defaultTask) => defaultTask.id === task.id))
-            ];
-        }
-
-        try {
-            localStorage.setItem(taskStorageKey, JSON.stringify(activeTasks));
-            localStorage.setItem(taskListInitializedKey, 'true');
-        } catch {
-            storageAvailable = false;
-            setTaskListMessage('ไม่สามารถบันทึกรายการ Task ในเบราว์เซอร์ได้');
-        }
-    }
-
-    renderTasks();
+    renderTasks(projectTasks);
+    if (memberWarning) setTaskMessage(memberWarning, true);
+  } catch (error) {
+    setTaskMessage(error.message, true);
+  }
 }
+
+loadTasks();

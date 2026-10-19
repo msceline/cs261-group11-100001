@@ -9,8 +9,8 @@ body {
     min-height: 100vh;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
-    padding: 24px 20px 38px;
+    gap: 36px;
+    padding: 30px 24px 40px;
     color: #080808;
     background:
         radial-gradient(ellipse at 20% 35%, rgba(187, 224, 247, 0.78), transparent 34%),
@@ -121,17 +121,9 @@ body {
     width: 100%;
     max-width: 904px;
     padding: 18px 29px 22px;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.68),
-        rgba(255, 255, 255, 0.32)
-    );
+    background: #fff;
     border-radius: 16px;
-    box-shadow:
-        0 8px 24px rgba(31, 38, 135, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.75);
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
-    backdrop-filter: blur(18px) saturate(150%);
+    box-shadow: 0 5px 13px rgba(0, 0, 0, 0.2);
 }
 
 .task-header {
@@ -155,9 +147,9 @@ body {
 }
 
 .task-card {
-    padding: 16px 29px 12px;
-    border: 2px solid #969696;
+    padding: 17px 34px 16px;
     background: #fff;
+    border: 2px solid #969696;
     border-radius: 16px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
 }
@@ -166,19 +158,16 @@ body {
     display: flex;
     min-height: 35px;
     align-items: center;
-    justify-content: space-between;
     gap: 18px;
-    margin-bottom: 13px;
+    margin-bottom: 16px;
 }
 
 .task-title {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 0 0 auto;
     font-family: "League Spartan", sans-serif;
     font-size: 24px;
     font-weight: 800;
     cursor: text;
-    overflow-wrap: anywhere;
 }
 
 .task-title:focus {
@@ -247,11 +236,10 @@ body {
 }
 
 .task-details {
-    height: 240px;
-    padding: 12px 15px;
+    padding: 10px 19px 18px;
     background: linear-gradient(145deg, #fff 0%, #fffce2 47%, #f8dfc6 100%);
     border: 1px solid #777;
-    border-radius: 13px;
+    border-radius: 16px;
 }
 
 .field-label {
@@ -265,129 +253,24 @@ body {
 .description-input {
     display: block;
     width: 100%;
-    height: calc(100% - 25px);
-    min-height: 0;
-    padding: 0;
-    resize: none;
-    border: 0;
     font-size: 16px;
     line-height: 1.4;
 }
 
 .description-section {
-    height: 100%;
+    min-height: 96px;
 }
 
 .action-footer {
-    position: relative;
-    z-index: 1;
     display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 13px;
-}
-
-.assignment-picker {
-    position: relative;
-    display: flex;
-    min-width: 0;
-    height: 32px;
-    flex: 1 1 auto;
-    align-items: center;
-    gap: 8px;
-    padding: 3px 6px 3px 12px;
-    overflow: hidden;
-    border: 1px solid #777;
-    border-radius: 13px;
-    cursor: pointer;
-    font-size: 17px;
-    line-height: 1;
-}
-
-.assignment-picker:focus-within {
-    outline: 2px solid #575df0;
-    outline-offset: 2px;
-}
-
-.assignment-label {
-    flex: 0 0 auto;
-}
-
-.assignment-toggle {
-    display: flex;
-    min-width: 0;
-    height: 22px;
-    flex: 1 1 auto;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 2px 8px;
-    color: #fff;
-    background: #050505;
-    border: 0;
-    border-radius: 12px;
-    cursor: pointer;
-    font: inherit;
-    font-size: 13px;
-    text-align: left;
-}
-
-.assignment-toggle span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.assignment-toggle i {
-    flex: 0 0 auto;
-    font-size: 10px;
-}
-
-.assignment-menu {
-    position: absolute;
-    z-index: 2;
-    top: calc(100% + 8px);
-    right: 0;
-    left: 0;
-    display: flex;
-    max-height: 180px;
-    flex-direction: column;
-    gap: 2px;
-    overflow-y: auto;
-    padding: 6px;
-    background: #fff;
-    border: 1px solid #888;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.assignment-menu[hidden] {
-    display: none;
-}
-
-.assignment-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.assignment-option:hover {
-    background: #f1f1f1;
-}
-
-.assignment-option input {
-    accent-color: #4148e9;
+    justify-content: flex-end;
+    margin-top: 17px;
 }
 
 .btn-submit {
-    width: 170px;
-    min-height: 32px;
-    flex: 0 0 170px;
-    padding: 4px 24px;
+    width: 198px;
+    min-height: 36px;
+    padding: 5px 24px;
     color: #fff;
     background: #050505;
     border: 0;
@@ -401,17 +284,6 @@ body {
 
 .btn-submit:hover {
     background: #333;
-}
-
-.submit-message {
-    margin-top: 8px;
-    color: #b42318;
-    font-size: 13px;
-    text-align: right;
-}
-
-.submit-message[hidden] {
-    display: none;
 }
 
 .btn-submit:active {
@@ -459,39 +331,23 @@ body {
     }
 
     .task-card-header {
-        align-items: center;
+        align-items: flex-start;
+        flex-direction: column;
         gap: 8px;
         margin-bottom: 12px;
     }
 
-    .task-title {
-        flex: 1 1 0;
-    }
-
     .due-date {
-        flex: 0 0 auto;
         flex-wrap: wrap;
         text-align: left;
         white-space: normal;
     }
 
     .task-details {
-        height: 240px;
         padding: 12px;
     }
 
-    .action-footer {
-        align-items: stretch;
-    }
-
-    .assignment-picker {
-        font-size: 14px;
-    }
-
     .btn-submit {
-        width: min(120px, 38%);
-        flex-basis: min(120px, 38%);
-        padding-right: 12px;
-        padding-left: 12px;
+        width: min(198px, 100%);
     }
 }

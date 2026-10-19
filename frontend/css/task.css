@@ -1,15 +1,15 @@
-* {
+.tasks-page,
+.tasks-page * {
     box-sizing: border-box;
+}
+
+.tasks-page * {
     margin: 0;
     padding: 0;
 }
 
-body {
-    display: flex;
+body:has(> .tasks-page) {
     min-height: 100vh;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
     padding: 28px 20px 40px;
     color: #080808;
     background:
@@ -17,100 +17,12 @@ body {
         radial-gradient(ellipse at 83% 32%, rgba(255, 216, 187, 0.72), transparent 38%),
         radial-gradient(ellipse at 88% 88%, rgba(255, 222, 171, 0.78), transparent 32%),
         linear-gradient(115deg, #f7fbfc 0%, #f6f4f1 48%, #fffaf4 100%);
-    font-family: "Prompt", "League Spartan", sans-serif;
 }
 
-.top-nav {
-    display: flex;
-    width: 100%;
-    max-width: 956px;
-    min-height: 60px;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 20px 7px 68px;
-    background: #fff;
-    border-radius: 17px;
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2);
-}
-
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-}
-
-.logo {
-    display: flex;
-    width: 54px;
-    height: 46px;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 3px 5px;
-    color: #fff;
-    background: #050505;
-    border-radius: 6px;
-    font-family: "League Spartan", sans-serif;
-    font-weight: 800;
-    line-height: 0.82;
-    text-decoration: none;
-}
-
-.logo-mark {
-    position: relative;
-    font-size: 21px;
-    letter-spacing: -2px;
-}
-
-.logo-mark i {
-    position: absolute;
-    top: 0;
-    right: -13px;
-    color: #ffe348;
-    font-size: 10px;
-}
-
-.tu-blue {
-    color: #3985ff;
-}
-
-.tu-red {
-    color: #ee4646;
-}
-
-.workspace {
-    font-size: 10px;
-    letter-spacing: 0.2px;
-}
-
-.icon-button {
-    display: grid;
-    width: 34px;
-    height: 38px;
-    place-items: center;
-    padding: 0;
-    color: #050505;
-    background: none;
-    border: 0;
-    cursor: pointer;
-    font-size: 27px;
-}
-
-.avatar {
-    display: grid;
-    width: 38px;
-    height: 38px;
-    place-items: center;
-    color: #171717;
-    background: radial-gradient(circle at 35% 30%, #f7b6d2, #a5d9c7 62%, #514259);
-    border: 2px solid #111;
-    border-radius: 50%;
-    font-size: 22px;
-}
-
-.main-container {
+.tasks-page {
     width: 100%;
     max-width: 904px;
+    margin: 0 auto;
     padding: 18px 29px 23px;
     background: linear-gradient(
         135deg,
@@ -126,7 +38,7 @@ body {
     backdrop-filter: blur(18px) saturate(150%);
 }
 
-.course-header {
+.tasks-page .course-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -134,7 +46,7 @@ body {
     margin-bottom: 17px;
 }
 
-.course-code {
+.tasks-page .course-code {
     color: #4148e9;
     font-family: "League Spartan", sans-serif;
     font-size: 50px;
@@ -143,49 +55,34 @@ body {
     line-height: 0.95;
 }
 
-.course-name {
+.tasks-page .course-name {
     margin-top: 3px;
     font-size: 22px;
     font-weight: 700;
     line-height: 1.2;
 }
 
-.course-badge {
-    display: grid;
-    width: 52px;
-    height: 52px;
-    flex: 0 0 auto;
-    place-items: center;
-    color: #fff;
-    background: linear-gradient(135deg, #ffdf54, #ec8c48 58%, #a63836);
-    border-radius: 50%;
-    font-family: "League Spartan", sans-serif;
-    font-size: 27px;
-    font-weight: 800;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-}
-
-.tasks-panel {
+.tasks-page .tasks-panel {
     min-height: 418px;
     padding: 21px 33px;
     border: 2px solid #999;
     border-radius: 15px;
 }
 
-.tasks-header {
+.tasks-page .tasks-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 18px;
 }
 
-.tasks-header h2 {
+.tasks-page .tasks-header h2 {
     font-family: "League Spartan", sans-serif;
     font-size: 27px;
     font-weight: 800;
 }
 
-.add-task {
+.tasks-page .add-task {
     display: grid;
     width: 30px;
     height: 30px;
@@ -198,15 +95,16 @@ body {
     transition: transform 0.15s, background-color 0.15s;
 }
 
-.add-task:hover {
+.tasks-page .add-task:hover {
     background: #4148e9;
     transform: scale(1.06);
 }
 
-.task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+.tasks-page .add-task:focus-visible,
+.tasks-page .task-title-button:focus-visible,
+.tasks-page .task-status:focus-visible {
+    outline: 3px solid #575df0;
+    outline-offset: 3px;
 }
 
 .task-list-message {
@@ -224,7 +122,7 @@ body {
     grid-template-columns: minmax(0, 1fr);
 }
 
-.task-name {
+.tasks-page .task-name {
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -281,7 +179,37 @@ body {
     font-weight: 600;
 }
 
-.task-deadline {
+.tasks-page .task-title-button {
+    min-width: 0;
+    flex: 1;
+    padding: 0;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+
+.tasks-page .task-status {
+    flex: 0 0 auto;
+    max-width: 112px;
+    padding: 5px 8px;
+    color: #fff;
+    background: #555;
+    border: 0;
+    border-radius: 12px;
+    font: 500 13px "Prompt", sans-serif;
+    cursor: pointer;
+}
+
+.tasks-page .task-status:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.tasks-page .task-deadline {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
@@ -322,52 +250,44 @@ body {
     white-space: nowrap;
 }
 
-.add-task:focus-visible,
-.logo:focus-visible,
-.icon-button:focus-visible {
-    outline: 3px solid #575df0;
-    outline-offset: 3px;
+.tasks-page .task-details[hidden] {
+    display: none;
+}
+
+.tasks-page .task-description,
+.tasks-page .task-assignee {
+    overflow-wrap: anywhere;
+    font-size: 15px;
+}
+
+.tasks-page .task-assignee {
+    margin-top: 7px;
+    font-weight: 600;
 }
 
 @media (max-width: 640px) {
-    body {
-        gap: 22px;
+    body:has(> .tasks-page) {
         padding: 18px 14px 28px;
     }
 
-    .top-nav {
-        min-height: 56px;
-        padding: 6px 13px;
-    }
-
-    .nav-right {
-        gap: 14px;
-    }
-
-    .main-container {
+    .tasks-page {
         padding: 20px 16px;
     }
 
-    .course-code {
+    .tasks-page .course-code {
         font-size: 44px;
     }
 
-    .course-name {
+    .tasks-page .course-name {
         font-size: 18px;
     }
 
-    .course-badge {
-        width: 44px;
-        height: 44px;
-        font-size: 23px;
-    }
-
-    .tasks-panel {
+    .tasks-page .tasks-panel {
         min-height: 420px;
         padding: 18px 16px;
     }
 
-    .task-list {
+    .tasks-page .task-list {
         gap: 16px;
     }
 

@@ -69,7 +69,7 @@ public class ReminderScheduler {
         }
 
         int userId = task.getAssignee().getUserId();
-        notificationService.createNotification(title,
+        notificationService.createSystemNotification(title,
                 "Task \"" + task.getTitle() + "\" is due on " + task.getDueDate(), "TASK_REMINDER", userId);
         log.info("Reminder {} sent for task {} to user {}", eventType, task.getTaskId(), userId);
     }

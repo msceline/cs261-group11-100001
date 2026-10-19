@@ -1,5 +1,6 @@
 package com.team.project.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,10 @@ public class ProjectService {
         String subject = req.subjectCode() == null ? "" : req.subjectCode().trim();
         if (subject.isEmpty() || subject.length() > 20) throw bad("subjectCode must be 1-20 characters");
         User host = userRepository.getReferenceById(userId);
-        Project project = projectRepository.save(new Project(null, name, subject, host, 0, null, null));
-        memberRepository.save(new ProjectMember(null, host, project, ProjectMember.HOST, null));
+        LocalDateTime createdAt = req.createdAt() != null ? req.createdAt().atStartOfDay() : LocalDateTime.now();
+        Project project = projectRepository.save(
+                new Project(null, name, subject, host, 0, createdAt));
+        memberRepository.save(new ProjectMember(null, host, project, "host", null));
         return ProjectResponse.from(project);
     }
 

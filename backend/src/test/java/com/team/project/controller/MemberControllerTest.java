@@ -57,14 +57,14 @@ class MemberControllerTest {
     @Test
     void addReturns201ForHost() throws Exception {
         when(memberService.add(eq(1), eq(1), any()))
-                .thenReturn(new MemberResponse(3, 1, 3, "visitor", "9900000001", "V"));
+                .thenReturn(new MemberResponse(3, 1, 3, "member", "9900000001", "V"));
 
         mockMvc.perform(post("/api/projects/1/members").requestAttr("userId", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":3,\"roleInProject\":\"visitor\"}"))
+                        .content("{\"studentId\":\"9900000001\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.userId").value(3))
-                .andExpect(jsonPath("$.roleInProject").value("visitor"));
+                .andExpect(jsonPath("$.roleInProject").value("member"));
     }
 
     @Test
@@ -73,7 +73,7 @@ class MemberControllerTest {
 
         mockMvc.perform(post("/api/projects/1/members").requestAttr("userId", 2)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":3}"))
+                        .content("{\"studentId\":\"9900000001\"}"))
                 .andExpect(status().isForbidden());
     }
 
@@ -83,7 +83,7 @@ class MemberControllerTest {
 
         mockMvc.perform(post("/api/projects/1/members").requestAttr("userId", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":2}"))
+                        .content("{\"studentId\":\"6609650002\"}"))
                 .andExpect(status().isConflict());
     }
 }

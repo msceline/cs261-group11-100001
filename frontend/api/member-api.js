@@ -43,14 +43,14 @@ async function getProjectMembers(projectId, token) {
   });
 }
 
-async function addProjectMember(projectId, userId, roleInProject, token) {
+async function addProjectMember(projectId, studentId, token) {
   return requestMembers(projectMembersUrl(projectId), {
     method: 'POST',
     headers: {
       ...authorizationHeaders(token),
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ userId, roleInProject }),
+    body: JSON.stringify({ studentId }),
   });
 }
 

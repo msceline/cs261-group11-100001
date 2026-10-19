@@ -20,12 +20,14 @@ public class MemberService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository memberRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     public MemberService(ProjectRepository projectRepository, ProjectMemberRepository memberRepository,
-                         UserService userService) {
+                         UserService userService, NotificationService notificationService) {
         this.projectRepository = projectRepository;
         this.memberRepository = memberRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     /** Members only. */
@@ -39,23 +41,27 @@ public class MemberService {
                 .toList();
     }
 
-    /** Host only. The host role itself comes from the project's host_id, so only member/visitor can be assigned. */
+    /** Host only. The added user always becomes a "member". */
     public MemberResponse add(int userId, int projectId, AddMemberRequest req) {
         Project project = findProject(projectId);
         if (!project.getHost().getUserId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can add members");
         }
-        if (req == null || req.userId() == null) throw bad("userId is required");
-        String role = req.roleInProject() == null ? ProjectMember.MEMBER : req.roleInProject().trim().toLowerCase();
-        if (!role.equals(ProjectMember.MEMBER) && !role.equals(ProjectMember.VISITOR)) {
-            throw bad("roleInProject must be 'member' or 'visitor'");
-        }
-        User user = userService.findById(req.userId())
+        if (req == null || req.studentId() == null || req.studentId().isBlank()) throw bad("studentId is required");
+        User user = userService.findByStudentId(req.studentId().trim())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (memberRepository.existsByProject_ProjectIdAndUser_UserId(projectId, user.getUserId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a member");
         }
-        return MemberResponse.from(memberRepository.save(new ProjectMember(null, user, project, role, null)), user);
+        ProjectMember saved = memberRepository.save(new ProjectMember(null, user, project, "member", null));
+        if (notificationService != null) {
+            notificationService.createSystemNotification(
+                    "คำเชิญเข้าร่วมกลุ่มโปรเจกต์",
+                    "คุณได้เข้าร่วมกลุ่มโปรเจกต์ \"" + project.getProjectName() + "\"",
+                    "invite",
+                    user.getUserId());
+        }
+        return MemberResponse.from(saved, user);
     }
 
     private Project findProject(int projectId) {

@@ -30,8 +30,8 @@ class AuthServiceTest {
     private TuAuthClient tuAuthClient;
     private AuthService authService;
 
-    private static User user(int id, String studentId, String role) {
-        return new User(id, studentId, role, "User " + id, studentId + "@dome.tu.ac.th", null,
+    private static User user(int id, String tu_id, String role) {
+        return new User(id, tu_id, role, "User " + id, tu_id + "@dome.tu.ac.th", null,
                 LocalDateTime.of(2026, 1, 1, 0, 0));
     }
 
@@ -43,7 +43,7 @@ class AuthServiceTest {
 
         userRepository = mock(UserRepository.class);
         for (User u : new User[] {student, student2, teacher}) {
-            when(userRepository.findByStudentId(u.getStudentId())).thenReturn(Optional.of(u));
+            when(userRepository.findByTu_id(u.getTu_id())).thenReturn(Optional.of(u));
             when(userRepository.findById(u.getUserId())).thenReturn(Optional.of(u));
         }
         when(userRepository.save(any(User.class))).thenAnswer(inv -> {
@@ -72,7 +72,7 @@ class AuthServiceTest {
         Optional<LoginResponse> result = authService.login(new LoginRequest("6609650001", "password123"));
 
         assertTrue(result.isPresent());
-        assertEquals("6609650001", result.get().user().studentId());
+        assertEquals("6609650001", result.get().user().tu_id());
         assertEquals(1, result.get().user().userId());
         assertEquals(1, jwtService.validateAndGetUserId(result.get().token()).getAsInt());
         verify(userRepository, never()).save(any(User.class));
@@ -101,7 +101,7 @@ class AuthServiceTest {
         UserResponse created = authService.login(new LoginRequest("6609659999", "password123")).orElseThrow().user();
 
         assertEquals(99, created.userId());
-        assertEquals("6609659999", created.studentId());
+        assertEquals("6609659999", created.tu_id());
         assertEquals("ผู้ใช้ ใหม่", created.displayName());
         assertEquals("6609659999@dome.tu.ac.th", created.email());
         assertEquals("student", created.role());
@@ -126,7 +126,7 @@ class AuthServiceTest {
         Optional<UserResponse> me = authService.me(2);
 
         assertTrue(me.isPresent());
-        assertEquals("6609650002", me.get().studentId());
+        assertEquals("6609650002", me.get().tu_id());
     }
 
     @Test

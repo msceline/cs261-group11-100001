@@ -16,8 +16,16 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public Optional<User> findByTu_id(String tu_id) {
+        return userRepository.findByTu_id(tu_id);
+    }
+
+    public Optional<User> findByTuId(String tuId) {
+        return userRepository.findByTu_id(tuId);
+    }
+
     public Optional<User> findByStudentId(String studentId) {
-        return userRepository.findByStudentId(studentId);
+        return userRepository.findByTu_id(studentId);
     }
 
     public Optional<User> findById(int userId) {

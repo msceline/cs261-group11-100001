@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.team.project.dto.notification.CreateNotificationRequest;
@@ -52,5 +53,11 @@ public class NotificationController {
                 request.getType(),
                 request.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(NotificationResponse.from(notification));
+    }
+
+    @RequestMapping(value = "/{id}/read", method = {RequestMethod.PATCH, RequestMethod.PUT})
+    public ResponseEntity<NotificationResponse> markAsRead(@RequestAttribute("userId") int callerId,
+                                                           @PathVariable int id) {
+        return ResponseEntity.ok(NotificationResponse.from(notificationService.markAsRead(callerId, id)));
     }
 }

@@ -14,13 +14,13 @@ body {
 }
 
 .sign-in-card {
-    font-family: "League Spartan", sans-serif;
+  font-family: "League Spartan", sans-serif;
   background-color: #ffffff;
   width: 100%;
-  max-width: 440px;
-  border-radius: 28px;
-  padding: 44px 36px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+  max-width: 320px;
+  border-radius: 25px;
+  padding: 41px 35px;
+  box-shadow: 0 16px 18px rgba(0, 0, 0, 0.18);
   text-align: center;
   margin: 0 auto;
   transform: translateY(-5px);
@@ -74,7 +74,7 @@ body {
 
 .btn-signin {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 35px;
   padding: 15px;
   background-color: #000000;
   color: #ffffff;
@@ -91,6 +91,17 @@ body {
   background-color: #222222;
 }
 
+.btn-signin:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.login-message {
+  margin-top: 12px;
+  color: #a32626;
+  font-size: 0.9rem;
+}
+
 .shake-error {
   animation: shake 0.4s ease-in-out;
   border: 1.5px solid #ef4444 !important;
@@ -101,4 +112,3 @@ body {
   20%, 60% { transform: translateX(-8px); }
   40%, 80% { transform: translateX(8px); }
 }
-

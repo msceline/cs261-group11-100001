@@ -20,8 +20,8 @@ public class User {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "tu_id", length = 20, nullable = false, unique = true)
-    private String tuId;
+    @Column(name = "student_id", length = 20, nullable = false, unique = true)
+    private String studentId;
 
     @Column(name = "role", length = 20, nullable = false)
     private String role = "student";
@@ -42,9 +42,9 @@ public class User {
     public User() {
     }
 
-    public User(Integer userId, String tuId, String role, String displayName, String email, String password, LocalDateTime createdAt) {
+    public User(Integer userId, String studentId, String role, String displayName, String email, String password, LocalDateTime createdAt) {
         this.userId = userId;
-        this.tuId = tuId;
+        this.studentId = studentId;
         this.role = role != null ? role : "student";
         this.displayName = displayName;
         this.email = email;
@@ -76,17 +76,12 @@ public class User {
         this.userId = userId;
     }
 
-    public String getTuId() {
-        return tuId;
-    }
-
-    public void setTuId(String tuId) {
-        this.tuId = tuId;
-    }
-
-    /** Alias for backward compatibility with existing UserResponse / UserRepository. */
     public String getStudentId() {
-        return tuId;
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 
     public String getRole() {

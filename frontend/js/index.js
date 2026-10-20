@@ -1,15 +1,22 @@
 const mainContainer = document.querySelector('.main-container');
 const sidebar = mainContainer?.querySelector('aside');
 const contentBox = document.querySelector('#contentBox');
+const logo = document.querySelector('.logo');
+const userProfile = document.querySelector('.user-profile');
+const profileDropdown = document.querySelector('#profileDropdown');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
 const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
+
+// Page URL html & js
 const pageUrls = {
 	project: new URL('../pages/project.html', scriptUrl),
 	creategroup: new URL('../pages/creategroup.html', scriptUrl),
 	addmember: new URL('../pages/addmember.html', scriptUrl),
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
 	members: new URL('../pages/members.html', scriptUrl),
+	task: new URL('../pages/task.html', scriptUrl),
+	createtask: new URL('../pages/createTask.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
@@ -17,10 +24,85 @@ const pageScriptUrls = {
 	creategroup: new URL('../js/creategroup.js', scriptUrl),
 	addmember: new URL('../js/addmember.js', scriptUrl),
 	members: new URL('../js/members.js', scriptUrl),
+	task: new URL('../js/task.js', scriptUrl),
+	createtask: new URL('../js/createTask.js', scriptUrl),
+};
+const pageTitles = {
+	project: 'Projects',
+	creategroup: 'Create Group',
+	addmember: 'Add Members',
+	dashboard: 'Dashboard',
+	members: 'Members',
+	task: 'Tasks',
 };
 const pageScriptPromises = {};
 let selectedProject = null;
 let projectDraft = null;
+
+document.title = pageTitles.project;
+
+function positionProfileDropdown() {
+	if (!profileDropdown || profileDropdown.hidden || !userProfile) return;
+
+	const triggerRect = userProfile.getBoundingClientRect();
+	const dropdownRect = profileDropdown.getBoundingClientRect();
+	const padding = 8;
+	const gap = 8;
+	const left = Math.max(padding, Math.min(
+		triggerRect.right - dropdownRect.width,
+		window.innerWidth - dropdownRect.width - padding,
+	));
+	const below = triggerRect.bottom + gap;
+	const top = below + dropdownRect.height <= window.innerHeight - padding
+		? below
+		: Math.max(padding, triggerRect.top - dropdownRect.height - gap);
+
+	profileDropdown.style.left = `${left}px`;
+	profileDropdown.style.top = `${top}px`;
+}
+
+function closeProfileDropdown() {
+	if (!profileDropdown || profileDropdown.hidden) return;
+
+	profileDropdown.hidden = true;
+	userProfile?.setAttribute('aria-expanded', 'false');
+}
+
+function openProfileDropdown() {
+	if (!profileDropdown) return;
+	profileDropdown.hidden = false;
+	userProfile?.setAttribute('aria-expanded', 'true');
+	positionProfileDropdown();
+}
+
+function toggleProfileDropdown() {
+	if (profileDropdown && !profileDropdown.hidden) {
+		closeProfileDropdown();
+	} else {
+		openProfileDropdown();
+	}
+}
+
+userProfile?.addEventListener('click', toggleProfileDropdown);
+userProfile?.addEventListener('keydown', (event) => {
+	if (event.key !== 'Enter' && event.key !== ' ') return;
+	event.preventDefault();
+	toggleProfileDropdown();
+});
+
+document.addEventListener('click', (event) => {
+	if (userProfile?.contains(event.target) || profileDropdown?.contains(event.target)) return;
+	closeProfileDropdown();
+});
+
+document.addEventListener('keydown', (event) => {
+	if (event.key !== 'Escape' || !profileDropdown || profileDropdown.hidden) return;
+	closeProfileDropdown();
+	userProfile?.focus();
+});
+
+window.addEventListener('resize', positionProfileDropdown);
+window.addEventListener('scroll', positionProfileDropdown, true);
 
 function setProjectContextLinksVisible(visible) {
 	projectContextLinks.forEach((link) => {
@@ -60,6 +142,8 @@ async function loadPage(page, pageData = null) {
 		}
 
 		contentBox.innerHTML = await response.text();
+		document.title = pageTitles[page] || 'App';
+
 		if (page === 'project') {
 			selectedProject = null;
 			projectDraft = null;
@@ -108,6 +192,16 @@ async function loadPage(page, pageData = null) {
 			document.dispatchEvent(new CustomEvent('member:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
+		} else if (page === 'task') {
+			await loadPageScript('task');
+			document.dispatchEvent(new CustomEvent('task:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
+		} else if (page === 'createtask') {
+			await loadPageScript('createtask');
+			document.dispatchEvent(new CustomEvent('createtask:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		}
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
@@ -127,6 +221,8 @@ document.addEventListener('addmember:create', async (event) => {
 	const project = {
 		projectName: event.detail.groupName,
 		subjectCode: event.detail.subject,
+		dueDate: event.detail.dueDate,
+		members: event.detail.members || [],
 		progress: 0,
 	};
 
@@ -146,18 +242,40 @@ pageButtons.forEach((button) => {
 	});
 });
 
+logo?.addEventListener('click', () => loadPage('project'));
+
+logo?.addEventListener('keydown', (event) => {
+	if (event.key !== 'Enter' && event.key !== ' ') return;
+	event.preventDefault();
+	loadPage('project');
+});
+
 contentBox?.addEventListener('click', (event) => {
 	if (event.target.closest('#createGroupIcon')) {
 		loadPage('creategroup');
 		return;
 	}
 
+	if (event.target.closest('#createTaskIcon')) {
+		loadPage('createtask', selectedProject);
+		return;
+	}
+
+	if (event.target.closest('#back-to-tasks')) {
+		loadPage('task', selectedProject);
+		return;
+	}
+
 	const projectCard = event.target.closest('.project-card');
 	if (projectCard) {
 		loadPage('dashboard', {
+			projectId: projectCard.dataset.projectId,
 			groupName: projectCard.dataset.projectName,
 			subject: projectCard.dataset.subjectCode,
+			subjectCode: projectCard.dataset.subjectCode,
 			progress: projectCard.dataset.progress,
+			dueDate: projectCard.dataset.dueDate,
+			members: JSON.parse(projectCard.dataset.members || '[]'),
 		});
 	}
 });
@@ -167,9 +285,13 @@ contentBox?.addEventListener('keydown', (event) => {
 	if (!projectCard || (event.key !== 'Enter' && event.key !== ' ')) return;
 	event.preventDefault();
 	loadPage('dashboard', {
+		projectId: projectCard.dataset.projectId,
 		groupName: projectCard.dataset.projectName,
 		subject: projectCard.dataset.subjectCode,
+		subjectCode: projectCard.dataset.subjectCode,
 		progress: projectCard.dataset.progress,
+		dueDate: projectCard.dataset.dueDate,
+		members: JSON.parse(projectCard.dataset.members || '[]'),
 	});
 });
 
@@ -190,8 +312,6 @@ if (mainContainer && sidebar) {
 		collapseTimer = window.setTimeout(() => {
 			mainContainer.classList.remove('is-expanded');
 			collapseTimer = null;
-		}, 2000);
+		}, 1000);
 	});
 }
-
-

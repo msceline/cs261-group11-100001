@@ -1,183 +1,216 @@
-.member-page {
-	display: grid;
-	grid-template-rows: minmax(0, 1fr);
-	width: 100%;
-	height: 100%;
-	min-height: 0;
-	padding: 10px;
-	color: #172a29;
+.course-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background: linear-gradient(to bottom, #f6fbfa, #caf1fe);
+    border-radius: 8px;
+    padding: clamp(16px, 3vw, 30px);
+    max-width: none;
+    margin: 0;
+    font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
-.member-page .group-descript {
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 16px;
-	padding: 8px 0;
+.course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 23px;
+
 }
 
-.member-page #gropnameMember {
-	font-size: 20px;
-	font-weight: normal;
-	overflow-wrap: anywhere;
-    border-left: 3px solid #000;
-    padding-left: 16px;
+.course-code {
+
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0;
+
+    background: linear-gradient(135deg, #386aaf 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.member-page #subjectMember {
-	color: #000;
-	font-size: 20px;
-	font-weight: normal;
+.course-group-name {
+    font-family: 'Kanit', sans-serif, -apple-system;
+    color: #111;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
 }
 
-.member-page .member-list {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	height: 100%;
-	min-width: 0;
-	min-height: 0;
-	padding: 20px;
-	background: #f5f8f6;
-	border: 1px solid #dce6e2;
-	border-radius: 20px;
+.members-card {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    padding: 32px 28px;
+    border-radius: 28px;
+
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.07),
+        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
+
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.members-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+}
+
+#members-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
     gap: 10px;
-    box-shadow: 0 4px 14px -9px #000;
-}
-
-.member-page .member{
-	display: flex;
-	flex: 1;
-	flex-direction: column;
-	min-height: 0;
-    border: 1px solid #888888;
-    border-radius: 20px;
-    padding: 20px;
+    margin-top: 16px;
+    overflow-x: hidden;
     overflow-y: auto;
-}
-
-.member-page .member-list h2 {
-    margin: 0 0 16px;
-	font-size: 30px;
-}
-
-.member-page #memberList {
-    display: grid;
-	flex: 1;
-	min-height: 0;
-	gap: 12px;
-	align-content: start;
-	overflow-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    overflow-x: hidden;
 }
 
-.member-page #memberList::-webkit-scrollbar{
+#members-list::-webkit-scrollbar {
     display: none;
 }
 
-.member-page .member-card {
-	display: grid;
-	grid-template-columns: 44px minmax(0, 1fr) auto;
-	align-items: center;
-	gap: 12px;
-	width: 100%;
-	min-width: 0;
-	padding: 10px;
-	background: #fff;
-	border: 1px solid #dce6e2;
-	border-radius: 26px;
-    box-shadow: 0 4px 14px -9px #000;
+.members-empty-message {
+    margin: 0;
+    padding: 12px;
+    color: #6b7280;
+    text-align: center;
 }
 
-.member-page .member-card__logo {
-	display: grid;
-	width: 44px;
-	aspect-ratio: 1;
-	place-items: center;
-	color: #fff;
-	background: #28745e;
-	border-radius: 50%;
-	font-size: 15px;
-	font-weight: 700;
+.member-item {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 32px;
+    padding: 5px 12px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.member-page .member-card__logo[data-tone="1"] {
-	background: #b85c38;
+.member-item:hover {
+    transform: translateY(-2px) scale(1.01);
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
-.member-page .member-card__logo[data-tone="2"] {
-	background: #426a8c;
+.member-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f8a238 0%, #f6703b 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-right: 16px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
 
-.member-page .member-card__logo[data-tone="3"] {
-	background: #80633e;
+.member-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
 }
 
-.member-page .member-card__identity {
-	min-width: 0;
+.member-name {
+    font-weight: 600;
+    color: #1f2937;
+    overflow-wrap: anywhere;
 }
 
-.member-page .member-card__name {
-	margin: 0;
-	color: #172a29;
-	font-size: 17px;
-	font-weight: 700;
-	overflow-wrap: anywhere;
+.member-id {
+    font-size: 0.85rem;
+    color: #6b7280;
 }
 
-.member-page .member-card__id {
-	margin: 4px 0 0;
-	color: #647471;
-	font-size: 13px;
+.member-role {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
 }
 
-.member-page .member-card__role {
-	padding: 6px 10px;
-	color: #000;
-	font-size: 12px;
-	font-weight: 700;
-	white-space: nowrap;
+@media (max-width: 600px) {
+    .course-header {
+        margin-bottom: 16px;
+    }
+
+    .members-card {
+        padding: 20px 16px;
+        border-radius: 20px;
+    }
+
+    .member-item {
+        gap: 10px;
+        padding: 5px 10px;
+    }
+
+    .member-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+
+    .member-role {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+    }
 }
 
-.member-page .member-empty {
-	margin: 0;
-	padding: 24px 16px;
-	color: #647471;
-	text-align: center;
-	background: #f5f8f6;
-	border-radius: 6px;
-}
+@media (max-width: 380px) {
+    .course-container {
+        padding: 12px;
+    }
 
-@media (max-width: 680px) {
-	.member-page {
-		gap: 16px;
-		padding: 8px;
-	}
+    .members-card {
+        padding: 16px 12px;
+    }
 
-	.member-page .member-list {
-		padding: 16px;
-	}
+    .course-code {
+        font-size: 1.75rem;
+    }
 
-	.member-page #gropnameMember {
-		font-size: 24px;
-	}
-}
-
-@media (max-width: 480px) {
-	.member-page .member-card {
-		grid-template-columns: 40px minmax(0, 1fr);
-		gap: 10px;
-		padding: 10px;
-	}
-
-	.member-page .member-card__logo {
-		width: 40px;
-	}
-
-	.member-page .member-card__role {
-		grid-column: 2;
-		justify-self: start;
-	}
+    .course-group-name {
+        font-size: 18px;
+    }
 }

@@ -61,7 +61,7 @@ class MemberControllerTest {
 
         mockMvc.perform(post("/api/projects/1/members").requestAttr("userId", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":3}"))
+                        .content("{\"studentId\":\"9900000001\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.userId").value(3))
                 .andExpect(jsonPath("$.roleInProject").value("member"));
@@ -73,7 +73,7 @@ class MemberControllerTest {
 
         mockMvc.perform(post("/api/projects/1/members").requestAttr("userId", 2)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":3}"))
+                        .content("{\"studentId\":\"9900000001\"}"))
                 .andExpect(status().isForbidden());
     }
 
@@ -83,7 +83,7 @@ class MemberControllerTest {
 
         mockMvc.perform(post("/api/projects/1/members").requestAttr("userId", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":2}"))
+                        .content("{\"studentId\":\"6609650002\"}"))
                 .andExpect(status().isConflict());
     }
 }

@@ -5,14 +5,27 @@
 	width: 100%;
 	height: 100%;
 	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 	margin: 0 auto;
 	padding: 16px;
 	color: #000;
+	background: linear-gradient(to bottom, #f6fbfa, #caf1fe);
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
+}
+
+.dashBoardpage::-webkit-scrollbar {
+	display: none;
 }
 
 .dashBoardpage .header-container {
 	display: flex;
-	align-items: center;
+	flex-direction: column;
+	align-items: right;
 	flex-wrap: wrap;
 	gap: 20px;
 	min-width: 0;
@@ -21,19 +34,24 @@
 .dashBoardpage .subject-head {
 	margin: 0;
 	color: #000;
-	font-size: 30px;
-	font-weight: bolder;
+	font-size: 2rem;
+	font-weight: 800;
+	letter-spacing: -0.03em;
 	text-transform: uppercase;
 	overflow-wrap: anywhere;
+
+	background: linear-gradient(135deg, #386aaf 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .dashBoardpage .group-name-head {
 	margin: 0;
-	padding-left: 16px;
-	border-left: 3px solid #000;
-	font-size: 30px;
-	font-weight: normal;
-	line-height: 1.15;
+	font-size: 20px;
+	font-weight: 700;
+	line-height: 1px;
+	letter-spacing: -0.03em;
 	overflow-wrap: anywhere;
 }
 
@@ -42,10 +60,20 @@
 .dashBoardpage .your-task-list {
 	min-width: 0;
 	padding: 20px;
-	background: #fff;
-	border: none;
-	border-radius: 20px;
+	border-radius: 28px;
 	box-shadow: 0 4px 14px -9px #000;
+
+	background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.07),
+        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
 }
 
 .dashBoardpage .progress-head,
@@ -54,6 +82,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
+	padding: 0 25px;
 }
 
 .dashBoardpage .progress-head,
@@ -81,12 +110,8 @@
 
 .dashBoardpage .head-title {
 	margin: 0;
-	font-size: 48px;
+	font-size: 1.5rem;
 	font-weight: 700;
-}
-
-.dashBoardpage .head-list .head-title {
-	font-size: 20px;
 	line-height: 1;
 }
 
@@ -94,7 +119,7 @@
 	flex: 0 0 auto;
 	margin: 0;
 	color: #000;
-	font-size: 30px;
+	font-size: 20px;
 	font-weight: 700;
 }
 
@@ -114,7 +139,7 @@
 	width: 0%;
 	height: 100%;
 	border-radius: inherit;
-	transition: width 300ms ease;
+	transition: width 900ms ease-out;
 }
 
 .dashBoardpage .progress-fill[data-progress-band="red"] {
@@ -131,10 +156,6 @@
 
 .dashBoardpage .progress-fill[data-progress-band="green"] {
 	background: linear-gradient(89deg, rgba(253, 240, 65, 1) 0%, rgba(137, 255, 69, 1) 50%);
-}
-
-.dashBoardpage .head-list button:empty {
-	display: none;
 }
 
 .dashBoardpage .list-container {
@@ -159,17 +180,17 @@
 	display: grid;
 	flex: 1;
 	min-height: 0;
-	margin-top: 16px;
-	padding: 16px;
+	margin-top: 10px;
+	padding: 16px 16px;
 	align-content: start;
 	justify-items: center;
-	color: #647471;
 	text-align: center;
-	background: #f5f8f6;
+	background: none;
 	border-radius: 6px;
 	overflow-y: auto;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
+	gap: 10px;
 }
 
 .dashBoardpage #upcomingListDashboard::-webkit-scrollbar,
@@ -177,21 +198,97 @@
 	display: none;
 }
 
+.dashBoardpage .dashboard-task-card {
+	justify-self: stretch;
+	width: 100%;
+	min-width: 0;
+	text-align: left;
+	border-radius: 28px;
+	background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	cursor: pointer;
+	padding: 25px 35px;
+}
+
+.dashBoardpage .dashboard-task-card:hover{
+	transform: translateY(-2px) scale(1.01);
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.dashBoardpage .dashboard-task-card__title {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 700;
+	overflow-wrap: anywhere;
+}
+
+.dashBoardpage .dashboard-task-card__description {
+	margin: 6px 0 0;
+	color: #52615c;
+	font-size: 13px;
+	line-height: 1.4;
+	overflow-wrap: anywhere;
+}
+
+.dashBoardpage .dashboard-task-card__details {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 12px;
+	color: #52615c;
+	font-size: 15px;
+}
+
+.dashBoardpage .dashboard-task-card__status {
+	padding: 4px 8px;
+	color: #385447;
+	background: #e5f2e8;
+	border-radius: 999px;
+	font-weight: 700;
+}
+
+.dashBoardpage .dashboard-task-card[data-status="in_progress"] .dashboard-task-card__status {
+	color: #dfa63b;
+	background: #fff1cc;
+}
+
+.dashBoardpage .dashboard-task-card[data-status="completed"] .dashboard-task-card__status,
+.dashBoardpage .dashboard-task-card[data-status="done"] .dashboard-task-card__status {
+	color: #245c49;
+	background: #dff3e8;
+}
+
 @media (max-width: 680px) {
 	.dashBoardpage {
+		grid-template-rows: auto auto;
 		gap: 14px;
 		padding: 8px;
-        height: fit-content;
 	}
 
 	.dashBoardpage .list-container {
 		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: repeat(2, minmax(0, 1fr));
+		grid-template-rows: repeat(2, minmax(260px, auto));
+		height: auto;
 	}
 
 	.dashBoardpage .progress-container,
 	.dashBoardpage .upcoming-list,
 	.dashBoardpage .your-task-list {
 		padding: 16px;
+	}
+
+	.dashBoardpage .dashboard-task-card {
+		padding: 12px;
+	}
+
+	.dashBoardpage .head-title{
+		font-size: 1rem;
 	}
 }

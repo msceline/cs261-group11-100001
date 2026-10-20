@@ -37,16 +37,16 @@ GO
 PRINT '2. เพิ่มข้อมูล Projects...';
 
 IF NOT EXISTS (SELECT 1 FROM [projects] WHERE [project_name] = N'TU-WorkSpace-Group11')
-    INSERT INTO [projects] ([project_name], [subject_id], [host_id], [progress], [project_description], [created_at])
-    VALUES (N'TU-WorkSpace-Group11', 'CS261', 1, 35, N'ระบบจัดการพื้นที่ทำงานและโปรเจกต์ร่วมกันสำหรับนักศึกษา', '2026-02-01 10:00:00');
+    INSERT INTO [projects] ([project_name], [subject_id], [host_id], [progress], [created_at])
+    VALUES (N'TU-WorkSpace-Group11', 'CS261', 1, 35, '2026-02-01 10:00:00');
 
 IF NOT EXISTS (SELECT 1 FROM [projects] WHERE [project_name] = N'Campus Event Planner')
-    INSERT INTO [projects] ([project_name], [subject_id], [host_id], [progress], [project_description], [created_at])
-    VALUES (N'Campus Event Planner', 'CS284', 2, 10, N'โปรเจกต์ประสานงานและจัดกิจกรรมภายในมหาวิทยาลัย', '2026-02-05 13:30:00');
+    INSERT INTO [projects] ([project_name], [subject_id], [host_id], [progress], [created_at])
+    VALUES (N'Campus Event Planner', 'CS284', 2, 10, '2026-02-05 13:30:00');
 
 IF NOT EXISTS (SELECT 1 FROM [projects] WHERE [project_name] = N'AI Study Hub')
-    INSERT INTO [projects] ([project_name], [subject_id], [host_id], [progress], [project_description], [created_at])
-    VALUES (N'AI Study Hub', 'CS300', 1, 0, N'กลุ่มศึกษาและแชร์ความรู้ด้าน Machine Learning', '2026-02-10 09:15:00');
+    INSERT INTO [projects] ([project_name], [subject_id], [host_id], [progress], [created_at])
+    VALUES (N'AI Study Hub', 'CS300', 1, 0, '2026-02-10 09:15:00');
 GO
 
 -- ------------------------------------------------------------------------------

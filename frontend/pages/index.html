@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../css/members.css">
   <link rel="stylesheet" href="../css/addmember.css">
   <link rel="stylesheet" href="../css/task.css">
+  <link rel="stylesheet" href="../css/createTask.css">
   <title>Document</title>
 </head>
 <body>
@@ -58,11 +59,18 @@
           </svg>
           <span>Members</span>
         </button>
+        <button class="sidebar-link" type="button" data-page="task" data-project-context hidden aria-label="Tasks" title="Tasks">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          </svg>
+          <span>Tasks</span>
+        </button>
       </div>
     </aside>
     <!--Display Box-->
     <main id="contentBox"></main>
   </div>
+  <script src="../api/task-api.js"></script>
   <script src="../js/index.js"></script>
 </body>
 </html>

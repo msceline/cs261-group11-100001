@@ -24,7 +24,7 @@ async function getProjectMembers(projectId, token) {
   });
 }
 
-async function addProjectMember(projectId, userId, roleInProject, token) {
+async function addProjectMember(projectId, studentId, token) {
   const url = `${API_BASE_URL}/projects/${encodeURIComponent(projectId)}/members`;
   return requestMembers(url, {
     method: 'POST',
@@ -32,7 +32,7 @@ async function addProjectMember(projectId, userId, roleInProject, token) {
       ...authorizationHeaders(token),
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ userId, roleInProject }),
+    body: JSON.stringify({ studentId }),
   });
 }
 

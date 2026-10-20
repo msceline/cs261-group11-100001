@@ -27,6 +27,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=${DB_NAME:-master};encrypt=true;trustServerCertificate=true
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: ${MSSQL_SA_PASSWORD}
+      TU_API_KEY: ${TU_API_KEY:-}
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (at least 32 characters)}
     ports:
       - "${BACKEND_PORT:-8080}:8080"

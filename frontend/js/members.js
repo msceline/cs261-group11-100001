@@ -42,6 +42,8 @@ const sampleMembers = [
     }
 ];
 
+window.groupMembers = sampleMembers;
+
 function createMemberItem(member) {
     const item = document.createElement('div');
     item.className = 'member-item';

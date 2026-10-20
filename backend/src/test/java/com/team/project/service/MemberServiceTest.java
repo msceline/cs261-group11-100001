@@ -34,6 +34,7 @@ import com.team.project.repository.UserRepository;
 class MemberServiceTest {
 
     private ProjectMemberRepository memberRepository;
+    private NotificationService notificationService;
     private MemberService memberService;
 
     private static User user(int id) {
@@ -46,18 +47,20 @@ class MemberServiceTest {
         User user1 = user(1);
         User user2 = user(2);
         User user3 = user(3);
-        Project project1 = new Project(1, "P1", "CS261", user1, 0, null, null);
-        Project project2 = new Project(2, "P2", "CS284", user2, 0, null, null);
+        Project project1 = new Project(1, "P1", "CS261", user1, 0, null);
+        Project project2 = new Project(2, "P2", "CS284", user2, 0, null);
         LocalDateTime now = LocalDateTime.of(2026, 1, 1, 0, 0);
 
         ProjectRepository projectRepository = mock(ProjectRepository.class);
         memberRepository = mock(ProjectMemberRepository.class);
         UserRepository userRepository = mock(UserRepository.class);
+        notificationService = mock(NotificationService.class);
 
         when(projectRepository.findById(1)).thenReturn(Optional.of(project1));
         when(projectRepository.findById(2)).thenReturn(Optional.of(project2));
         for (User u : new User[] {user1, user2, user3}) {
             when(userRepository.findById(u.getUserId())).thenReturn(Optional.of(u));
+            when(userRepository.findByStudentId(u.getStudentId())).thenReturn(Optional.of(u));
         }
 
         when(memberRepository.findByProject_ProjectId(1)).thenReturn(List.of(
@@ -72,7 +75,8 @@ class MemberServiceTest {
             return m;
         });
 
-        memberService = new MemberService(projectRepository, memberRepository, new UserService(userRepository));
+        memberService = new MemberService(projectRepository, memberRepository, new UserService(userRepository),
+                notificationService);
     }
 
     private static HttpStatus statusOf(ResponseStatusException e) {
@@ -112,7 +116,7 @@ class MemberServiceTest {
 
     @Test
     void hostCanAddUserAsMember() {
-        MemberResponse added = memberService.add(2, 2, new AddMemberRequest(1));
+        MemberResponse added = memberService.add(2, 2, new AddMemberRequest("6609650001"));
 
         assertEquals(100, added.id());
         assertEquals(1, added.userId());
@@ -123,23 +127,25 @@ class MemberServiceTest {
         verify(memberRepository).save(saved.capture());
         assertEquals(1, saved.getValue().getUserId());
         assertEquals(2, saved.getValue().getProjectId());
+        verify(notificationService).createSystemNotification(any(), any(), org.mockito.ArgumentMatchers.eq("invite"), org.mockito.ArgumentMatchers.eq(1));
     }
 
     @Test
     void nonHostCannotAddMember() {
-        assertAddFails(HttpStatus.FORBIDDEN, 2, 1, new AddMemberRequest(3));
+        assertAddFails(HttpStatus.FORBIDDEN, 2, 1, new AddMemberRequest("6609650003"));
     }
 
     @Test
     void addRejectsUnknownUserDuplicateAndMissingId() {
-        assertAddFails(HttpStatus.NOT_FOUND, 1, 1, new AddMemberRequest(999));
-        assertAddFails(HttpStatus.CONFLICT, 1, 1, new AddMemberRequest(2));
+        assertAddFails(HttpStatus.NOT_FOUND, 1, 1, new AddMemberRequest("0000000000"));
+        assertAddFails(HttpStatus.CONFLICT, 1, 1, new AddMemberRequest("6609650002"));
         assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest(null));
+        assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, new AddMemberRequest("  "));
         assertAddFails(HttpStatus.BAD_REQUEST, 1, 1, null);
     }
 
     @Test
     void addToUnknownProjectIsNotFound() {
-        assertAddFails(HttpStatus.NOT_FOUND, 1, 999, new AddMemberRequest(2));
+        assertAddFails(HttpStatus.NOT_FOUND, 1, 999, new AddMemberRequest("6609650002"));
     }
 }

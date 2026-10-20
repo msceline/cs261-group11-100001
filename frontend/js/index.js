@@ -14,6 +14,7 @@ const pageUrls = {
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
 	members: new URL('../pages/members.html', scriptUrl),
 	task: new URL('../pages/task.html', scriptUrl),
+	createtask: new URL('../pages/createTask.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
@@ -22,6 +23,7 @@ const pageScriptUrls = {
 	addmember: new URL('../js/addmember.js', scriptUrl),
 	members: new URL('../js/members.js', scriptUrl),
 	task: new URL('../js/task.js', scriptUrl),
+	createtask: new URL('../js/createTask.js', scriptUrl),
 };
 const pageTitles = {
 	project: 'Projects',
@@ -125,6 +127,16 @@ async function loadPage(page, pageData = null) {
 			document.dispatchEvent(new CustomEvent('member:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
+		} else if (page === 'task') {
+			await loadPageScript('task');
+			document.dispatchEvent(new CustomEvent('task:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
+		} else if (page === 'createtask') {
+			await loadPageScript('createtask');
+			document.dispatchEvent(new CustomEvent('createtask:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		}
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
@@ -176,6 +188,16 @@ logo?.addEventListener('keydown', (event) => {
 contentBox?.addEventListener('click', (event) => {
 	if (event.target.closest('#createGroupIcon')) {
 		loadPage('creategroup');
+		return;
+	}
+
+	if (event.target.closest('#createTaskIcon')) {
+		loadPage('createtask', selectedProject);
+		return;
+	}
+
+	if (event.target.closest('#back-to-tasks')) {
+		loadPage('task', selectedProject);
 		return;
 	}
 

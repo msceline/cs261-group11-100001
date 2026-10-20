@@ -1,0 +1,56 @@
+<section class="create-task-page">
+    <header class="task-header">
+        <div>
+            <h1 class="course-code" id="course-code"></h1>
+            <h2 class="course-name" id="course-name"></h2>
+        </div>
+    </header>
+
+    <form class="task-card" id="create-task-form">
+        <div class="task-card-header">
+            <h3 class="task-title" id="task-title-input" contenteditable="true" role="textbox" aria-label="Task name"
+                aria-multiline="false" spellcheck="false">Task name</h3>
+            <div class="due-date">
+                <label for="due-date-input">Due Date:</label>
+                <div class="date-picker">
+                    <input class="date-input" id="due-date-input" type="text" placeholder="xx/xx/xxxx" readonly
+                        aria-haspopup="dialog">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path
+                            d="M7 3v4m10-4v4M4 9h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"
+                            fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="1.8" />
+                    </svg>
+                    <input class="native-date-input" id="due-date-picker" name="dueDate" type="date" tabindex="-1"
+                        aria-hidden="true">
+                </div>
+            </div>
+        </div>
+
+        <div class="task-details">
+            <section class="section description-section">
+                <label class="field-label" for="description-input">Description:</label>
+                <textarea class="text-input description-input" id="description-input" name="description" placeholder="-"
+                    rows="4"></textarea>
+            </section>
+        </div>
+
+        <div class="action-footer">
+            <div class="assignment-picker">
+                <span class="assignment-label">ASSIGN:</span>
+                <button class="assignment-toggle" id="assignment-toggle" type="button"
+                    aria-label="Choose a group member" aria-expanded="false" aria-controls="assignment-menu">
+                    <span id="assigned-member">Select member</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2.2" />
+                    </svg>
+                </button>
+                <div class="assignment-menu" id="assignment-menu" role="radiogroup" aria-label="Group members" hidden></div>
+            </div>
+            <button class="back-to-tasks" id="back-to-tasks" type="button">Back</button>
+            <button type="submit" class="btn-submit" id="submit-btn">Submit</button>
+        </div>
+        <p class="submit-message" id="submit-message" role="alert" hidden></p>
+    </form>
+</section>

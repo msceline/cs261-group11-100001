@@ -6,16 +6,11 @@ import com.team.project.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    Optional<User> findByTuId(String tuId);
+    Optional<User> findByStudentId(String studentId);
 
     Optional<User> findByEmail(String email);
 
-    boolean existsByTuId(String tuId);
+    boolean existsByStudentId(String studentId);
 
     boolean existsByEmail(String email);
-
-    /** Backward-compatible alias for UserService. */
-    default Optional<User> findByStudentId(String studentId) {
-        return findByTuId(studentId);
-    }
 }

@@ -1,0 +1,370 @@
+/* Create-task page. Everything is scoped under .create-task-page because it is shown inside the index.html shell. */
+.create-task-page,
+.create-task-page * {
+    box-sizing: border-box;
+}
+
+.create-task-page * {
+    margin: 0;
+    padding: 0;
+}
+
+.create-task-page {
+    width: 100%;
+    max-width: 904px;
+    margin: 0 auto;
+    min-height: 553px;
+    padding: 18px 29px 23px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.68),
+        rgba(255, 255, 255, 0.32)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 16px;
+    box-shadow:
+        0 8px 24px rgba(31, 38, 135, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    backdrop-filter: blur(18px) saturate(150%);
+}
+
+.create-task-page .task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 17px;
+}
+
+.create-task-page .course-code {
+    color: #4148e9;
+    font-family: "League Spartan", sans-serif;
+    font-size: 50px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 0.95;
+}
+
+.create-task-page .course-name {
+    margin-top: 3px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.create-task-page .task-card {
+    min-height: 418px;
+    padding: 12px 28px 14px;
+    background: #fff;
+    border: 2px solid #969696;
+    border-radius: 16px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
+}
+
+.create-task-page .task-card-header {
+    display: flex;
+    min-height: 35px;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 10px;
+}
+
+.create-task-page .task-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: "League Spartan", sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    cursor: text;
+    overflow-wrap: anywhere;
+}
+
+.create-task-page .task-title:focus {
+    outline: 2px solid #575df0;
+    outline-offset: 3px;
+}
+
+.create-task-page .due-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: "League Spartan", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.create-task-page .due-date input,
+.create-task-page .text-input {
+    min-width: 0;
+    padding: 0;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    font: inherit;
+}
+
+.create-task-page .due-date input::placeholder,
+.create-task-page .text-input::placeholder {
+    color: #333;
+    opacity: 1;
+}
+
+.create-task-page .due-date input:focus,
+.create-task-page .text-input:focus {
+    outline: 2px solid #575df0;
+    outline-offset: 2px;
+}
+
+.create-task-page .date-picker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.create-task-page .date-picker .date-input {
+    width: 104px;
+    cursor: pointer;
+}
+
+.create-task-page .date-picker > svg {
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+}
+
+.create-task-page .native-date-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.create-task-page .task-details {
+    padding: 8px 18px 12px;
+    background: linear-gradient(145deg, #fff 0%, #fffce2 47%, #f8dfc6 100%);
+    border: 1px solid #777;
+    border-radius: 16px;
+}
+
+.create-task-page .field-label {
+    display: block;
+    font-family: "Prompt", sans-serif;
+    margin-bottom: 1px;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.create-task-page .description-input {
+    display: block;
+    width: 100%;
+    font-size: 16px;
+    line-height: 1.4;
+    resize: vertical;
+}
+
+.create-task-page .description-section {
+    min-height: 70px;
+}
+
+.create-task-page .action-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+    padding: 8px 0 2px;
+    background: #fff;
+}
+
+/* Assign-member dropdown */
+.create-task-page .assignment-picker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.create-task-page .assignment-label {
+    font-family: "League Spartan", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.create-task-page .assignment-toggle {
+    display: flex;
+    min-width: 180px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 14px;
+    color: #111;
+    background: #fff;
+    border: 1px solid #777;
+    border-radius: 12px;
+    cursor: pointer;
+    font: 500 14px "Prompt", sans-serif;
+}
+
+.create-task-page .assignment-toggle svg {
+    width: 16px;
+    height: 16px;
+}
+
+.create-task-page .assignment-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+.create-task-page .assignment-menu {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    z-index: 5;
+    display: grid;
+    min-width: 260px;
+    max-height: 220px;
+    padding: 6px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #777;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.create-task-page .assignment-menu[hidden] {
+    display: none;
+}
+
+.create-task-page .assignment-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.create-task-page .assignment-option:hover,
+.create-task-page .assignment-option:has(input:checked) {
+    background: #ffe9cf;
+}
+
+.create-task-page .assignment-message {
+    padding: 8px 10px;
+    color: #555;
+    font-size: 14px;
+}
+
+.create-task-page .btn-submit,
+.create-task-page .back-to-tasks {
+    width: 198px;
+    min-height: 36px;
+    padding: 5px 24px;
+    color: #fff;
+    background: #050505;
+    border: 0;
+    border-radius: 18px;
+    cursor: pointer;
+    font-family: "League Spartan", sans-serif;
+    font-size: 19px;
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.create-task-page .back-to-tasks {
+    color: #111;
+    background: #e5e5e5;
+}
+
+.create-task-page .btn-submit:hover {
+    background: #333;
+}
+
+.create-task-page .back-to-tasks:hover {
+    background: #d1d1d1;
+}
+
+.create-task-page .btn-submit:active,
+.create-task-page .back-to-tasks:active {
+    transform: scale(0.98);
+}
+
+.create-task-page .btn-submit:disabled,
+.create-task-page .back-to-tasks:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.create-task-page .btn-submit:focus-visible,
+.create-task-page .back-to-tasks:focus-visible,
+.create-task-page .assignment-toggle:focus-visible {
+    outline: 3px solid #575df0;
+    outline-offset: 3px;
+}
+
+.create-task-page .submit-message {
+    margin-top: 12px;
+    color: #b42318;
+    font-size: 14px;
+}
+
+.create-task-page .submit-message[hidden] {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .create-task-page {
+        padding: 20px 16px;
+    }
+
+    .create-task-page .course-code {
+        font-size: 44px;
+    }
+
+    .create-task-page .course-name {
+        font-size: 18px;
+    }
+
+    .create-task-page .task-card {
+        padding: 17px 14px;
+    }
+
+    .create-task-page .task-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .create-task-page .due-date {
+        flex-wrap: wrap;
+        text-align: left;
+        white-space: normal;
+    }
+
+    .create-task-page .task-details {
+        padding: 12px;
+    }
+
+    .create-task-page .action-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .create-task-page .btn-submit,
+    .create-task-page .back-to-tasks {
+        width: 100%;
+    }
+}

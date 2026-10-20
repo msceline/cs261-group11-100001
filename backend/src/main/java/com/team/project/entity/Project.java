@@ -37,10 +37,6 @@ public class Project {
     @Column(name = "progress", nullable = false)
     private Integer progress = 0;
 
-    @Nationalized
-    @Column(name = "project_description", length = 500)
-    private String projectDescription;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -48,13 +44,12 @@ public class Project {
     }
 
     public Project(Integer projectId, String projectName, String subjectId, User host, Integer progress,
-                   String projectDescription, LocalDateTime createdAt) {
+                   LocalDateTime createdAt) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.subjectId = subjectId;
         this.host = host;
         this.progress = progress != null ? progress : 0;
-        this.projectDescription = projectDescription;
         this.createdAt = createdAt;
     }
 
@@ -106,14 +101,6 @@ public class Project {
 
     public void setProgress(Integer progress) {
         this.progress = progress;
-    }
-
-    public String getProjectDescription() {
-        return projectDescription;
-    }
-
-    public void setProjectDescription(String projectDescription) {
-        this.projectDescription = projectDescription;
     }
 
     public LocalDateTime getCreatedAt() {

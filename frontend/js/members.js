@@ -27,7 +27,7 @@ function createMemberItem(member) {
 
     const studentId = document.createElement('span');
     studentId.className = 'member-id';
-    studentId.textContent = member.studentId || '-';
+    studentId.textContent = member.tu_id || member.tuId || member.studentId || '-';
 
     details.append(name, studentId);
 

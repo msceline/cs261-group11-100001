@@ -60,6 +60,25 @@ body::-webkit-scrollbar {
   transform: translateX(2px);
 }
 
+.notification-item.is-unread {
+  background-color: #eff6ff;
+}
+
+.notification-unread-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #0ea5e9;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.notification-status {
+  padding: 12px 6px;
+  color: #64748b;
+  text-align: center;
+}
+
 .notification-avatar-wrapper {
   margin-right: 14px;
   flex-shrink: 0;

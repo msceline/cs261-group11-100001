@@ -13,7 +13,6 @@
     width: 100%;
     max-width: 904px;
     margin: 0 auto;
-    min-height: 553px;
     padding: 18px 29px 23px;
     background: linear-gradient(
         135deg,
@@ -54,7 +53,6 @@
 }
 
 .create-task-page .task-card {
-    min-height: 418px;
     padding: 12px 28px 14px;
     background: #fff;
     border: 2px solid #969696;

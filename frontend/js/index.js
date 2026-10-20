@@ -2,6 +2,10 @@ const mainContainer = document.querySelector('.main-container');
 const sidebar = mainContainer?.querySelector('aside');
 const contentBox = document.querySelector('#contentBox');
 const logo = document.querySelector('.logo');
+const notificationTrigger = document.querySelector('#notificationTrigger');
+const notificationDropdown = document.querySelector('#notificationDropdown');
+const userProfile = document.querySelector('.user-profile');
+const profileDropdown = document.querySelector('#profileDropdown');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
 const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
@@ -36,8 +40,136 @@ const pageTitles = {
 const pageScriptPromises = {};
 let selectedProject = null;
 let projectDraft = null;
+let dropdownCloseTimer = null;
+let activeDropdown = null;
 
 document.title = pageTitles.project;
+
+function positionDropdown(trigger, dropdown) {
+	if (!trigger || !dropdown || dropdown.hidden) return;
+
+	const triggerRect = trigger.getBoundingClientRect();
+	const dropdownRect = dropdown.getBoundingClientRect();
+	const padding = 8;
+	const gap = 8;
+	const left = Math.max(padding, Math.min(
+		triggerRect.right - dropdownRect.width,
+		window.innerWidth - dropdownRect.width - padding,
+	));
+	const below = triggerRect.bottom + gap;
+	const top = below + dropdownRect.height <= window.innerHeight - padding
+		? below
+		: Math.max(padding, triggerRect.top - dropdownRect.height - gap);
+
+	dropdown.style.left = `${left}px`;
+	dropdown.style.top = `${top}px`;
+}
+
+function closeDropdown() {
+	if (dropdownCloseTimer !== null) {
+		window.clearTimeout(dropdownCloseTimer);
+		dropdownCloseTimer = null;
+	}
+
+	if (activeDropdown === 'profile') {
+		profileDropdown.hidden = true;
+		userProfile?.setAttribute('aria-expanded', 'false');
+	} else if (activeDropdown === 'notification') {
+		notificationDropdown.hidden = true;
+		notificationTrigger?.setAttribute('aria-expanded', 'false');
+	}
+	activeDropdown = null;
+}
+
+function clearDropdownCloseTimer() {
+	if (dropdownCloseTimer === null) return;
+
+	window.clearTimeout(dropdownCloseTimer);
+	dropdownCloseTimer = null;
+}
+
+function scheduleDropdownClose(name) {
+	clearDropdownCloseTimer();
+	if (activeDropdown !== name) return;
+	const trigger = name === 'profile' ? userProfile : notificationTrigger;
+	const dropdown = name === 'profile' ? profileDropdown : notificationDropdown;
+	if (trigger?.matches(':hover') || dropdown?.matches(':hover')) return;
+
+	dropdownCloseTimer = window.setTimeout(() => {
+		if (activeDropdown === name) closeDropdown();
+	}, 2000);
+}
+
+function toggleDropdown(name) {
+	if (activeDropdown === name) {
+		closeDropdown();
+		return;
+	}
+
+	closeDropdown();
+	activeDropdown = name;
+	clearDropdownCloseTimer();
+
+	if (name === 'profile') {
+		profileDropdown.hidden = false;
+		userProfile?.setAttribute('aria-expanded', 'true');
+		positionDropdown(userProfile, profileDropdown);
+	} else {
+		notificationDropdown.hidden = false;
+		notificationTrigger?.setAttribute('aria-expanded', 'true');
+		positionDropdown(notificationTrigger, notificationDropdown);
+	}
+
+	scheduleDropdownClose(name);
+}
+
+notificationTrigger?.addEventListener('click', () => toggleDropdown('notification'));
+userProfile?.addEventListener('click', () => toggleDropdown('profile'));
+[
+	['notification', notificationTrigger],
+	['notification', notificationDropdown],
+	['profile', userProfile],
+	['profile', profileDropdown],
+].forEach(([name, element]) => {
+	element?.addEventListener('mouseenter', () => clearDropdownCloseTimer());
+	element?.addEventListener('mouseleave', () => scheduleDropdownClose(name));
+});
+notificationTrigger?.addEventListener('keydown', (event) => {
+	if (event.key !== 'Enter' && event.key !== ' ') return;
+	event.preventDefault();
+	toggleDropdown('notification');
+});
+userProfile?.addEventListener('keydown', (event) => {
+	if (event.key !== 'Enter' && event.key !== ' ') return;
+	event.preventDefault();
+	toggleDropdown('profile');
+});
+
+document.addEventListener('click', (event) => {
+	if (
+		notificationTrigger?.contains(event.target)
+		|| notificationDropdown?.contains(event.target)
+		|| userProfile?.contains(event.target)
+		|| profileDropdown?.contains(event.target)
+	) return;
+	closeDropdown();
+});
+
+document.addEventListener('keydown', (event) => {
+	if (event.key !== 'Escape' || activeDropdown === null) return;
+	const lastTrigger = activeDropdown === 'profile' ? userProfile : notificationTrigger;
+	closeDropdown();
+	lastTrigger?.focus();
+});
+
+window.addEventListener('resize', () => {
+	if (activeDropdown === 'profile') positionDropdown(userProfile, profileDropdown);
+	if (activeDropdown === 'notification') positionDropdown(notificationTrigger, notificationDropdown);
+});
+window.addEventListener('scroll', () => {
+	if (activeDropdown === 'profile') positionDropdown(userProfile, profileDropdown);
+	if (activeDropdown === 'notification') positionDropdown(notificationTrigger, notificationDropdown);
+}, true);
 
 function setProjectContextLinksVisible(visible) {
 	projectContextLinks.forEach((link) => {

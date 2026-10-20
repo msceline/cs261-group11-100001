@@ -157,6 +157,30 @@ async function loadProjects() {
 	}
 }
 
+// Creates the project, then invites every chosen member (POST /api/projects/{id}/members, host only).
+async function createProjectWithMembers(project) {
+	try {
+		const api = await loadProjectApi();
+		const created = await api.createProject({ projectName: project.projectName, subjectCode: project.subjectCode });
+
+		const me = await api.getCurrentUser();
+		const ids = [...new Set((project.members || []).map((member) => member.studentId))]
+			.filter((id) => id && id !== me.tu_id && id !== me.studentId);
+
+		const failures = [];
+		for (const id of ids) {
+			try {
+				await api.addProjectMember(created.projectId, id);
+			} catch (error) {
+				failures.push(`${id}: ${error.message}`);
+			}
+		}
+		if (failures.length) createError = new Error(`เพิ่มสมาชิกไม่สำเร็จ - ${failures.join(' / ')}`);
+	} catch (error) {
+		createError = error;
+	}
+}
+
 document.addEventListener('project:loaded', loadProjects);
 
 document.addEventListener('project:create', (event) => {
@@ -164,11 +188,7 @@ document.addEventListener('project:create', (event) => {
 	if (!project.projectName || !project.subjectCode) return;
 
 	if (hasStoredAuthToken()) {
-		pendingCreate = loadProjectApi()
-			.then((api) => api.createProject({ projectName: project.projectName, subjectCode: project.subjectCode }))
-			.catch((error) => {
-				createError = error;
-			});
+		pendingCreate = createProjectWithMembers(project);
 		return;
 	}
 

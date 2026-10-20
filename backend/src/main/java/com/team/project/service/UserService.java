@@ -24,10 +24,6 @@ public class UserService {
         return userRepository.findByTu_id(tuId);
     }
 
-    public Optional<User> findByStudentId(String studentId) {
-        return userRepository.findByTu_id(studentId);
-    }
-
     public Optional<User> findById(int userId) {
         return userRepository.findById(userId);
     }

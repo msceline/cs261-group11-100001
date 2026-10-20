@@ -22,15 +22,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
         return findByTu_id(tuId);
     }
 
-    default Optional<User> findByStudentId(String studentId) {
-        return findByTu_id(studentId);
-    }
-
     default boolean existsByTuId(String tuId) {
         return existsByTu_id(tuId);
-    }
-
-    default boolean existsByStudentId(String studentId) {
-        return existsByTu_id(studentId);
     }
 }

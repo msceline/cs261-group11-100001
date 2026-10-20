@@ -50,4 +50,32 @@ class UserControllerTest {
         mockMvc.perform(get("/api/users/me").requestAttr("userId", 9))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void lookupByTuIdReturnsOnlyIdAndName() throws Exception {
+        when(userService.findByTuId("6609650002")).thenReturn(Optional.of(user(2, "Somying", "y@x.com")));
+
+        mockMvc.perform(get("/api/users/6609650002").requestAttr("userId", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tu_id").value("6609650002"))
+                .andExpect(jsonPath("$.displayName").value("Somying"))
+                .andExpect(jsonPath("$.email").doesNotExist())
+                .andExpect(jsonPath("$.password").doesNotExist());
+    }
+
+    @Test
+    void lookupByTuIdReturns404WhenNobodyHasThatId() throws Exception {
+        when(userService.findByTuId("0000000000")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/users/0000000000").requestAttr("userId", 1))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void meIsStillServedByTheMeEndpoint() throws Exception {
+        when(userService.findById(1)).thenReturn(Optional.of(user(1, "Somchai", "s@x.com")));
+
+        mockMvc.perform(get("/api/users/me").requestAttr("userId", 1))
+                .andExpect(jsonPath("$.email").value("s@x.com"));
+    }
 }

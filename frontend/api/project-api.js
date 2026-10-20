@@ -62,6 +62,35 @@
     });
   }
 
+  /** POST /api/projects/{id}/members with AddMemberRequest { tu_id }: host only; the user joins as "member". */
+  async function addProjectMember(projectId, studentId, token) {
+    try {
+      return await request(`/projects/${encodeURIComponent(projectId)}/members`, token, {
+        method: 'POST',
+        body: JSON.stringify({ tu_id: studentId }),
+      });
+    } catch (error) {
+      const reasons = {
+        400: 'รหัสไม่ถูกต้อง',
+        403: 'เฉพาะหัวหน้ากลุ่มเท่านั้นที่เพิ่มสมาชิกได้',
+        404: 'ไม่พบผู้ใช้นี้ (ต้องเคยเข้าสู่ระบบอย่างน้อย 1 ครั้ง)',
+        409: 'เป็นสมาชิกของกลุ่มอยู่แล้ว',
+      };
+      if (reasons[error.status]) error.message = reasons[error.status];
+      throw error;
+    }
+  }
+
+  /** GET /api/users/{tu_id}: { tu_id, displayName } of someone who has logged in before, or null when there is nobody with that id. */
+  async function findUser(studentId, token) {
+    try {
+      return await request(`/users/${encodeURIComponent(studentId)}`, token);
+    } catch (error) {
+      if (error.status === 404) return null;
+      throw error;
+    }
+  }
+
   /** GET /api/projects/{id} */
   function getProject(projectId, token) {
     return request(`/projects/${encodeURIComponent(projectId)}`, token);
@@ -93,7 +122,7 @@
       && project.projectName === selected.groupName) || null;
   }
 
-  const projectApi = { getProjects, createProject, getProject, getProjectTasks, getCurrentUser, findProject };
+  const projectApi = { getProjects, createProject, addProjectMember, findUser, getProject, getProjectTasks, getCurrentUser, findProject };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = projectApi;

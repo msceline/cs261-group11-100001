@@ -91,14 +91,6 @@ public class User {
         this.tu_id = tuId;
     }
 
-    public String getStudentId() {
-        return tu_id;
-    }
-
-    public void setStudentId(String studentId) {
-        this.tu_id = studentId;
-    }
-
     public String getRole() {
         return role;
     }

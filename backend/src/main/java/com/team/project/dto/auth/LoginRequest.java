@@ -10,8 +10,4 @@ public record LoginRequest(
     public String tuId() {
         return tu_id;
     }
-
-    public String studentId() {
-        return tu_id;
-    }
 }

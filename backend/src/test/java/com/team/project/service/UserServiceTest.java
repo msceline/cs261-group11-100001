@@ -24,7 +24,7 @@ class UserServiceTest {
         User u2 = new User(2, "6609650002", "student", "Two", "two@x.com", "hash", LocalDateTime.of(2026, 1, 1, 0, 0));
         UserRepository userRepository = mock(UserRepository.class);
         when(userRepository.findByTu_id("6609650001")).thenReturn(Optional.of(u1));
-        when(userRepository.findByStudentId("6609650001")).thenReturn(Optional.of(u1));
+        when(userRepository.findByTu_id("6609650001")).thenReturn(Optional.of(u1));
         when(userRepository.findById(2)).thenReturn(Optional.of(u2));
         userService = new UserService(userRepository);
     }
@@ -35,13 +35,13 @@ class UserServiceTest {
     }
 
     @Test
-    void findByStudentIdReturnsUser() {
-        assertEquals(1, userService.findByStudentId("6609650001").orElseThrow().getUserId());
+    void findByTuIdReturnsUser() {
+        assertEquals(1, userService.findByTuId("6609650001").orElseThrow().getUserId());
     }
 
     @Test
-    void findByStudentIdReturnsEmptyWhenMissing() {
-        assertTrue(userService.findByStudentId("nope").isEmpty());
+    void findByTuIdReturnsEmptyWhenMissing() {
+        assertTrue(userService.findByTuId("nope").isEmpty());
     }
 
     @Test

@@ -1,250 +1,227 @@
-// ข้อมูลจำลอง (Mock Data) สอดคล้องกับภาพแบบเป๊ะๆ
-const mockNotifications = [
-  {
-<<<<<<< HEAD
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
-    message: 'Tariq has sent you a message!',
-    time: '04 days ago.',
-    unread: true
-  },
-  {
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
-    message: 'Johan just joined your platform!',
-    time: '20 minutes ago.',
-    unread: true
-  },
-  {
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
-    message: 'Johan just joined your platform!',
-    time: '20 minutes ago.',
-    unread: true
-  },
-  {
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
-    message: 'You have a new message from Cate!',
-    time: '35 minutes ago.',
-    unread: true
-  },
-  {
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80',
-    message: 'Stefan Jones has reached out to you!',
-    time: '01 days ago.',
-    unread: true
-  },
-  {
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&auto=format&fit=crop&q=80',
-    message: 'Need to approve',
-    time: '1 days ago.',
-    unread: true
+function getCurrentUserId() {
+  try {
+    const storedUser = localStorage.getItem('authUser') || sessionStorage.getItem('authUser');
+    const user = JSON.parse(storedUser || 'null');
+    const userId = Number(user?.userId);
+    return Number.isInteger(userId) && userId > 0 ? userId : null;
+  } catch (error) {
+    console.error('Could not read the signed-in user:', error);
+    return null;
   }
-];
-
-// ฟังก์ชันนำข้อมูลไปเรนเดอร์ในการ์ด
-function renderNotifications() {
-  const notiList = document.getElementById('notiList');
-  if (!notiList) return;
-
-  notiList.innerHTML = mockNotifications.map(item => `
-    <div class="noti-item">
-      <img src="${item.avatar}" alt="Avatar" class="noti-avatar">
-      <div class="noti-text-container">
-        <p class="noti-message">${item.message}</p>
-        <span class="noti-time">${item.time}</span>
-      </div>
-      ${item.unread ? '<span class="noti-unread-dot"></span>' : ''}
-    </div>
-  `).join('');
 }
 
-// ผูก Event การคลิกเปิด/ปิด กล่องแจ้งเตือน
-function initNotificationDropdown() {
-  const notiIcon = document.querySelector('.noti-icon');
-  const notiDropdown = document.getElementById('notiDropdown');
+function hasStoredToken() {
+  try {
+    return Boolean(
+      localStorage.getItem('authToken')
+      || localStorage.getItem('token')
+      || sessionStorage.getItem('authToken')
+      || sessionStorage.getItem('token'),
+    );
+  } catch (error) {
+    console.error('Could not read the authentication token:', error);
+    return false;
+  }
+}
 
-  if (!notiIcon || !notiDropdown) return;
+function formatRelativeTime(value) {
+  if (!value) return 'Recently';
 
-  // วาดรายการข้อมูลจำลอง
-  renderNotifications();
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Recently';
 
-  // เมื่อคลิกที่ไอคอนกระดิ่งของเพื่อน -> สลับเปิด/ปิด
-  notiIcon.addEventListener('click', (event) => {
-    // ป้องกันไม่ให้การคลิกเนื้อหาข้างในการ์ดเผลอไปปิดตัวเอง
-    if (notiDropdown.contains(event.target)) return;
-    
-    notiDropdown.classList.toggle('hidden');
-  });
+  const minutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
 
-  // เมื่อคลิกที่พื้นที่อื่นนอกกล่อง -> ปิดการ์ด
-  document.addEventListener('click', (event) => {
-    if (!notiIcon.contains(event.target)) {
-      notiDropdown.classList.add('hidden');
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`;
+
+  const weeks = Math.floor(days / 7);
+  return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+}
+
+function getListElement() {
+  return document.getElementById('notification-list') || document.getElementById('notiList');
+}
+
+function createNotificationElement(item, index, compact) {
+  const row = document.createElement('div');
+  row.className = compact ? 'noti-item' : 'notification-item';
+  row.dataset.id = String(item.id);
+
+  if (!item.isRead) {
+    row.classList.add('is-unread');
+    row.setAttribute('role', 'button');
+    row.setAttribute('tabindex', '0');
+    row.setAttribute('aria-label', `${item.title}: ${item.message}. Mark as read`);
+  }
+
+  const title = item.title || item.type || 'Notification';
+  const messageText = item.message || 'No message';
+  const displayMessage = `${title}: ${messageText}`;
+  const timeText = formatRelativeTime(item.createdAt);
+
+  if (compact) {
+    const avatar = document.createElement('div');
+    avatar.className = 'noti-avatar';
+    avatar.textContent = title.trim().slice(0, 2).toUpperCase();
+
+    const content = document.createElement('div');
+    content.className = 'noti-text-container';
+
+    const message = document.createElement('p');
+    message.className = 'noti-message';
+    message.textContent = displayMessage;
+
+    const time = document.createElement('span');
+    time.className = 'noti-time';
+    time.textContent = timeText;
+
+    content.append(message, time);
+    row.append(avatar, content);
+  } else {
+    const avatar = document.createElement('div');
+    avatar.className = 'notification-avatar';
+    avatar.dataset.tone = String(index % 5);
+    avatar.textContent = title.trim().slice(0, 2).toUpperCase();
+
+    const content = document.createElement('div');
+    content.className = 'notification-content';
+
+    const message = document.createElement('span');
+    message.className = 'notification-message';
+    message.textContent = displayMessage;
+
+    const time = document.createElement('span');
+    time.className = 'notification-time';
+    time.textContent = timeText;
+
+    content.append(message, time);
+    row.append(avatar, content);
+  }
+
+  if (!item.isRead) {
+    const unreadDot = document.createElement('span');
+    unreadDot.className = compact ? 'noti-unread-dot' : 'notification-unread-dot';
+    unreadDot.setAttribute('aria-hidden', 'true');
+    row.append(unreadDot);
+  }
+
+  return row;
+}
+
+function renderNotifications(items, messageText = '') {
+  const list = getListElement();
+  if (!list) return;
+
+  list.replaceChildren();
+
+  if (messageText) {
+    const status = document.createElement('p');
+    status.className = 'notification-status';
+    status.setAttribute('role', 'status');
+    status.textContent = messageText;
+    list.append(status);
+    return;
+  }
+
+  if (!items.length) {
+    const emptyMessage = document.createElement('p');
+    emptyMessage.className = 'notification-status';
+    emptyMessage.textContent = 'No notifications yet.';
+    list.append(emptyMessage);
+    return;
+  }
+
+  const compact = list.id === 'notiList';
+  list.replaceChildren(...items.map((item, index) => createNotificationElement(item, index, compact)));
+}
+
+async function loadNotifications() {
+  const userId = getCurrentUserId();
+
+  if (!hasStoredToken() || !userId) {
+    renderNotifications([], 'Please sign in to view your notifications.');
+    return;
+  }
+
+  try {
+    const items = await window.notificationApi.getNotificationsByUserId(userId);
+    if (!Array.isArray(items)) {
+      throw new Error('The notification service returned an invalid response.');
     }
-  });
+    renderNotifications(items);
+  } catch (error) {
+    console.error('Failed to load notifications:', error);
+    renderNotifications([], error.message || 'Could not load notifications.');
+  }
+}
 
-  // ปุ่ม Show all notification
-  const showAllBtn = document.getElementById('showAllNotiBtn');
-  if (showAllBtn) {
-    showAllBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      alert('เปิดหน้าดูการแจ้งเตือนทั้งหมด');
+async function handleNotificationActivation(event) {
+  const row = event.target.closest('[data-id].is-unread');
+  if (!row || !getListElement()?.contains(row)) return;
+  if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+
+  if (event.type === 'keydown') {
+    event.preventDefault();
+  }
+
+  try {
+    await window.notificationApi.markAsRead(row.dataset.id);
+    await loadNotifications();
+  } catch (error) {
+    console.error('Failed to mark notification as read:', error);
+    const list = getListElement();
+    if (list) {
+      const status = document.createElement('p');
+      status.className = 'notification-status';
+      status.setAttribute('role', 'alert');
+      status.textContent = error.message || 'Could not mark notification as read.';
+      list.prepend(status);
+    }
+  }
+}
+
+function initNotificationDropdown() {
+  const icon = document.querySelector('.noti-icon');
+  const dropdown = document.getElementById('notiDropdown');
+  const showAllButton = document.getElementById('showAllNotiBtn');
+
+  if (icon && dropdown) {
+    icon.addEventListener('click', (event) => {
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.toggle('hidden');
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!icon.contains(event.target)) {
+        dropdown.classList.add('hidden');
+      }
     });
   }
+
+  showAllButton?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    window.location.assign('/pages/notification.html');
+  });
+
+  if (window.notificationApi) {
+    loadNotifications();
+  } else {
+    renderNotifications([], 'Notification service is unavailable.');
+  }
+
+  document.addEventListener('click', handleNotificationActivation);
+  document.addEventListener('keydown', handleNotificationActivation);
 }
 
-// สั่งทำงานทันทีเมื่อโหลดหน้าเว็บเสร็จ
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initNotificationDropdown);
 } else {
   initNotificationDropdown();
 }
-=======
-    id: 1,
-    title: 'Message',
-    message: 'Nawamintra has sent you a message!',
-    createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 2,
-    title: 'Welcome',
-    message: 'Siwadol just joined your platform!',
-    createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 3,
-    title: 'Inbox',
-    message: 'You have a new message',
-    createdAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 4,
-    title: 'Project',
-    message: 'Papangkorn has reached out to you!',
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 5,
-    title: 'Approval',
-    message: 'Need to approve',
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-  },
-];
-
-function getStoredToken() {
-  return localStorage.getItem('token') || sessionStorage.getItem('token') || '';
-}
-
-function getCurrentUserId() {
-  try {
-    const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
-    if (storedUser && storedUser.userId) {
-      return Number(storedUser.userId);
-    }
-  } catch (error) {
-    console.warn('Could not parse stored user:', error);
-  }
-
-  const numericUserId = Number(localStorage.getItem('userId') || sessionStorage.getItem('userId'));
-  return Number.isFinite(numericUserId) ? numericUserId : null;
-}
-
-function getAvatarText(value) {
-  const source = (value || 'N').trim();
-  if (!source) return 'N';
-  return source
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase();
-}
-
-function formatRelativeTime(value) {
-  if (!value) {
-    return 'Recently';
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return 'Recently';
-  }
-
-  const diffMinutes = Math.max(0, Math.round((Date.now() - date.getTime()) / 60000));
-
-  if (diffMinutes < 1) return 'Just now';
-  if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
-
-  const diffHours = Math.round(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-
-  const diffDays = Math.round(diffHours / 24);
-  if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-
-  const diffWeeks = Math.round(diffDays / 7);
-  return `${diffWeeks} week${diffWeeks === 1 ? '' : 's'} ago`;
-}
-
-function createNotificationItem(item, index) {
-  const itemEl = document.createElement('div');
-  itemEl.className = 'notification-item';
-  itemEl.dataset.id = item.id;
-
-  const avatar = document.createElement('div');
-  avatar.className = 'notification-avatar';
-  avatar.dataset.tone = String(index % 5);
-  avatar.textContent = getAvatarText(item.title || item.message);
-
-  const content = document.createElement('div');
-  content.className = 'notification-content';
-
-  const message = document.createElement('span');
-  message.className = 'notification-message';
-  const displayMessage = item.message || item.notificationMessage || 'No message';
-  message.textContent = item.title && item.title !== displayMessage
-    ? `${item.title}: ${displayMessage}`
-    : displayMessage;
-
-  const time = document.createElement('span');
-  time.className = 'notification-time';
-  time.textContent = formatRelativeTime(item.createdAt || item.created_at);
-
-  content.append(message, time);
-  itemEl.append(avatar, content);
-
-  return itemEl;
-}
-
-function renderNotifications(items) {
-  const container = document.getElementById('notification-list');
-  if (!container) return;
-
-  const notifications = Array.isArray(items) && items.length ? items : sampleNotifications;
-  container.replaceChildren(...notifications.map(createNotificationItem));
-}
-
-async function loadNotifications() {
-  const userId = getCurrentUserId();
-  const token = getStoredToken();
-
-  if (!userId || !token) {
-    renderNotifications(sampleNotifications);
-    return;
-  }
-
-  try {
-    const notifications = await window.notificationApi.getNotificationsByUserId(userId, token);
-    renderNotifications(notifications);
-  } catch (error) {
-    console.error('Failed to load notifications from backend:', error);
-    renderNotifications(sampleNotifications);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  if (window.notificationApi) {
-    await loadNotifications();
-    return;
-  }
-
-  renderNotifications(sampleNotifications);
-});
->>>>>>> setup-notification-component

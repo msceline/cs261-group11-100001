@@ -60,7 +60,7 @@ class MemberServiceTest {
         when(projectRepository.findById(2)).thenReturn(Optional.of(project2));
         for (User u : new User[] {user1, user2, user3}) {
             when(userRepository.findById(u.getUserId())).thenReturn(Optional.of(u));
-            when(userRepository.findByStudentId(u.getStudentId())).thenReturn(Optional.of(u));
+            when(userRepository.findByTu_id(u.getTu_id())).thenReturn(Optional.of(u));
         }
 
         when(memberRepository.findByProject_ProjectId(1)).thenReturn(List.of(
@@ -97,7 +97,7 @@ class MemberServiceTest {
 
         assertEquals(List.of(1, 2), members.stream().map(MemberResponse::userId).toList());
         assertEquals(List.of("host", "member"), members.stream().map(MemberResponse::roleInProject).toList());
-        assertEquals("6609650001", members.get(0).studentId());
+        assertEquals("6609650001", members.get(0).tu_id());
     }
 
     @Test

@@ -12,9 +12,10 @@ body::-webkit-scrollbar {
 .notification-card {
   box-sizing: border-box;
   font-family: "League Spartan", sans-serif ;
-  width: min(380px, 100%);
-  max-width: 380px;
-  background-color: #ffffff;
+  width: min(390px, 100%);
+  max-width: 390px;
+  background: #ffffff25;
+  backdrop-filter: blur(2px);
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
   padding: 24px 20px 16px 20px;
@@ -23,7 +24,7 @@ body::-webkit-scrollbar {
 }
 
 .notification-header {
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .notification-title {
@@ -48,6 +49,8 @@ body::-webkit-scrollbar {
   align-items: center;
   padding: 12px 6px;
   border-bottom: 1px solid #f1f5f9;
+  background: #ffffff96;
+  backdrop-filter: blur(2px);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }

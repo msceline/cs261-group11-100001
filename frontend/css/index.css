@@ -90,11 +90,12 @@ nav {
 .notification-dropdown {
   position: fixed;
   z-index: 1000;
-  width: min(420px, calc(100vw - 24px));
+  width: min(320px, calc(100vw - 24px));
   height: clamp(300px, 65dvh, 520px);
   max-height: calc(100dvh - 16px);
   padding: 0;
-  background: #fff;
+  background: #ffffff96;
+  backdrop-filter: blur(2px);
   border: 0;
   border-radius: 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);

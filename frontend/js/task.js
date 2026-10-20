@@ -2,6 +2,7 @@ let taskList = null;
 let taskMessage = null;
 let taskRows = [];
 let projectMembers = new Map();
+let currentProjectId = null;
 
 function findSelectedProject(projects, selected) {
   const byId = projects.find((project) => String(project.projectId) === String(selected.projectId));
@@ -245,6 +246,19 @@ function renderTasks(tasks) {
   visibleTasks.forEach((task) => taskList.append(createTaskRow(task)));
 }
 
+// The backend recalculates the project's progress (done tasks / all tasks * 100) on every status change; show the new value.
+async function showProjectProgress(listEmpty) {
+  let text = listEmpty ? 'No tasks yet.' : '';
+  try {
+    const projects = await taskApi.getProjects();
+    const project = projects.find((item) => item.projectId === currentProjectId);
+    if (project) text = `ความคืบหน้าโปรเจกต์ ${project.progress}%${listEmpty ? ' · No tasks yet.' : ''}`;
+  } catch {
+    // the status change itself succeeded; just skip the progress line
+  }
+  if (taskMessage?.isConnected) setTaskMessage(text);
+}
+
 async function updateStatus(task, select) {
   const previousStatus = task.status || 'todo';
   const nextStatus = select.value;
@@ -255,16 +269,16 @@ async function updateStatus(task, select) {
     const updatedTask = await taskApi.updateTaskStatus(task.taskId, nextStatus);
     task.status = updatedTask?.status || nextStatus;
 
+    let listEmpty = false;
     if (task.status === 'done') {
       const row = taskRows.find((item) => item.task === task);
       row?.article.remove();
-      if (!taskRows.some((item) => item.task.status !== 'done' && item.article.isConnected)) {
-        setTaskMessage('No tasks yet.');
-      }
-      return;
+      listEmpty = !taskRows.some((item) => item.task.status !== 'done' && item.article.isConnected);
+    } else {
+      select.value = task.status;
     }
 
-    select.value = task.status;
+    await showProjectProgress(listEmpty);
   } catch (error) {
     select.value = previousStatus;
     setTaskMessage(error.message, true);
@@ -288,6 +302,7 @@ async function loadTasks(selected) {
       return;
     }
 
+    currentProjectId = project.projectId;
     document.getElementById('course-code').textContent = project.subjectCode || '';
     document.getElementById('course-name').textContent = project.projectName || '';
 

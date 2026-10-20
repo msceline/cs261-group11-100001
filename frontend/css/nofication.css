@@ -1,6 +1,18 @@
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 .notification-card {
+  box-sizing: border-box;
   font-family: "League Spartan", sans-serif ;
-  width: 100%;
+  width: min(380px, 100%);
   max-width: 380px;
   background-color: #ffffff;
   border-radius: 20px;
@@ -25,6 +37,10 @@
 .notification-list {
   display: flex;
   flex-direction: column;
+}
+
+.notification-list::-webkit-scrollbar{
+  display: none;
 }
 
 .notification-item {

@@ -1,3 +1,7 @@
+//ส่งขอมูลเพื่อสร้างกลุ่ม ในหน้านีเก็บ memberList โดยขั้นแรก ต้องกรอก userID เพื่อนที่ต้องการเชิญ -> กด send invite เกิด event ส่ง userID เช็คกับ TU API
+//ถ้ามี useID ที่ตรงกัน -> รับข้อมูล ชื่่อ userID กลับมาเพื่อป้อนลง memberList และใส่ role เป็น "Member" ถ้าไม่มี -> ส่งแจ้งเตือนว่า userID ไม่ถูกต้องหรือ ไม่พบผู้ใช้ userID นี้
+//กดปุ่ม Okay ส่งต่อข้อมูลไปที่ backend เพื่่อ project 
+
 const memberDirectory = new Map([
     ['6809617431', { avatarText: 'SA', name: 'ศิวดล อานามวัฒน์', role: 'Leader' }],
     ['6809617118', { avatarText: 'NB', name: 'ณัฐรดา บัวสุวรรณ', role: 'Member' }],

@@ -37,6 +37,7 @@ function createStatusSelect(task) {
   const select = document.createElement('select');
   select.className = 'task-status';
   select.setAttribute('aria-label', `Status for ${task.taskTitle}`);
+  select.hidden = true;
 
   [
     ['todo', 'To do'],
@@ -50,9 +51,126 @@ function createStatusSelect(task) {
   });
 
   select.value = task.status || 'todo';
+
+  const control = document.createElement('div');
+  control.className = 'task-status-control';
+
+  const trigger = document.createElement('button');
+  trigger.className = 'task-status-trigger';
+  trigger.type = 'button';
+  trigger.setAttribute('aria-label', `Status for ${task.taskTitle}`);
+  trigger.setAttribute('aria-haspopup', 'menu');
+  trigger.setAttribute('aria-expanded', 'false');
+
+  const selectedLabel = document.createElement('span');
+  selectedLabel.className = 'task-status-label';
+  const chevron = document.createElement('span');
+  chevron.className = 'task-status-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.textContent = '▾';
+  trigger.append(selectedLabel, chevron);
+
+  const menu = document.createElement('div');
+  menu.className = 'task-status-menu';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-label', `Status options for ${task.taskTitle}`);
+  menu.hidden = true;
+
+  const options = Array.from(select.options).map((option) => {
+    const menuOption = document.createElement('button');
+    menuOption.className = 'task-status-option';
+    menuOption.type = 'button';
+    menuOption.setAttribute('role', 'menuitemradio');
+    menuOption.dataset.value = option.value;
+    menuOption.textContent = option.textContent;
+    menuOption.addEventListener('click', () => {
+      select.value = option.value;
+      closeMenu();
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    menu.append(menuOption);
+    return menuOption;
+  });
+
+  function syncControl() {
+    const selectedOption = select.selectedOptions[0];
+    selectedLabel.textContent = selectedOption?.textContent || '';
+    trigger.disabled = select.disabled;
+    trigger.setAttribute('aria-label', `${task.taskTitle}: ${selectedLabel.textContent}`);
+    options.forEach((option) => {
+      const selected = option.dataset.value === select.value;
+      option.setAttribute('aria-checked', String(selected));
+      option.tabIndex = selected ? 0 : -1;
+    });
+  }
+
+  function closeMenu(restoreFocus = false) {
+    menu.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    control.closest('.task-item')?.classList.remove('has-open-status-menu');
+    document.removeEventListener('pointerdown', handleOutsidePointerDown, true);
+    if (restoreFocus) trigger.focus();
+  }
+
+  function handleOutsidePointerDown(event) {
+    if (!control.contains(event.target)) closeMenu();
+  }
+
+  function openMenu(focusSelected = false) {
+    if (trigger.disabled) return;
+    menu.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+    control.closest('.task-item')?.classList.add('has-open-status-menu');
+    document.addEventListener('pointerdown', handleOutsidePointerDown, true);
+    if (focusSelected) {
+      options.find((option) => option.dataset.value === select.value)?.focus();
+    }
+  }
+
+  trigger.addEventListener('click', () => {
+    if (menu.hidden) openMenu();
+    else closeMenu();
+  });
+
+  trigger.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+    event.preventDefault();
+    openMenu(true);
+  });
+
+  menu.addEventListener('keydown', (event) => {
+    const currentIndex = options.indexOf(document.activeElement);
+    let nextIndex = currentIndex;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeMenu(true);
+      return;
+    }
+    if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % options.length;
+    else if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + options.length) % options.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = options.length - 1;
+    else return;
+
+    event.preventDefault();
+    options[nextIndex].focus();
+  });
+
   select.addEventListener('click', (event) => event.stopPropagation());
-  select.addEventListener('change', () => updateStatus(task, select));
-  return select;
+  select.addEventListener('change', async () => {
+    syncControl();
+    const updatePromise = updateStatus(task, select);
+    syncControl();
+    await updatePromise;
+    syncControl();
+    if (trigger.isConnected) trigger.focus();
+  });
+  control.addEventListener('click', (event) => event.stopPropagation());
+
+  control.append(trigger, menu, select);
+  syncControl();
+  return { control, select };
 }
 
 function createTaskRow(task) {
@@ -71,19 +189,22 @@ function createTaskRow(task) {
   title.className = 'task-title-text';
   title.textContent = task.taskTitle;
 
-  const statusSelect = createStatusSelect(task);
+  const statusControl = createStatusSelect(task);
   const deadline = document.createElement('time');
   deadline.className = 'task-deadline';
   deadline.textContent = formatDueDate(task.dueDate);
   if (task.dueDate) deadline.dateTime = task.dueDate;
 
   nameButton.append(title);
-  row.append(nameButton, statusSelect, deadline);
+  row.append(nameButton, statusControl.control, deadline);
 
   const details = document.createElement('div');
   details.className = 'task-details';
-  details.hidden = true;
+  details.setAttribute('aria-hidden', 'true');
+  details.inert = true;
 
+  const detailsContent = document.createElement('div');
+  detailsContent.className = 'task-details-content';
   const description = document.createElement('p');
   description.className = 'task-description';
   description.textContent = task.taskDescription || 'No description';
@@ -93,17 +214,20 @@ function createTaskRow(task) {
   const member = projectMembers.get(task.assigneeId);
   assignee.textContent = `Assigned member: ${member ? member.displayName : task.assigneeId ? `User ${task.assigneeId}` : 'Unassigned'}`;
 
-  details.append(description, assignee);
+  detailsContent.append(description, assignee);
+  details.append(detailsContent);
   article.append(row, details);
 
-  nameButton.addEventListener('click', () => {
-    const isExpanded = !details.hidden;
-    details.hidden = isExpanded;
-    nameButton.setAttribute('aria-expanded', String(!isExpanded));
-    article.classList.toggle('is-expanded', !isExpanded);
+  article.addEventListener('click', (event) => {
+    if (event.target.closest('.task-status-control')) return;
+
+    const isExpanded = article.classList.toggle('is-expanded');
+    details.setAttribute('aria-hidden', String(!isExpanded));
+    details.inert = !isExpanded;
+    nameButton.setAttribute('aria-expanded', String(isExpanded));
   });
 
-  taskRows.push({ article, task, statusSelect });
+  taskRows.push({ article, task, statusSelect: statusControl.select });
   return article;
 }
 

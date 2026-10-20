@@ -70,19 +70,26 @@
     margin-bottom: 10px;
 }
 
+.create-task-page .task-card-header input{
+    border: none;
+}
+
 .create-task-page .task-title {
     flex: 1 1 auto;
-    min-width: 0;
+    min-width: 100px;
     font-family: "League Spartan", sans-serif;
     font-size: 24px;
     font-weight: 800;
     cursor: text;
     overflow-wrap: anywhere;
+    color: #050505;
+    width: fit-content;
 }
 
 .create-task-page .task-title:focus {
-    outline: 2px solid #575df0;
+    outline: none;
     outline-offset: 3px;
+    border-bottom: 2px solid #8f9094;
 }
 
 .create-task-page .due-date {
@@ -99,7 +106,7 @@
 .create-task-page .due-date input,
 .create-task-page .text-input {
     min-width: 0;
-    padding: 0;
+    padding: 0 5px;
     color: inherit;
     background: transparent;
     border: 0;
@@ -115,8 +122,10 @@
 
 .create-task-page .due-date input:focus,
 .create-task-page .text-input:focus {
-    outline: 2px solid #575df0;
+    outline: none;
     outline-offset: 2px;
+    border: 2px solid #8f9094;
+    border-radius: 8px;
 }
 
 .create-task-page .date-picker {
@@ -324,7 +333,7 @@
     display: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
     .create-task-page {
         padding: 20px 16px;
     }
@@ -360,7 +369,17 @@
 
     .create-task-page .action-footer {
         flex-direction: column;
-        align-items: stretch;
+        box-sizing: border-box;
+
+    }
+
+    .create-task-page .action-footer .btn-submit,
+    .create-task-page .action-footer .back-to-tasks{
+       width: 50%;
+       min-width: 100px;
+       display: flex;
+       justify-content: center;
+       align-items: center;
     }
 
     .create-task-page .btn-submit,

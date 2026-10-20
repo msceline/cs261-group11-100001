@@ -188,12 +188,7 @@
 	min-width: 0;
 	text-align: left;
 	border-radius: 28px;
-	background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	background: rgba(255, 255, 255);
 	cursor: pointer;
 	padding: 0 16px;
 }
@@ -282,11 +277,9 @@
     min-width: 100%;
     gap: 3px;
     padding: 5px;
-    background: #ffffff48;
-    backdrop-filter: blur(2px);
-    border: 1px solid #e1e1e1;
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+    background: #ffffff;
+    border: 1px solid #999;
+    border-radius: 15px;
 }
 
 .tasks-page .task-status-menu[hidden] {

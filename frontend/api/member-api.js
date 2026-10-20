@@ -1,4 +1,9 @@
-const API_BASE_URL = '/api';
+function getApiBaseUrl() {
+  if (typeof window === 'undefined') return '/api';
+  return (['5500', '5501'].includes(window.location.port) || window.location.protocol === 'file:')
+    ? 'http://localhost:8080/api'
+    : '/api';
+}
 
 async function requestMembers(url, options = {}) {
   const response = await fetch(url, options);
@@ -26,7 +31,14 @@ async function requestMembers(url, options = {}) {
 }
 
 function authorizationHeaders(token) {
-  return token ? { Authorization: ['Bearer', token].join(' ') } : {};
+  let authToken = token;
+  if (!authToken && typeof localStorage !== 'undefined') {
+    authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+  }
+  if (!authToken && typeof sessionStorage !== 'undefined') {
+    authToken = sessionStorage.getItem('authToken') || sessionStorage.getItem('token');
+  }
+  return authToken ? { Authorization: ['Bearer', authToken].join(' ') } : {};
 }
 
 function projectMembersUrl(projectId) {
@@ -34,7 +46,7 @@ function projectMembersUrl(projectId) {
     throw new Error('Project ID ต้องเป็นจำนวนเต็มบวก');
   }
 
-  return `${API_BASE_URL}/projects/${encodeURIComponent(projectId)}/members`;
+  return `${getApiBaseUrl()}/projects/${encodeURIComponent(projectId)}/members`;
 }
 
 async function getProjectMembers(projectId, token) {
@@ -44,7 +56,7 @@ async function getProjectMembers(projectId, token) {
 }
 
 async function addProjectMember(projectId, tu_id, token) {
-  const url = `${API_BASE_URL}/projects/${encodeURIComponent(projectId)}/members`;
+  const url = `${getApiBaseUrl()}/projects/${encodeURIComponent(projectId)}/members`;
   return requestMembers(url, {
     method: 'POST',
     headers: {

@@ -29,6 +29,9 @@ const pageScriptUrls = {
 	task: new URL('../js/task.js', scriptUrl),
 	createtask: new URL('../js/createTask.js', scriptUrl),
 };
+const pageApiScriptUrls = {
+	members: new URL('../client-api/member-api.js', scriptUrl),
+};
 const pageTitles = {
 	project: 'Projects',
 	creategroup: 'Create Group',
@@ -39,6 +42,7 @@ const pageTitles = {
 	createtask: 'Task',
 };
 const pageScriptPromises = {};
+const pageApiScriptPromises = {};
 let selectedProject = null;
 let projectDraft = null;
 let dropdownCloseTimer = null;
@@ -196,6 +200,26 @@ function loadPageScript(page) {
 	return pageScriptPromises[page];
 }
 
+function loadPageApiScript(page) {
+	const scriptUrl = pageApiScriptUrls[page];
+	if (!scriptUrl) return Promise.resolve();
+
+	if (!pageApiScriptPromises[page]) {
+		pageApiScriptPromises[page] = new Promise((resolve, reject) => {
+			const pageScript = document.createElement('script');
+			pageScript.src = scriptUrl.href;
+			pageScript.onload = resolve;
+			pageScript.onerror = () => {
+				pageApiScriptPromises[page] = null;
+				reject(new Error(`Unable to load ${page} API`));
+			};
+			document.body.append(pageScript);
+		});
+	}
+
+	return pageApiScriptPromises[page];
+}
+
 async function loadPage(page, pageData = null) {
 	if (!contentBox) return;
 	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page);
@@ -257,7 +281,7 @@ async function loadPage(page, pageData = null) {
 				detail: projectDraft || {},
 			}));
 		} else if (page === 'members') {
-			await loadPageScript('members');
+			await Promise.all([loadPageScript('members'), loadPageApiScript('members')]);
 			document.dispatchEvent(new CustomEvent('member:loaded', {
 				detail: pageData || selectedProject || {},
 			}));

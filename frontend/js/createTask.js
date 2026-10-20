@@ -13,6 +13,8 @@ document.addEventListener('createtask:loaded', (event) => {
   const assignmentMenu = document.getElementById('assignment-menu');
   const submitButton = document.getElementById('submit-btn');
   const submitMessage = document.getElementById('submit-message');
+  const submissionModal = document.getElementById('submissionModal');
+  const closePopupBtn = document.getElementById('closePopupBtn');
 
   let projectPromise = null;
   let membersLoaded = false;
@@ -131,6 +133,14 @@ document.addEventListener('createtask:loaded', (event) => {
     if (opening && !membersLoaded) await loadMembers();
   });
 
+  if (closePopupBtn && submissionModal) {
+    closePopupBtn.addEventListener('click', () => {
+      submissionModal.classList.remove('active');
+      
+      document.dispatchEvent(new CustomEvent('createtask:done', { detail: selected }));
+    });
+  }
+
   form.addEventListener('submit', async (submitEvent) => {
     submitEvent.preventDefault();
     showSubmitMessage('');
@@ -163,7 +173,14 @@ document.addEventListener('createtask:loaded', (event) => {
         status: 'todo',
         dueDate: `${dueDate}T23:59:00`,
       });
-      document.dispatchEvent(new CustomEvent('createtask:done', { detail: selected }));
+
+      if (submissionModal) {
+        submissionModal.classList.add('active');
+      }
+
+      submitButton.disabled = false;
+      submitButton.textContent = 'Submit';
+
     } catch (error) {
       showSubmitMessage(error.message);
       submitButton.disabled = false;

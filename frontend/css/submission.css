@@ -1,7 +1,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(60, 60, 60, 0.7); /* พื้นหลังมืดคล้ายในภาพ */
+  background-color: rgba(60, 60, 60, 0.7); 
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -14,6 +14,7 @@
 }
 
 .modal-overlay.active {
+  display: flex;
   opacity: 1;
   visibility: visible;
 }

@@ -36,6 +36,7 @@ const pageTitles = {
 	dashboard: 'Dashboard',
 	members: 'Members',
 	task: 'Tasks',
+	createtask: 'Task',
 };
 const pageScriptPromises = {};
 let selectedProject = null;
@@ -283,6 +284,10 @@ document.addEventListener('creategroup:next', (event) => {
 
 document.addEventListener('addmember:back', () => {
 	loadPage('creategroup', projectDraft);
+});
+
+document.addEventListener('createtask:done', (event) => {
+	loadPage('task', event.detail || selectedProject);
 });
 
 document.addEventListener('addmember:create', async (event) => {

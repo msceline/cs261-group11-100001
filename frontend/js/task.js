@@ -236,23 +236,22 @@ function renderTasks(tasks) {
   taskList.replaceChildren();
   taskRows.length = 0;
 
-  const visibleTasks = tasks.filter((task) => task.status !== 'done');
-  if (!visibleTasks.length) {
+  if (!tasks.length) {
     setTaskMessage('No tasks yet.');
     return;
   }
 
   setTaskMessage('');
-  visibleTasks.forEach((task) => taskList.append(createTaskRow(task)));
+  tasks.forEach((task) => taskList.append(createTaskRow(task)));
 }
 
 // The backend recalculates the project's progress (done tasks / all tasks * 100) on every status change; show the new value.
-async function showProjectProgress(listEmpty) {
-  let text = listEmpty ? 'No tasks yet.' : '';
+async function showProjectProgress() {
+  let text = '';
   try {
     const projects = await taskApi.getProjects();
     const project = projects.find((item) => item.projectId === currentProjectId);
-    if (project) text = `ความคืบหน้าโปรเจกต์ ${project.progress}%${listEmpty ? ' · No tasks yet.' : ''}`;
+    if (project) text = `ความคืบหน้าโปรเจกต์ ${project.progress}%`;
   } catch {
     // the status change itself succeeded; just skip the progress line
   }
@@ -269,16 +268,8 @@ async function updateStatus(task, select) {
     const updatedTask = await taskApi.updateTaskStatus(task.taskId, nextStatus);
     task.status = updatedTask?.status || nextStatus;
 
-    let listEmpty = false;
-    if (task.status === 'done') {
-      const row = taskRows.find((item) => item.task === task);
-      row?.article.remove();
-      listEmpty = !taskRows.some((item) => item.task.status !== 'done' && item.article.isConnected);
-    } else {
-      select.value = task.status;
-    }
-
-    await showProjectProgress(listEmpty);
+    select.value = task.status;
+    await showProjectProgress();
   } catch (error) {
     select.value = previousStatus;
     setTaskMessage(error.message, true);

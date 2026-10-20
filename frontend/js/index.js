@@ -114,6 +114,7 @@ function toggleDropdown(name) {
 		profileDropdown.hidden = false;
 		userProfile?.setAttribute('aria-expanded', 'true');
 		positionDropdown(userProfile, profileDropdown);
+		document.dispatchEvent(new Event('profile:opened'));
 	} else {
 		notificationDropdown.hidden = false;
 		notificationTrigger?.setAttribute('aria-expanded', 'true');

@@ -109,8 +109,8 @@ nav {
 .profile-dropdown {
   position: fixed;
   z-index: 1000;
-  width: 252px;
-  height: 186px;
+  width: 338px;
+  height: 198px;
   max-width: calc(100vw - 16px);
   max-height: calc(100vh - 16px);
   padding: 0;
@@ -130,10 +130,10 @@ nav {
   --line-color: #c8c8c8;
 
   display: flex;
-  width: 252px;
-  height: 186px;
+  width: 338px;
+  height: 198px;
   flex-direction: column;
-  padding: 15px 13px 0;
+  padding: 15px 13px 12px;
   overflow: hidden;
   color: var(--text-color);
   background: var(--card-background);
@@ -149,6 +149,7 @@ nav {
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 8px 14px 8px 17px;
   border: 1px solid #a0a0a0;
   border-radius: 15px;
@@ -160,15 +161,17 @@ nav {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  word-break: break-word;
 }
 
 
 .profile-dropdown .user-details h1 {
-  margin: 0;
-  font-size: 25px;
+  overflow: hidden;
+  margin: 0 0 10px;
+  font-size: 20px;
   font-weight: 600;
-  line-height: 0.95;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .profile-dropdown .user-status {
@@ -176,35 +179,24 @@ nav {
   align-items: center;
   gap: 5px;
   margin: 0;
-  color: #08a941;
+  color: #565756;
   font-size: 18px;
   line-height: 1;
 }
 
-.profile-dropdown .user-status-icon {
-  color: #050505;
-  font-size: 13px;
-}
-
 .profile-dropdown .user-avatar {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  place-items: center;
-  color: #171717;
-  background:
-    radial-gradient(circle at 30% 28%, #ffd6e8 0 19%, transparent 20%),
-    radial-gradient(circle at 65% 70%, #f5b3cb 0 28%, transparent 29%),
-    linear-gradient(135deg, #d94e88, #f9c6d8 53%, #772752);
-  border: 1.5px solid #111;
+  display: block;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
   border-radius: 50%;
-  font-size: 23px;
 }
 
-.profile-dropdown .user-avatar svg {
-  width: 24px;
-  height: 24px;
+.profile-dropdown .user-avatar img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .profile-dropdown .menu-item {
@@ -220,7 +212,7 @@ nav {
   border: 0;
   cursor: pointer;
   font: inherit;
-  font-size: 22px;
+  font-size: 20px;
   text-align: left;
   text-decoration: none;
 }

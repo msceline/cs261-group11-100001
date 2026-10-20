@@ -2,6 +2,8 @@ const mainContainer = document.querySelector('.main-container');
 const sidebar = mainContainer?.querySelector('aside');
 const contentBox = document.querySelector('#contentBox');
 const logo = document.querySelector('.logo');
+const userProfile = document.querySelector('.user-profile');
+const profileDropdown = document.querySelector('#profileDropdown');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
 const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
@@ -38,6 +40,69 @@ let selectedProject = null;
 let projectDraft = null;
 
 document.title = pageTitles.project;
+
+function positionProfileDropdown() {
+	if (!profileDropdown || profileDropdown.hidden || !userProfile) return;
+
+	const triggerRect = userProfile.getBoundingClientRect();
+	const dropdownRect = profileDropdown.getBoundingClientRect();
+	const padding = 8;
+	const gap = 8;
+	const left = Math.max(padding, Math.min(
+		triggerRect.right - dropdownRect.width,
+		window.innerWidth - dropdownRect.width - padding,
+	));
+	const below = triggerRect.bottom + gap;
+	const top = below + dropdownRect.height <= window.innerHeight - padding
+		? below
+		: Math.max(padding, triggerRect.top - dropdownRect.height - gap);
+
+	profileDropdown.style.left = `${left}px`;
+	profileDropdown.style.top = `${top}px`;
+}
+
+function closeProfileDropdown() {
+	if (!profileDropdown || profileDropdown.hidden) return;
+
+	profileDropdown.hidden = true;
+	userProfile?.setAttribute('aria-expanded', 'false');
+}
+
+function openProfileDropdown() {
+	if (!profileDropdown) return;
+	profileDropdown.hidden = false;
+	userProfile?.setAttribute('aria-expanded', 'true');
+	positionProfileDropdown();
+}
+
+function toggleProfileDropdown() {
+	if (profileDropdown && !profileDropdown.hidden) {
+		closeProfileDropdown();
+	} else {
+		openProfileDropdown();
+	}
+}
+
+userProfile?.addEventListener('click', toggleProfileDropdown);
+userProfile?.addEventListener('keydown', (event) => {
+	if (event.key !== 'Enter' && event.key !== ' ') return;
+	event.preventDefault();
+	toggleProfileDropdown();
+});
+
+document.addEventListener('click', (event) => {
+	if (userProfile?.contains(event.target) || profileDropdown?.contains(event.target)) return;
+	closeProfileDropdown();
+});
+
+document.addEventListener('keydown', (event) => {
+	if (event.key !== 'Escape' || !profileDropdown || profileDropdown.hidden) return;
+	closeProfileDropdown();
+	userProfile?.focus();
+});
+
+window.addEventListener('resize', positionProfileDropdown);
+window.addEventListener('scroll', positionProfileDropdown, true);
 
 function setProjectContextLinksVisible(visible) {
 	projectContextLinks.forEach((link) => {

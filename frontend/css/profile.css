@@ -57,7 +57,7 @@ body {
 }
 
 .user-details h1 {
-    font-size: 25px;
+    font-size: 22px;
     font-weight: 600;
     line-height: 0.95;
     margin-top : 2px;
@@ -68,14 +68,9 @@ body {
     align-items: center;
     gap: 5px;
     margin-top: 2px;
-    color: #08a941;
+    color: #565756;
     font-size: 18px;
     line-height: 1;
-}
-
-.user-status i {
-    color: #050505;
-    font-size: 13px;
 }
 
 .user-avatar {

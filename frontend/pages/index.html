@@ -40,16 +40,13 @@
     <div class="profile-card">
       <div class="user-summary">
         <div class="user-details">
-          <h1>Name</h1>
+          <h1 id="profileName">Name</h1>
           <p class="user-status">
-            <span class="user-status-icon" aria-hidden="true">●</span>
-            <span>online</span>
+            <span id="profileStudentId">รหัสนักศึกษา</span>
           </p>
         </div>
         <div class="user-avatar" role="img" aria-label="Profile avatar">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
-          </svg>
+          <img src="../asset/image/Profile 1.svg" alt="">
         </div>
       </div>
       <button class="menu-item theme-button" id="theme-button" type="button" aria-pressed="false">
@@ -60,7 +57,7 @@
       </button>
       <a class="menu-item sign-out-button" href="login.html">
         <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M10 17l5-5-5-5m5 5H3m9-9h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
         </svg>
         <span>Sign Out</span>
       </a>
@@ -108,6 +105,7 @@
   </div>
   <script src="../api/task-api.js"></script>
   <script src="../js/index.js"></script>
+  <script src="../api/profile-api.js"></script>
   <script src="../js/profile.js"></script>
 </body>
 </html>

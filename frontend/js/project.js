@@ -16,6 +16,8 @@ function createProjectCard(project) {
 	card.dataset.projectName = project.projectName || '';
 	card.dataset.subjectCode = project.subjectCode || '';
 	card.dataset.progress = String(progress);
+	card.dataset.dueDate = project.dueDate || '';
+	card.dataset.members = JSON.stringify(project.members || []);
 	card.tabIndex = 0;
 	card.setAttribute('role', 'button');
 	card.setAttribute('aria-label', `เปิด dashboard ของ ${project.projectName || 'โปรเจกต์'}`);
@@ -32,6 +34,14 @@ function createProjectCard(project) {
 	name.textContent = project.projectName || 'ไม่ระบุชื่อโปรเจกต์';
 
 	details.append(subject, name);
+
+	if (project.dueDate || project.members?.length) {
+		const metadata = document.createElement('p');
+		metadata.className = 'project-card__meta';
+		const metadataItems = [];
+		metadata.textContent = metadataItems.join(' · ');
+		details.append(metadata);
+	}
 
 	const progressSection = document.createElement('div');
 	progressSection.className = 'project-card__progress';
@@ -80,3 +90,14 @@ function renderProjectCards(projectItems) {
 }
 
 document.addEventListener('project:loaded', () => renderProjectCards(projects));
+
+document.addEventListener('project:create', (event) => {
+	const project = event.detail || {};
+	if (!project.projectName || !project.subjectCode) return;
+
+	projects.push({
+		...project,
+		projectId: Date.now(),
+		progress: Number(project.progress) || 0,
+	});
+});

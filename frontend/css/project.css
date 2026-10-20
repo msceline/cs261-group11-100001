@@ -7,6 +7,7 @@
     min-width: 0;
     min-height: 100%;
     color: #000;
+    font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
 }
 
 .project-page .process-container {
@@ -27,30 +28,37 @@
     gap: 8px;
     min-width: 0;
     min-height: 40px;
-    padding: 0;
+    padding: 0 15px;
 }
 
 .project-page .header-box h3 {
     min-width: 0;
     margin: 0;
     color: #000;
-    font-size: clamp(20px, 6vw, 40px);
-    font-weight: bold;
+    font-size: 2rem;
+    font-weight: 800;
     overflow-wrap: anywhere;
 }
 
 .project-page #createGroupIcon {
     display: inline-flex;
+    width: 32px;
+    height: 32px;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    min-height: 40px;
-    padding: 0 14px;
+    padding: 4px;
     color: #000;
     background: none;
     border: none;
     cursor: pointer;
     transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.project-page #createGroupIcon img {
+    display: block;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .project-page #createGroupIcon:active {
@@ -87,7 +95,7 @@
 .project-page #completeTaskList > * {
     padding: 16px;
     background: #f8faf9;
-    border: 1px solid ;
+    border: none;
     border-radius: 20px;
 }
 
@@ -125,6 +133,10 @@
     cursor: pointer;
 }
 
+.project-page .project-card:hover{
+    transform: translateY(-1px) scale(1.01);
+}
+
 .project-page .project-card:focus-visible {
     outline: 3px solid #28745e;
     outline-offset: 3px;
@@ -150,6 +162,13 @@
     margin: 0;
     color: #687772;
     font-size: 14px;
+}
+
+.project-page .project-card__meta {
+    margin: 2px 0 0;
+    color: #41544f;
+    font-size: 12px;
+    overflow-wrap: anywhere;
 }
 
 .project-page .project-card__progress {

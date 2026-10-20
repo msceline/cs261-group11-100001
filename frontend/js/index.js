@@ -1,21 +1,41 @@
 const mainContainer = document.querySelector('.main-container');
 const sidebar = mainContainer?.querySelector('aside');
 const contentBox = document.querySelector('#contentBox');
+const logo = document.querySelector('.logo');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
 const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
+
+// Page URL html & js
 const pageUrls = {
 	project: new URL('../pages/project.html', scriptUrl),
 	creategroup: new URL('../pages/creategroup.html', scriptUrl),
+	addmember: new URL('../pages/addmember.html', scriptUrl),
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
+	members: new URL('../pages/members.html', scriptUrl),
+	task: new URL('../pages/task.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
 	dashboard: new URL('../js/dashboard.js', scriptUrl),
 	creategroup: new URL('../js/creategroup.js', scriptUrl),
+	addmember: new URL('../js/addmember.js', scriptUrl),
+	members: new URL('../js/members.js', scriptUrl),
+	task: new URL('../js/task.js', scriptUrl),
+};
+const pageTitles = {
+	project: 'Projects',
+	creategroup: 'Create Group',
+	addmember: 'Add Members',
+	dashboard: 'Dashboard',
+	members: 'Members',
+	task: 'Tasks',
 };
 const pageScriptPromises = {};
 let selectedProject = null;
+let projectDraft = null;
+
+document.title = pageTitles.project;
 
 function setProjectContextLinksVisible(visible) {
 	projectContextLinks.forEach((link) => {
@@ -55,12 +75,22 @@ async function loadPage(page, pageData = null) {
 		}
 
 		contentBox.innerHTML = await response.text();
-		if (page === 'project' || page === 'creategroup') {
+		document.title = pageTitles[page] || 'App';
+
+		if (page === 'project') {
 			selectedProject = null;
-		} else if (pageData) {
+			projectDraft = null;
+		} else if (page === 'creategroup') {
+			selectedProject = null;
+			projectDraft = pageData || null;
+		} else if (page === 'dashboard' && pageData) {
 			selectedProject = pageData;
+		} else if (page === 'members' && pageData) {
+			selectedProject = pageData;
+		} else if (page === 'addmember') {
+			projectDraft = pageData || projectDraft;
 		}
-		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup');
+		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup' && page !== 'addmember');
 
 		pageButtons.forEach((button) => {
 			const isActive = button.dataset.page === page;
@@ -82,18 +112,65 @@ async function loadPage(page, pageData = null) {
 			}));
 		} else if (page === 'creategroup') {
 			await loadPageScript('creategroup');
-			document.dispatchEvent(new Event('creategroup:loaded'));
+			document.dispatchEvent(new CustomEvent('creategroup:loaded', {
+				detail: projectDraft || {},
+			}));
+		} else if (page === 'addmember') {
+			await loadPageScript('addmember');
+			document.dispatchEvent(new CustomEvent('addmember:loaded', {
+				detail: projectDraft || {},
+			}));
+		} else if (page === 'members') {
+			await loadPageScript('members');
+			document.dispatchEvent(new CustomEvent('member:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		}
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
 	}
 }
 
+document.addEventListener('creategroup:next', (event) => {
+	projectDraft = event.detail;
+	loadPage('addmember', projectDraft);
+});
+
+document.addEventListener('addmember:back', () => {
+	loadPage('creategroup', projectDraft);
+});
+
+document.addEventListener('addmember:create', async (event) => {
+	const project = {
+		projectName: event.detail.groupName,
+		subjectCode: event.detail.subject,
+		dueDate: event.detail.dueDate,
+		members: event.detail.members || [],
+		progress: 0,
+	};
+
+	try {
+		await loadPageScript('project');
+		document.dispatchEvent(new CustomEvent('project:create', { detail: project }));
+		await loadPage('project');
+	} catch {
+		contentBox.textContent = 'ไม่สามารถสร้าง project ได้';
+	}
+});
+
 pageButtons.forEach((button) => {
 	button.addEventListener('click', () => {
 		const pageData = button.hasAttribute('data-project-context') ? selectedProject : null;
 		loadPage(button.dataset.page, pageData);
 	});
+});
+
+logo?.addEventListener('click', () => loadPage('project'));
+
+logo?.addEventListener('keydown', (event) => {
+	if (event.key !== 'Enter' && event.key !== ' ') return;
+	event.preventDefault();
+	loadPage('project');
 });
 
 contentBox?.addEventListener('click', (event) => {
@@ -105,9 +182,13 @@ contentBox?.addEventListener('click', (event) => {
 	const projectCard = event.target.closest('.project-card');
 	if (projectCard) {
 		loadPage('dashboard', {
+			projectId: projectCard.dataset.projectId,
 			groupName: projectCard.dataset.projectName,
 			subject: projectCard.dataset.subjectCode,
+			subjectCode: projectCard.dataset.subjectCode,
 			progress: projectCard.dataset.progress,
+			dueDate: projectCard.dataset.dueDate,
+			members: JSON.parse(projectCard.dataset.members || '[]'),
 		});
 	}
 });
@@ -117,9 +198,13 @@ contentBox?.addEventListener('keydown', (event) => {
 	if (!projectCard || (event.key !== 'Enter' && event.key !== ' ')) return;
 	event.preventDefault();
 	loadPage('dashboard', {
+		projectId: projectCard.dataset.projectId,
 		groupName: projectCard.dataset.projectName,
 		subject: projectCard.dataset.subjectCode,
+		subjectCode: projectCard.dataset.subjectCode,
 		progress: projectCard.dataset.progress,
+		dueDate: projectCard.dataset.dueDate,
+		members: JSON.parse(projectCard.dataset.members || '[]'),
 	});
 });
 
@@ -140,8 +225,6 @@ if (mainContainer && sidebar) {
 		collapseTimer = window.setTimeout(() => {
 			mainContainer.classList.remove('is-expanded');
 			collapseTimer = null;
-		}, 2000);
+		}, 1000);
 	});
 }
-
-

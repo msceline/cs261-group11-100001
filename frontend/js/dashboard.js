@@ -1,3 +1,6 @@
+const dashboardScriptUrl = document.currentScript?.src || window.location.href;
+
+// Shown only while nobody is logged in (no auth token), so the page can still be previewed without the backend.
 const sampleUpcomingTasks = [
 	{
 		taskTitle: 'สรุปขอบเขตโครงงาน',
@@ -35,11 +38,17 @@ const taskStatusLabels = {
 	done: 'Completed',
 };
 
+// The backend uses todo / doing / done; the card styles use in_progress for "doing".
+function normalizeTaskStatus(status) {
+	const value = String(status || 'todo').toLowerCase().replaceAll(' ', '_');
+	return value === 'doing' ? 'in_progress' : value;
+}
+
 function createDashboardTaskCard(task) {
 	const card = document.createElement('article');
-	const status = String(task.status || 'todo').toLowerCase();
+	const status = normalizeTaskStatus(task.status);
 	card.className = 'dashboard-task-card';
-	card.dataset.status = status.replaceAll(' ', '_');
+	card.dataset.status = status;
 
 	const title = document.createElement('h3');
 	title.className = 'dashboard-task-card__title';
@@ -70,10 +79,131 @@ function createDashboardTaskCard(task) {
 	return card;
 }
 
-function renderDashboardTaskCards(container, tasks, fallbackTasks) {
+function renderDashboardTaskCards(container, tasks, emptyMessage = '') {
 	if (!container) return;
-	const items = Array.isArray(tasks) ? tasks : fallbackTasks;
-	container.replaceChildren(...items.map(createDashboardTaskCard));
+	if (!tasks.length && emptyMessage) {
+		const message = document.createElement('p');
+		message.textContent = emptyMessage;
+		container.replaceChildren(message);
+		return;
+	}
+	container.replaceChildren(...tasks.map(createDashboardTaskCard));
+}
+
+function showDashboardMessage(container, text) {
+	if (!container) return;
+	const message = document.createElement('p');
+	message.textContent = text;
+	container.replaceChildren(message);
+}
+
+function loadProjectApi() {
+	if (window.projectApi) return Promise.resolve(window.projectApi);
+
+	return new Promise((resolve, reject) => {
+		const script = document.createElement('script');
+		script.src = new URL('../api/project-api.js', dashboardScriptUrl).href;
+		script.onload = () => resolve(window.projectApi);
+		script.onerror = () => reject(new Error('โหลดบริการข้อมูลโปรเจกต์ไม่สำเร็จ'));
+		document.head.append(script);
+	});
+}
+
+function startOfDay(date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function isSameDay(a, b) {
+	return startOfDay(a).getTime() === startOfDay(b).getTime();
+}
+
+function formatTaskDueDate(value, today) {
+	if (!value) return 'No due date';
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return String(value);
+	if (isSameDay(date, today)) return 'วันนี้';
+	return date.toLocaleDateString('th-TH-u-ca-gregory', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function hasStoredAuthToken() {
+	try {
+		return Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+	} catch {
+		return false;
+	}
+}
+
+function renderProgress(dashboard, progressValue) {
+	const progressPercentage = dashboard.querySelector('#progressBarPercentageDashboard');
+	const progressBar = dashboard.querySelector('#progressBardashboard');
+	const progress = Math.min(100, Math.max(0, Number(progressValue) || 0));
+
+	if (progressPercentage) progressPercentage.textContent = `${progress}%`;
+	if (!progressBar) return;
+
+	progressBar.style.width = '0%';
+	progressBar.setAttribute('aria-valuenow', String(progress));
+	progressBar.dataset.progressBand = progress < 25
+		? 'red'
+		: progress < 50
+			? 'orange'
+			: progress < 75
+				? 'yellow'
+				: 'green';
+
+	progressBar.getBoundingClientRect();
+	requestAnimationFrame(() => {
+		if (progressBar.isConnected) {
+			progressBar.style.width = `${progress}%`;
+		}
+	});
+}
+
+// Loads the project, its tasks and the current user from the backend and fills the dashboard.
+async function loadDashboardData(dashboard, selected) {
+	const groupName = dashboard.querySelector('#groupNameDashboard');
+	const subject = dashboard.querySelector('#subjectGroupDashboard');
+	const upcomingList = dashboard.querySelector('#upcomingListDashboard');
+	const todayList = dashboard.querySelector('#yourTaskListDashboard');
+
+	showDashboardMessage(upcomingList, 'Loading...');
+	showDashboardMessage(todayList, 'Loading...');
+
+	try {
+		const api = await loadProjectApi();
+		const project = await api.findProject(selected);
+		if (!project) throw new Error('ไม่พบโปรเจกต์นี้ในบัญชีของคุณ');
+
+		const [tasks, me] = await Promise.all([
+			api.getProjectTasks(project.projectId),
+			api.getCurrentUser(),
+		]);
+		if (!dashboard.isConnected) return;
+
+		const today = new Date();
+		const openTasks = tasks.filter((task) => task.status !== 'done');
+		const byDueDate = (a, b) => new Date(a.dueDate || 8.64e15) - new Date(b.dueDate || 8.64e15);
+
+		// Upcoming: unfinished tasks of this project due today or later, soonest first.
+		const upcoming = openTasks
+			.filter((task) => task.dueDate && startOfDay(new Date(task.dueDate)) >= startOfDay(today))
+			.sort(byDueDate);
+		// Your tasks today: unfinished tasks assigned to me that are due today.
+		const mineToday = openTasks
+			.filter((task) => task.assigneeId === me.userId && task.dueDate && isSameDay(new Date(task.dueDate), today));
+
+		const format = (task) => ({ ...task, dueDate: formatTaskDueDate(task.dueDate, today) });
+
+		if (groupName) groupName.textContent = project.projectName || '';
+		if (subject) subject.textContent = project.subjectCode || '';
+		renderProgress(dashboard, project.progress);
+		renderDashboardTaskCards(upcomingList, upcoming.map(format), 'ไม่มีงานที่ใกล้ถึงกำหนด');
+		renderDashboardTaskCards(todayList, mineToday.map(format), 'วันนี้ไม่มีงานของคุณ');
+	} catch (error) {
+		if (!dashboard.isConnected) return;
+		showDashboardMessage(upcomingList, error.message);
+		showDashboardMessage(todayList, error.message);
+	}
 }
 
 document.addEventListener('dashboard:loaded', (event) => {
@@ -83,34 +213,17 @@ document.addEventListener('dashboard:loaded', (event) => {
 	const project = event.detail || {};
 	const groupName = dashboard.querySelector('#groupNameDashboard');
 	const subject = dashboard.querySelector('#subjectGroupDashboard');
-	const progressPercentage = dashboard.querySelector('#progressBarPercentageDashboard');
-	const progressBar = dashboard.querySelector('#progressBardashboard');
-	const upcomingList = dashboard.querySelector('#upcomingListDashboard');
-	const todayList = dashboard.querySelector('#yourTaskListDashboard');
-	const progress = Math.min(100, Math.max(0, Number(project.progress) || 0));
 
+	// Show what the project card already knows straight away; the backend data replaces it when it arrives.
 	if (groupName) groupName.textContent = project.groupName || '';
 	if (subject) subject.textContent = project.subject || '';
-	if (progressPercentage) progressPercentage.textContent = `${progress}%`;
-	if (progressBar) {
-		progressBar.style.width = '0%';
-		progressBar.setAttribute('aria-valuenow', String(progress));
-		progressBar.dataset.progressBand = progress < 25
-			? 'red'
-			: progress < 50
-				? 'orange'
-				: progress < 75
-					? 'yellow'
-					: 'green';
+	renderProgress(dashboard, project.progress);
 
-		progressBar.getBoundingClientRect();
-		requestAnimationFrame(() => {
-			if (progressBar.isConnected) {
-				progressBar.style.width = `${progress}%`;
-			}
-		});
+	if (hasStoredAuthToken()) {
+		loadDashboardData(dashboard, project);
+		return;
 	}
 
-		renderDashboardTaskCards(upcomingList, project.upcomingTasks, sampleUpcomingTasks);
-		renderDashboardTaskCards(todayList, project.todayTasks, sampleTodayTasks);
+	renderDashboardTaskCards(dashboard.querySelector('#upcomingListDashboard'), project.upcomingTasks || sampleUpcomingTasks);
+	renderDashboardTaskCards(dashboard.querySelector('#yourTaskListDashboard'), project.todayTasks || sampleTodayTasks);
 });

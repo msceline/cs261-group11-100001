@@ -1,5 +1,7 @@
 
-// Object Project
+const projectScriptUrl = document.currentScript?.src || window.location.href;
+
+// Shown only while nobody is logged in (no auth token), so the page can still be previewed without the backend.
 const projects = [
 	{ projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 20 },
     { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS213', progress: 55 },
@@ -89,11 +91,86 @@ function renderProjectCards(projectItems) {
 	});
 }
 
-document.addEventListener('project:loaded', () => renderProjectCards(projects));
+function hasStoredAuthToken() {
+	try {
+		return Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+	} catch {
+		return false;
+	}
+}
+
+function loadProjectApi() {
+	if (window.projectApi) return Promise.resolve(window.projectApi);
+
+	return new Promise((resolve, reject) => {
+		const script = document.createElement('script');
+		script.src = new URL('../api/project-api.js', projectScriptUrl).href;
+		script.onload = () => resolve(window.projectApi);
+		script.onerror = () => reject(new Error('โหลดบริการข้อมูลโปรเจกต์ไม่สำเร็จ'));
+		document.head.append(script);
+	});
+}
+
+function showProjectMessage(text) {
+	const processingList = document.getElementById('processTaskList');
+	const completeList = document.getElementById('completeTaskList');
+	if (!processingList || !completeList) return;
+
+	const message = document.createElement('p');
+	message.textContent = text;
+	processingList.replaceChildren(message);
+	completeList.replaceChildren();
+}
+
+// A project created while logged in is saved through the backend; the project list waits for that to finish.
+let pendingCreate = Promise.resolve();
+let createError = null;
+
+// Every project the logged-in user belongs to (GET /api/projects), or the sample list without a login.
+async function loadProjects() {
+	if (!hasStoredAuthToken()) {
+		renderProjectCards(projects);
+		return;
+	}
+
+	showProjectMessage('Loading...');
+	try {
+		await pendingCreate;
+		const api = await loadProjectApi();
+		const items = await api.getProjects();
+		if (!document.getElementById('processTaskList')) return;
+
+		if (!items.length) {
+			showProjectMessage('ยังไม่มีโปรเจกต์');
+		} else {
+			renderProjectCards(items);
+		}
+
+		if (createError) {
+			const message = document.createElement('p');
+			message.textContent = createError.message;
+			document.getElementById('processTaskList').prepend(message);
+			createError = null;
+		}
+	} catch (error) {
+		if (document.getElementById('processTaskList')) showProjectMessage(error.message);
+	}
+}
+
+document.addEventListener('project:loaded', loadProjects);
 
 document.addEventListener('project:create', (event) => {
 	const project = event.detail || {};
 	if (!project.projectName || !project.subjectCode) return;
+
+	if (hasStoredAuthToken()) {
+		pendingCreate = loadProjectApi()
+			.then((api) => api.createProject({ projectName: project.projectName, subjectCode: project.subjectCode }))
+			.catch((error) => {
+				createError = error;
+			});
+		return;
+	}
 
 	projects.push({
 		...project,

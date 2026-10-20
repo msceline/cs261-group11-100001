@@ -13,8 +13,6 @@ document.addEventListener('createtask:loaded', (event) => {
   const assignmentMenu = document.getElementById('assignment-menu');
   const submitButton = document.getElementById('submit-btn');
   const submitMessage = document.getElementById('submit-message');
-  const submissionModal = document.getElementById('submissionModal');
-  const closePopupBtn = document.getElementById('closePopupBtn');
 
   let projectPromise = null;
   let membersLoaded = false;
@@ -25,6 +23,11 @@ document.addEventListener('createtask:loaded', (event) => {
 
     const [year, month, day] = dateValue.split('-');
     return `${day}/${month}/${year}`;
+  }
+
+  // The Back button is handled by index.js (it reopens the task list of the selected project); clicking it does the same.
+  function goBackToTasks() {
+    document.getElementById('back-to-tasks')?.click();
   }
 
   function showSubmitMessage(message) {
@@ -133,14 +136,6 @@ document.addEventListener('createtask:loaded', (event) => {
     if (opening && !membersLoaded) await loadMembers();
   });
 
-  if (closePopupBtn && submissionModal) {
-    closePopupBtn.addEventListener('click', () => {
-      submissionModal.classList.remove('active');
-      
-      document.dispatchEvent(new CustomEvent('createtask:done', { detail: selected }));
-    });
-  }
-
   form.addEventListener('submit', async (submitEvent) => {
     submitEvent.preventDefault();
     showSubmitMessage('');
@@ -174,13 +169,7 @@ document.addEventListener('createtask:loaded', (event) => {
         dueDate: `${dueDate}T23:59:00`,
       });
 
-      if (submissionModal) {
-        submissionModal.classList.add('active');
-      }
-
-      submitButton.disabled = false;
-      submitButton.textContent = 'Submit';
-
+      goBackToTasks();
     } catch (error) {
       showSubmitMessage(error.message);
       submitButton.disabled = false;

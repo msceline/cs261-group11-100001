@@ -174,23 +174,21 @@ async function loadDashboardData(dashboard, selected) {
 		const project = await api.findProject(selected);
 		if (!project) throw new Error('ไม่พบโปรเจกต์นี้ในบัญชีของคุณ');
 
-		const [tasks, me] = await Promise.all([
-			api.getProjectTasks(project.projectId),
-			api.getCurrentUser(),
-		]);
+		const tasks = await api.getProjectTasks(project.projectId);
 		if (!dashboard.isConnected) return;
 
 		const today = new Date();
 		const openTasks = tasks.filter((task) => task.status !== 'done');
 		const byDueDate = (a, b) => new Date(a.dueDate || 8.64e15) - new Date(b.dueDate || 8.64e15);
 
-		// Upcoming: unfinished tasks of this project due today or later, soonest first.
-		const upcoming = openTasks
-			.filter((task) => task.dueDate && startOfDay(new Date(task.dueDate)) >= startOfDay(today))
+		// Task Today: every unfinished task of this project that is due today.
+		const dueToday = openTasks
+			.filter((task) => task.dueDate && isSameDay(new Date(task.dueDate), today))
 			.sort(byDueDate);
-		// Your tasks today: unfinished tasks assigned to me that are due today.
-		const mineToday = openTasks
-			.filter((task) => task.assigneeId === me.userId && task.dueDate && isSameDay(new Date(task.dueDate), today));
+		// Upcoming: unfinished tasks due after today, soonest first.
+		const upcoming = openTasks
+			.filter((task) => task.dueDate && startOfDay(new Date(task.dueDate)) > startOfDay(today))
+			.sort(byDueDate);
 
 		const format = (task) => ({ ...task, dueDate: formatTaskDueDate(task.dueDate, today) });
 
@@ -198,7 +196,7 @@ async function loadDashboardData(dashboard, selected) {
 		if (subject) subject.textContent = project.subjectCode || '';
 		renderProgress(dashboard, project.progress);
 		renderDashboardTaskCards(upcomingList, upcoming.map(format), 'ไม่มีงานที่ใกล้ถึงกำหนด');
-		renderDashboardTaskCards(todayList, mineToday.map(format), 'วันนี้ไม่มีงานของคุณ');
+		renderDashboardTaskCards(todayList, dueToday.map(format), 'วันนี้ไม่มีงานที่ครบกำหนด');
 	} catch (error) {
 		if (!dashboard.isConnected) return;
 		showDashboardMessage(upcomingList, error.message);

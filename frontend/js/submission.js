@@ -1,23 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const modal = document.getElementById('submissionModal');
-  const closeBtn = document.getElementById('closePopupBtn');
+    const form = document.getElementById('create-task-form');
+    const modal = document.getElementById('submissionModal');
+    const closeBtn = document.getElementById('closePopupBtn');
 
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      if (modal) {
-        modal.classList.remove('active');
-      }
+    if (form && modal) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); 
 
+            modal.classList.add('active');
+        });
+    }
 
-      if (typeof loadPage === 'function') {
-        loadPage('task');
-      } else {
-
-        const taskSidebarBtn = document.querySelector('[data-page="task"]');
-        if (taskSidebarBtn) {
-          taskSidebarBtn.click();
-        }
-      }
-    });
-  }
+    if (closeBtn && modal) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
 });

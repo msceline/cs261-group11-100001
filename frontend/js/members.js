@@ -6,37 +6,37 @@ const courseData = {
 const sampleMembers = [
     {
         name: 'ศิวดล อานามวัฒน์',
-        studentId: '6809617431',
-        role: 'Leader',
+        tu_id: '6809617431',
+        role: 'Host',
         avatarText: 'SA'
     },
     {
         name: 'ณัฐรดา บัวสุวรรณ',
-        studentId: '6809617118',
+        tu_id: '6809617118',
         role: 'Member',
         avatarText: 'NB'
     },
     {
         name: 'ตรีทิพยนิภา ชูเชิด',
-        studentId: '6809617134',
+        tu_id: '6809617134',
         role: 'Member',
         avatarText: 'TC'
     },
     {
         name: 'นวมินทร์ตรา คำมุงคุล',
-        studentId: '6809540161',
+        tu_id: '6809540161',
         role: 'Member',
         avatarText: 'NK'
     },
     {
         name: 'ปภังกร รักนิยม',
-        studentId: '6809617217',
+        tu_id: '6809617217',
         role: 'Member',
         avatarText: 'PR'
     },
     {
         name: 'สุวิจักษณ์ แซ่ท้าว',
-        studentId: '6809681486',
+        tu_id: '6809681486',
         role: 'Member',
         avatarText: 'SS'
     }
@@ -59,11 +59,11 @@ function createMemberItem(member) {
     name.className = 'member-name';
     name.textContent = member.name;
 
-    const studentId = document.createElement('span');
-    studentId.className = 'member-id';
-    studentId.textContent = member.studentId;
+    const tuIdElement = document.createElement('span');
+    tuIdElement.className = 'member-id';
+    tuIdElement.textContent = member.tu_id || member.tuId || member.studentId;
 
-    details.append(name, studentId);
+    details.append(name, tuIdElement);
 
     const role = document.createElement('span');
     role.className = 'member-role';

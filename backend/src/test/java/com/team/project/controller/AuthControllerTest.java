@@ -42,10 +42,10 @@ class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"studentId\":\"6609650001\",\"password\":\"password123\"}"))
+                        .content("{\"tu_id\":\"6609650001\",\"password\":\"password123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("jwt-token"))
-                .andExpect(jsonPath("$.user.studentId").value("6609650001"));
+                .andExpect(jsonPath("$.user.tu_id").value("6609650001"));
     }
 
     @Test
@@ -54,7 +54,7 @@ class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"studentId\":\"6609650001\",\"password\":\"bad\"}"))
+                        .content("{\"tu_id\":\"6609650001\",\"password\":\"bad\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error").exists());
     }

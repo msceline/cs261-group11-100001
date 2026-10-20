@@ -1,9 +1,12 @@
 const mainContainer = document.querySelector('.main-container');
 const sidebar = mainContainer?.querySelector('aside');
 const contentBox = document.querySelector('#contentBox');
+const logo = document.querySelector('.logo');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
 const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
+
+// Page URL html & js
 const pageUrls = {
 	project: new URL('../pages/project.html', scriptUrl),
 	creategroup: new URL('../pages/creategroup.html', scriptUrl),
@@ -146,6 +149,14 @@ pageButtons.forEach((button) => {
 		const pageData = button.hasAttribute('data-project-context') ? selectedProject : null;
 		loadPage(button.dataset.page, pageData);
 	});
+});
+
+logo?.addEventListener('click', () => loadPage('project'));
+
+logo?.addEventListener('keydown', (event) => {
+	if (event.key !== 'Enter' && event.key !== ' ') return;
+	event.preventDefault();
+	loadPage('project');
 });
 
 contentBox?.addEventListener('click', (event) => {

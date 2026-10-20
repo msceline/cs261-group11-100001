@@ -25,8 +25,8 @@ public class AuthService {
 
     /** Verifies the account with the TU API and creates the local user on first login. Empty when invalid. */
     public Optional<LoginResponse> login(LoginRequest req) {
-        if (req == null || req.studentId() == null || req.password() == null) return Optional.empty();
-        return tuAuthClient.verify(req.studentId(), req.password())
+        if (req == null || req.tu_id() == null || req.password() == null) return Optional.empty();
+        return tuAuthClient.verify(req.tu_id(), req.password())
                 .map(this::findOrCreate)
                 .map(u -> new LoginResponse(jwtService.generateToken(u.getUserId()), UserResponse.from(u)));
     }
@@ -36,9 +36,9 @@ public class AuthService {
     }
 
     private User findOrCreate(TuAuthClient.TuUser tu) {
-        return userService.findByStudentId(tu.username()).orElseGet(() -> {
+        return userService.findByTu_id(tu.username()).orElseGet(() -> {
             User u = new User();
-            u.setStudentId(tu.username());
+            u.setTu_id(tu.username());
             u.setRole("employee".equalsIgnoreCase(tu.type()) ? "teacher" : "student");
             u.setDisplayName(tu.displayName());
             u.setEmail(tu.email());

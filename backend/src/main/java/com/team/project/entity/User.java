@@ -20,8 +20,8 @@ public class User {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "student_id", length = 20, nullable = false, unique = true)
-    private String studentId;
+    @Column(name = "tu_id", length = 20, nullable = false, unique = true)
+    private String tu_id;
 
     @Column(name = "role", length = 20, nullable = false)
     private String role = "student";
@@ -42,20 +42,19 @@ public class User {
     public User() {
     }
 
-    public User(Integer userId, String studentId, String role, String displayName, String email, String password, LocalDateTime createdAt) {
+    public User(Integer userId, String tu_id, String role, String displayName, String email, String password, LocalDateTime createdAt) {
         this.userId = userId;
-        this.studentId = studentId;
+        this.tu_id = tu_id;
         this.role = role != null ? role : "student";
         this.displayName = displayName;
         this.email = email;
         this.password = password;
         this.createdAt = createdAt;
-        this.role = role;
     }
 
     /** Backward-compatible constructor for existing mock data. */
-    public User(int userId, String studentId, String password, String displayName, String email, LocalDateTime createdAt) {
-        this(userId, studentId, "student", displayName, email, password, createdAt);
+    public User(int userId, String tu_id, String password, String displayName, String email, LocalDateTime createdAt) {
+        this(userId, tu_id, "student", displayName, email, password, createdAt);
     }
 
     @PrePersist
@@ -76,12 +75,28 @@ public class User {
         this.userId = userId;
     }
 
+    public String getTu_id() {
+        return tu_id;
+    }
+
+    public void setTu_id(String tu_id) {
+        this.tu_id = tu_id;
+    }
+
+    public String getTuId() {
+        return tu_id;
+    }
+
+    public void setTuId(String tuId) {
+        this.tu_id = tuId;
+    }
+
     public String getStudentId() {
-        return studentId;
+        return tu_id;
     }
 
     public void setStudentId(String studentId) {
-        this.studentId = studentId;
+        this.tu_id = studentId;
     }
 
     public String getRole() {

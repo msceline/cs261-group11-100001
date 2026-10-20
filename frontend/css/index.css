@@ -72,51 +72,12 @@ nav {
   cursor: pointer;
 }
 
-.noti-icon {
-  background: #f2f6f5;
-}
-
-.noti-icon::before {
-  width: 13px;
-  height: 15px;
-  content: "";
-  border: 2px solid black;
-  border-radius: 9px 9px 5px 5px;
-}
-
-.noti-icon::after {
-  position: absolute;
-  bottom: 11px;
-  width: 19px;
-  height: 4px;
-  content: "";
-  border-bottom: 2px solid black;
-  border-radius: 50%;
-}
-
-.user-profile {
-  overflow: hidden;
-  background: lightgray;
-}
-
-.user-profile::before {
-  position: absolute;
-  top: 8px;
-  width: 11px;
-  height: 11px;
-  content: "";
-  border-radius: 50%;
-  background: black;
-}
-
-.user-profile::after {
-  position: absolute;
-  bottom: -5px;
-  width: 24px;
-  height: 20px;
-  content: "";
-  border-radius: 50% 50% 0 0;
-  background: black;
+.noti-icon img,
+.user-profile img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .main-container {

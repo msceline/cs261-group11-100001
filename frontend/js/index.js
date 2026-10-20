@@ -144,6 +144,8 @@ document.addEventListener('addmember:create', async (event) => {
 	const project = {
 		projectName: event.detail.groupName,
 		subjectCode: event.detail.subject,
+		dueDate: event.detail.dueDate,
+		members: event.detail.members || [],
 		progress: 0,
 	};
 
@@ -180,9 +182,13 @@ contentBox?.addEventListener('click', (event) => {
 	const projectCard = event.target.closest('.project-card');
 	if (projectCard) {
 		loadPage('dashboard', {
+			projectId: projectCard.dataset.projectId,
 			groupName: projectCard.dataset.projectName,
 			subject: projectCard.dataset.subjectCode,
+			subjectCode: projectCard.dataset.subjectCode,
 			progress: projectCard.dataset.progress,
+			dueDate: projectCard.dataset.dueDate,
+			members: JSON.parse(projectCard.dataset.members || '[]'),
 		});
 	}
 });
@@ -192,9 +198,13 @@ contentBox?.addEventListener('keydown', (event) => {
 	if (!projectCard || (event.key !== 'Enter' && event.key !== ' ')) return;
 	event.preventDefault();
 	loadPage('dashboard', {
+		projectId: projectCard.dataset.projectId,
 		groupName: projectCard.dataset.projectName,
 		subject: projectCard.dataset.subjectCode,
+		subjectCode: projectCard.dataset.subjectCode,
 		progress: projectCard.dataset.progress,
+		dueDate: projectCard.dataset.dueDate,
+		members: JSON.parse(projectCard.dataset.members || '[]'),
 	});
 });
 
@@ -218,4 +228,3 @@ if (mainContainer && sidebar) {
 		}, 1000);
 	});
 }
-

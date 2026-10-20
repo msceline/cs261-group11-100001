@@ -36,7 +36,7 @@
     white-space: nowrap;
 }
 
-#create-group-form {
+#createProjectForm {
     display: flex;
     flex: 1;
     flex-direction: column;

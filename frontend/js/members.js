@@ -48,18 +48,23 @@ function createMemberItem(member) {
 
     const avatar = document.createElement('div');
     avatar.className = 'member-avatar';
-    avatar.textContent = member.avatarText;
+    avatar.textContent = member.avatarText || (member.name || member.displayName || '?')
+        .split(/\s+/)
+        .map((part) => part[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase();
 
     const details = document.createElement('div');
     details.className = 'member-details';
 
     const name = document.createElement('span');
     name.className = 'member-name';
-    name.textContent = member.name;
+    name.textContent = member.name || member.displayName || 'Unknown member';
 
     const studentId = document.createElement('span');
     studentId.className = 'member-id';
-    studentId.textContent = member.studentId;
+    studentId.textContent = member.studentId || '';
 
     details.append(name, studentId);
 
@@ -87,7 +92,14 @@ function renderMembers(data = {}) {
     }
 
     if (membersListContainer) {
-        membersListContainer.replaceChildren(...sampleMembers.map(createMemberItem));
+        const members = Array.isArray(data.members) ? data.members : sampleMembers;
+        membersListContainer.replaceChildren(...members.map(createMemberItem));
+        if (members.length === 0) {
+            const emptyMessage = document.createElement('p');
+            emptyMessage.className = 'members-empty-message';
+            emptyMessage.textContent = 'No members have been added to this project yet.';
+            membersListContainer.append(emptyMessage);
+        }
     }
 }
 

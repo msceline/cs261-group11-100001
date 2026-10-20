@@ -211,6 +211,25 @@
 	outline-offset: 2px;
 }
 
+.addmember-page .addmember-card .invited-member-card__remove-btn {
+	background: transparent;
+	color: #000;
+	border: none;
+}
+
+.addmember-page .addmember-card .invited-member-card__remove-btn:hover {
+	background: transparent;
+	transform: none;
+	box-shadow: none;
+}
+
+.addmember-page .addmember-card .invited-member-card__remove-btn:focus-visible {
+	background: transparent;
+	transform: scale(1.05);
+	box-shadow: none;
+	outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.addmember-page .addmember-card button {
 		transition: none;

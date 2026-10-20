@@ -93,7 +93,7 @@ document.addEventListener('dashboard:loaded', (event) => {
 	if (subject) subject.textContent = project.subject || '';
 	if (progressPercentage) progressPercentage.textContent = `${progress}%`;
 	if (progressBar) {
-		progressBar.style.width = `${progress}%`;
+		progressBar.style.width = '0%';
 		progressBar.setAttribute('aria-valuenow', String(progress));
 		progressBar.dataset.progressBand = progress < 25
 			? 'red'
@@ -102,6 +102,13 @@ document.addEventListener('dashboard:loaded', (event) => {
 				: progress < 75
 					? 'yellow'
 					: 'green';
+
+		progressBar.getBoundingClientRect();
+		requestAnimationFrame(() => {
+			if (progressBar.isConnected) {
+				progressBar.style.width = `${progress}%`;
+			}
+		});
 	}
 
 		renderDashboardTaskCards(upcomingList, project.upcomingTasks, sampleUpcomingTasks);

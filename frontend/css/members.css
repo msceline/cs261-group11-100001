@@ -93,6 +93,13 @@
     display: none;
 }
 
+.members-empty-message {
+    margin: 0;
+    padding: 12px;
+    color: #6b7280;
+    text-align: center;
+}
+
 .member-item {
     display: flex;
     flex: 0 0 auto;

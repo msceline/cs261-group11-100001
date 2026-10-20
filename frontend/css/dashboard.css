@@ -82,11 +82,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-}
-
-.dashBoardpage .head-list Button{
-	cursor: pointer;
-	
+	padding: 0 25px;
 }
 
 .dashBoardpage .progress-head,
@@ -143,7 +139,7 @@
 	width: 0%;
 	height: 100%;
 	border-radius: inherit;
-	transition: width 300ms ease;
+	transition: width 900ms ease-out;
 }
 
 .dashBoardpage .progress-fill[data-progress-band="red"] {
@@ -184,8 +180,8 @@
 	display: grid;
 	flex: 1;
 	min-height: 0;
-	margin-top: 16px;
-	padding: 16px;
+	margin-top: 10px;
+	padding: 16px 16px;
 	align-content: start;
 	justify-items: center;
 	text-align: center;
@@ -206,7 +202,6 @@
 	justify-self: stretch;
 	width: 100%;
 	min-width: 0;
-	padding: 14px;
 	text-align: left;
 	border-radius: 28px;
 	background: rgba(255, 255, 255, 0.55);
@@ -216,6 +211,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	cursor: pointer;
+	padding: 25px 35px;
 }
 
 .dashBoardpage .dashboard-task-card:hover{
@@ -247,7 +243,7 @@
 	gap: 8px;
 	margin-top: 12px;
 	color: #52615c;
-	font-size: 12px;
+	font-size: 15px;
 }
 
 .dashBoardpage .dashboard-task-card__status {

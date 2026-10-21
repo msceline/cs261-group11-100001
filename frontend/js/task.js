@@ -22,7 +22,7 @@ function formatDueDate(value) {
 function getStatusLabel(status) {
   const labels = {
     todo: 'To do',
-    doing: 'Doing',
+    doing: 'In progress',
     done: 'Done',
   };
   return labels[status] || status || 'To do';
@@ -42,7 +42,7 @@ function createStatusSelect(task) {
 
   [
     ['todo', 'To do'],
-    ['doing', 'Doing'],
+    ['doing', 'In progress'],
     ['done', 'Done'],
   ].forEach(([value, label]) => {
     const option = document.createElement('option');

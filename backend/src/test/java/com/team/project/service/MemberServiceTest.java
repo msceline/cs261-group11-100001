@@ -36,6 +36,7 @@ class MemberServiceTest {
     private ProjectMemberRepository memberRepository;
     private NotificationService notificationService;
     private MemberService memberService;
+    private TuStudentService tuStudentService;
 
     private static User user(int id) {
         return new User(id, "660965000" + id, "student", "User " + id, "u" + id + "@x.com", "hash",
@@ -55,12 +56,15 @@ class MemberServiceTest {
         memberRepository = mock(ProjectMemberRepository.class);
         UserRepository userRepository = mock(UserRepository.class);
         notificationService = mock(NotificationService.class);
+        tuStudentService = mock(TuStudentService.class);
 
         when(projectRepository.findById(1)).thenReturn(Optional.of(project1));
         when(projectRepository.findById(2)).thenReturn(Optional.of(project2));
         for (User u : new User[] {user1, user2, user3}) {
             when(userRepository.findById(u.getUserId())).thenReturn(Optional.of(u));
             when(userRepository.findByTu_id(u.getTu_id())).thenReturn(Optional.of(u));
+            // TU knows every user of this fixture; any other id is unknown to TU
+            when(tuStudentService.findOrCreateUser(u.getTu_id())).thenReturn(Optional.of(u));
         }
 
         when(memberRepository.findByProject_ProjectId(1)).thenReturn(List.of(
@@ -76,7 +80,7 @@ class MemberServiceTest {
         });
 
         memberService = new MemberService(projectRepository, memberRepository, new UserService(userRepository),
-                notificationService);
+                tuStudentService, notificationService);
     }
 
     private static HttpStatus statusOf(ResponseStatusException e) {

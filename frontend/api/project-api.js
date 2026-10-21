@@ -73,7 +73,8 @@
       const reasons = {
         400: 'รหัสไม่ถูกต้อง',
         403: 'เฉพาะหัวหน้ากลุ่มเท่านั้นที่เพิ่มสมาชิกได้',
-        404: 'ไม่พบผู้ใช้นี้ (ต้องเคยเข้าสู่ระบบอย่างน้อย 1 ครั้ง)',
+        404: 'ไม่พบรหัสนักศึกษานี้ในระบบของ TU',
+        502: 'ตรวจสอบกับระบบ TU ไม่ได้ในขณะนี้',
         409: 'เป็นสมาชิกของกลุ่มอยู่แล้ว',
       };
       if (reasons[error.status]) error.message = reasons[error.status];
@@ -89,6 +90,11 @@
       if (error.status === 404) return null;
       throw error;
     }
+  }
+
+  /** GET /api/projects/{id}/members: [{ id, projectId, userId, roleInProject, tu_id, displayName }]. */
+  function getProjectMembers(projectId, token) {
+    return request(`/projects/${encodeURIComponent(projectId)}/members`, token);
   }
 
   /** GET /api/projects/{id} */
@@ -122,7 +128,7 @@
       && project.projectName === selected.groupName) || null;
   }
 
-  const projectApi = { getProjects, createProject, addProjectMember, findUser, getProject, getProjectTasks, getCurrentUser, findProject };
+  const projectApi = { getProjects, createProject, addProjectMember, getProjectMembers, findUser, getProject, getProjectTasks, getCurrentUser, findProject };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = projectApi;

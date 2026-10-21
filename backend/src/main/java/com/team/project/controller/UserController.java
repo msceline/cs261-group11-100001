@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.team.project.dto.auth.UserLookupResponse;
 import com.team.project.dto.auth.UserResponse;
+import com.team.project.service.TuStudentService;
 import com.team.project.service.UserService;
 
 @RestController
@@ -19,9 +20,11 @@ import com.team.project.service.UserService;
 public class UserController {
 
     private final UserService userService;
+    private final TuStudentService tuStudentService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, TuStudentService tuStudentService) {
         this.userService = userService;
+        this.tuStudentService = tuStudentService;
     }
 
     @GetMapping("/me")
@@ -32,12 +35,13 @@ public class UserController {
                         .body(Map.of("error", "User not found")));
     }
 
-    /** Looks a user up by TU id (only name and id are returned); 404 when nobody with that id has logged in yet. */
+    /** Looks a student up in the TU directory by id (only id and name are returned); 404 when TU has no such student. */
     @GetMapping("/{tuId}")
     public ResponseEntity<?> getByTuId(@PathVariable String tuId) {
-        return userService.findByTuId(tuId.trim())
-                .<ResponseEntity<?>>map(u -> ResponseEntity.ok(UserLookupResponse.from(u)))
+        return tuStudentService.lookup(tuId)
+                .<ResponseEntity<?>>map(student -> ResponseEntity.ok(
+                        new UserLookupResponse(student.username(), student.displayName())))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "User not found")));
+                        .body(Map.of("error", "Student not found")));
     }
 }

@@ -1,48 +1,9 @@
+const membersScriptUrl = document.currentScript?.src || window.location.href;
+
 const courseData = {
     code: 'CS261',
     groupName: 'SoftWhere?',
 };
-
-const sampleMembers = [
-    {
-        name: 'ศิวดล อานามวัฒน์',
-        tu_id: '6809617431',
-        role: 'Host',
-        avatarText: 'SA'
-    },
-    {
-        name: 'ณัฐรดา บัวสุวรรณ',
-        tu_id: '6809617118',
-        role: 'Member',
-        avatarText: 'NB'
-    },
-    {
-        name: 'ตรีทิพยนิภา ชูเชิด',
-        tu_id: '6809617134',
-        role: 'Member',
-        avatarText: 'TC'
-    },
-    {
-        name: 'นวมินทร์ตรา คำมุงคุล',
-        tu_id: '6809540161',
-        role: 'Member',
-        avatarText: 'NK'
-    },
-    {
-        name: 'ปภังกร รักนิยม',
-        tu_id: '6809617217',
-        role: 'Member',
-        avatarText: 'PR'
-    },
-    {
-        name: 'สุวิจักษณ์ แซ่ท้าว',
-        tu_id: '6809681486',
-        role: 'Member',
-        avatarText: 'SS'
-    }
-];
-
-window.groupMembers = sampleMembers;
 
 function createMemberItem(member) {
     const item = document.createElement('div');
@@ -78,6 +39,60 @@ function createMemberItem(member) {
     return item;
 }
 
+function hasStoredAuthToken() {
+    try {
+        return Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+    } catch {
+        return false;
+    }
+}
+
+function loadProjectApiForMembers() {
+    if (window.projectApi) return Promise.resolve(window.projectApi);
+
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = new URL('../api/project-api.js', membersScriptUrl).href;
+        script.onload = () => resolve(window.projectApi);
+        script.onerror = () => reject(new Error('โหลดบริการข้อมูลโปรเจกต์ไม่สำเร็จ'));
+        document.head.append(script);
+    });
+}
+
+const roleLabels = { host: 'Host', member: 'Member' };
+
+function showMembersMessage(container, text) {
+    const message = document.createElement('p');
+    message.className = 'members-empty-message';
+    message.textContent = text;
+    container.replaceChildren(message);
+}
+
+// The members of the opened project from the backend (GET /api/projects/{id}/members).
+async function loadMembersFromBackend(memberPage, data) {
+    const container = memberPage.querySelector('#members-list');
+    if (!container) return;
+
+    showMembersMessage(container, 'Loading...');
+    try {
+        const api = await loadProjectApiForMembers();
+        const members = await api.getProjectMembers(data.projectId);
+        if (!container.isConnected) return;
+
+        if (!members.length) {
+            showMembersMessage(container, 'No members have been added to this project yet.');
+            return;
+        }
+        container.replaceChildren(...members.map((member) => createMemberItem({
+            name: member.displayName,
+            tu_id: member.tu_id,
+            role: roleLabels[member.roleInProject] || member.roleInProject,
+        })));
+    } catch (error) {
+        if (container.isConnected) showMembersMessage(container, error.message);
+    }
+}
+
 function renderMembers(data = {}) {
     const memberPage = document.querySelector('#contentBox .course-container');
     if (!memberPage) return;
@@ -93,8 +108,14 @@ function renderMembers(data = {}) {
         courseGroupElem.textContent = data.groupName || courseData.groupName;
     }
 
+    // A project that comes from the backend has an id: ask the backend who its members are.
+    if (membersListContainer && hasStoredAuthToken() && data.projectId) {
+        loadMembersFromBackend(memberPage, data);
+        return;
+    }
+
     if (membersListContainer) {
-        const members = Array.isArray(data.members) ? data.members : sampleMembers;
+        const members = Array.isArray(data.members) ? data.members : [];
         membersListContainer.replaceChildren(...members.map(createMemberItem));
         if (members.length === 0) {
             const emptyMessage = document.createElement('p');

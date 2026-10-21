@@ -8,8 +8,11 @@
 
     <form class="task-card" id="create-task-form">
         <div class="task-card-header">
-            <h3 class="task-title" id="task-title-input" contenteditable="true" role="textbox" aria-label="Task name"
-                aria-multiline="false" spellcheck="false">Task name</h3>
+            <div class="task-title">
+                <label for="task-title-input">Task name :</label>
+                <input type="text" id="task-title-input" name="taskTitle" maxlength="200" autocomplete="off"
+                    placeholder="Enter task name" required>
+            </div>
             <div class="due-date">
                 <label for="due-date-input">Due Date:</label>
                 <div class="date-picker">

@@ -108,9 +108,20 @@ document.addEventListener('createtask:loaded', (event) => {
     .catch((error) => showSubmitMessage(error.message));
 
   dueDatePicker.required = true;
+
+  // The due date starts as today (local date, yyyy-MM-dd).
+  const now = new Date();
+  dueDatePicker.value = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+  dueDateDisplay.value = formatDueDate(dueDatePicker.value);
   taskDescriptionInput.required = true;
 
-  dueDateDisplay.addEventListener('click', () => {
+  // The whole bordered box opens the calendar, not just the text.
+  dueDateDisplay.closest('.date-picker').addEventListener('click', (clickEvent) => {
+    if (clickEvent.target === dueDatePicker) return; // the fallback below clicks it, which would bubble back here
     if (typeof dueDatePicker.showPicker === 'function') {
       dueDatePicker.showPicker();
     } else {
@@ -120,12 +131,6 @@ document.addEventListener('createtask:loaded', (event) => {
 
   dueDatePicker.addEventListener('change', () => {
     dueDateDisplay.value = formatDueDate(dueDatePicker.value);
-  });
-
-  taskTitleInput.addEventListener('focus', () => {
-    if (taskTitleInput.textContent.trim() === 'Task name') {
-      taskTitleInput.textContent = '';
-    }
   });
 
   assignmentToggle.addEventListener('click', async () => {
@@ -140,11 +145,11 @@ document.addEventListener('createtask:loaded', (event) => {
     submitEvent.preventDefault();
     showSubmitMessage('');
 
-    const taskTitle = taskTitleInput.textContent.trim();
+    const taskTitle = taskTitleInput.value.trim();
     const taskDescription = taskDescriptionInput.value.trim();
     const dueDate = dueDatePicker.value;
 
-    if (!taskTitle || taskTitle === 'Task name') {
+    if (!taskTitle) {
       showSubmitMessage('Enter a task name.');
       taskTitleInput.focus();
       return;

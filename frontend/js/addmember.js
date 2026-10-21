@@ -103,7 +103,7 @@ document.addEventListener('addmember:loaded', (event) => {
                 // GET /api/users/{tu_id}: only people who have logged in before exist in the database.
                 const user = await api.findUser(memberId);
                 if (!user) {
-                    alert(`ไม่มีรหัสนักศึกษา ${memberId} ในระบบ (ต้องเคยเข้าสู่ระบบอย่างน้อย 1 ครั้ง)`);
+                    alert(`ไม่พบรหัสนักศึกษา ${memberId} ในระบบของมหาวิทยาลัย (TU)`);
                     return;
                 }
 

@@ -20,13 +20,16 @@ public class MemberService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository memberRepository;
     private final UserService userService;
+    private final TuStudentService tuStudentService;
     private final NotificationService notificationService;
 
     public MemberService(ProjectRepository projectRepository, ProjectMemberRepository memberRepository,
-                         UserService userService, NotificationService notificationService) {
+                         UserService userService, TuStudentService tuStudentService,
+                         NotificationService notificationService) {
         this.projectRepository = projectRepository;
         this.memberRepository = memberRepository;
         this.userService = userService;
+        this.tuStudentService = tuStudentService;
         this.notificationService = notificationService;
     }
 
@@ -48,8 +51,8 @@ public class MemberService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can add members");
         }
         if (req == null || req.tu_id() == null || req.tu_id().isBlank()) throw bad("tu_id is required");
-        User user = userService.findByTu_id(req.tu_id().trim())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = tuStudentService.findOrCreateUser(req.tu_id().trim())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No such student id in TU"));
         if (memberRepository.existsByProject_ProjectIdAndUser_UserId(projectId, user.getUserId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a member");
         }

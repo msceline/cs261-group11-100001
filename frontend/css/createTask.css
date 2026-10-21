@@ -13,7 +13,6 @@
     width: 100%;
     max-width: 904px;
     margin: 0 auto;
-    min-height: 553px;
     padding: 18px 29px 23px;
     background: linear-gradient(
         135deg,
@@ -48,13 +47,13 @@
 
 .create-task-page .course-name {
     margin-top: 3px;
+    font-family: "League Spartan", sans-serif;
     font-size: 22px;
     font-weight: 700;
     line-height: 1.2;
 }
 
 .create-task-page .task-card {
-    min-height: 418px;
     padding: 12px 28px 14px;
     background: #fff;
     border: 2px solid #969696;
@@ -70,19 +69,45 @@
     margin-bottom: 10px;
 }
 
-.create-task-page .task-title {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-family: "League Spartan", sans-serif;
-    font-size: 24px;
-    font-weight: 800;
-    cursor: text;
-    overflow-wrap: anywhere;
+.create-task-page .task-card-header input{
+    border: none;
 }
 
-.create-task-page .task-title:focus {
+.create-task-page .task-title {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.create-task-page .task-title label {
+    flex: 0 0 auto;
+    font-family: "League Spartan", sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #050505;
+    white-space: nowrap;
+}
+
+.create-task-page .task-title input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 6px 14px;
+    color: #050505;
+    background: #fff;
+    border: 1px solid #777;
+    border-radius: 12px;
+    font: 500 16px "Prompt", sans-serif;
+}
+
+.create-task-page .task-title input::placeholder {
+    color: #8f9094;
+}
+
+.create-task-page .task-title input:focus {
     outline: 2px solid #575df0;
-    outline-offset: 3px;
+    outline-offset: 2px;
 }
 
 .create-task-page .due-date {
@@ -99,7 +124,7 @@
 .create-task-page .due-date input,
 .create-task-page .text-input {
     min-width: 0;
-    padding: 0;
+    padding: 0 5px;
     color: inherit;
     background: transparent;
     border: 0;
@@ -115,15 +140,27 @@
 
 .create-task-page .due-date input:focus,
 .create-task-page .text-input:focus {
-    outline: 2px solid #575df0;
+    outline: none;
     outline-offset: 2px;
+    border: 2px solid #8f9094;
+    border-radius: 8px;
 }
 
 .create-task-page .date-picker {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #fff;
+    border: 1px solid #777;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.create-task-page .date-picker:focus-within {
+    outline: 2px solid #575df0;
+    outline-offset: 2px;
 }
 
 .create-task-page .date-picker .date-input {
@@ -324,7 +361,7 @@
     display: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
     .create-task-page {
         padding: 20px 16px;
     }
@@ -348,6 +385,10 @@
         margin-bottom: 12px;
     }
 
+    .create-task-page .task-title {
+        width: 100%;
+    }
+
     .create-task-page .due-date {
         flex-wrap: wrap;
         text-align: left;
@@ -360,7 +401,17 @@
 
     .create-task-page .action-footer {
         flex-direction: column;
-        align-items: stretch;
+        box-sizing: border-box;
+
+    }
+
+    .create-task-page .action-footer .btn-submit,
+    .create-task-page .action-footer .back-to-tasks{
+       width: 50%;
+       min-width: 100px;
+       display: flex;
+       justify-content: center;
+       align-items: center;
     }
 
     .create-task-page .btn-submit,

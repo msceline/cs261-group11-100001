@@ -12,8 +12,8 @@
 	margin: 0 auto;
 	padding: 16px;
 	color: #000;
-	background: linear-gradient(to bottom, #f6fbfa, #caf1fe);
-	border-radius: 8px;
+	background: linear-gradient(180deg,rgba(255, 209, 186, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(202, 241, 254, 1) 100%);
+	border-radius: 20px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 	font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
 }
@@ -27,7 +27,7 @@
 	flex-direction: column;
 	align-items: right;
 	flex-wrap: wrap;
-	gap: 20px;
+	gap: 5px;
 	min-width: 0;
 }
 
@@ -50,7 +50,7 @@
 	margin: 0;
 	font-size: 20px;
 	font-weight: 700;
-	line-height: 1px;
+	line-height: normal;
 	letter-spacing: -0.03em;
 	overflow-wrap: anywhere;
 }
@@ -60,7 +60,7 @@
 .dashBoardpage .your-task-list {
 	min-width: 0;
 	padding: 20px;
-	border-radius: 28px;
+	border-radius: 21px;
 	box-shadow: 0 4px 14px -9px #000;
 
 	background: rgba(255, 255, 255, 0.45);
@@ -113,6 +113,7 @@
 	font-size: 1.5rem;
 	font-weight: 700;
 	line-height: 1;
+	color: #386aaf;
 }
 
 .dashBoardpage .percent {
@@ -120,7 +121,7 @@
 	margin: 0;
 	color: #000;
 	font-size: 20px;
-	font-weight: 700;
+	font-weight: 800;
 }
 
 .dashBoardpage .progress-track {
@@ -139,7 +140,7 @@
 	width: 0%;
 	height: 100%;
 	border-radius: inherit;
-	transition: width 900ms ease-out;
+	transition: width 2000ms ease-out;
 }
 
 .dashBoardpage .progress-fill[data-progress-band="red"] {
@@ -289,6 +290,6 @@
 	}
 
 	.dashBoardpage .head-title{
-		font-size: 1rem;
+		font-size: 1.3rem;
 	}
 }

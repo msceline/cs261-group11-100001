@@ -11,29 +11,25 @@ function createMemberItem(member) {
 
     const avatar = document.createElement('div');
     avatar.className = 'member-avatar';
-    avatar.textContent = member.avatarText || (member.name || member.displayName || '?')
-        .split(/\s+/)
-        .map((part) => part[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
+    avatar.textContent = getMemberInitials(member.displayName);
 
     const details = document.createElement('div');
     details.className = 'member-details';
 
     const name = document.createElement('span');
     name.className = 'member-name';
-    name.textContent = member.name || member.displayName || 'Unknown member';
+    name.textContent = member.displayName || 'Unknown member';
 
-    const tuIdElement = document.createElement('span');
-    tuIdElement.className = 'member-id';
-    tuIdElement.textContent = member.tu_id || member.tuId || member.studentId;
+    const studentId = document.createElement('span');
+    studentId.className = 'member-id';
+    studentId.textContent = member.tu_id || member.tuId || member.studentId || '-';
 
-    details.append(name, tuIdElement);
+    details.append(name, studentId);
 
     const role = document.createElement('span');
     role.className = 'member-role';
-    role.textContent = member.role;
+    const roleName = member.roleInProject || 'member';
+    role.textContent = roleName.charAt(0).toUpperCase() + roleName.slice(1);
 
     item.append(avatar, details, role);
     return item;
@@ -102,11 +98,32 @@ function renderMembers(data = {}) {
     const membersListContainer = memberPage.querySelector('#members-list');
 
     if (courseCodeElem) {
-        courseCodeElem.textContent = data.code || data.subject || data.subjectCode || courseData.code;
+        courseCodeElem.textContent = project.subjectCode || project.subject || 'Project';
     }
     if (courseGroupElem) {
-        courseGroupElem.textContent = data.groupName || courseData.groupName;
+        courseGroupElem.textContent = project.groupName || project.projectName || '';
     }
+    if (!membersListContainer) return;
+
+    const projectId = Number(project.projectId);
+    if (!Number.isInteger(projectId) || projectId <= 0) {
+        setMemberListMessage(membersListContainer, 'Select a project to view its members.', true);
+        return;
+    }
+    if (!window.memberApi) {
+        setMemberListMessage(membersListContainer, 'Member service is unavailable.', true);
+        return;
+    }
+
+    setMemberListMessage(membersListContainer, 'Loading members...');
+
+    try {
+        const members = await window.memberApi.getProjectMembers(projectId);
+        if (!Array.isArray(members)) {
+            throw new Error('The member service returned an invalid response.');
+        }
+
+        if (requestId !== memberRequestId || !document.querySelector('#contentBox .course-container')) return;
 
     // A project that comes from the backend has an id: ask the backend who its members are.
     if (membersListContainer && hasStoredAuthToken() && data.projectId) {
@@ -118,14 +135,22 @@ function renderMembers(data = {}) {
         const members = Array.isArray(data.members) ? data.members : [];
         membersListContainer.replaceChildren(...members.map(createMemberItem));
         if (members.length === 0) {
-            const emptyMessage = document.createElement('p');
-            emptyMessage.className = 'members-empty-message';
-            emptyMessage.textContent = 'No members have been added to this project yet.';
-            membersListContainer.append(emptyMessage);
+            setMemberListMessage(membersListContainer, 'No members have been added to this project yet.');
+            return;
         }
+
+        membersListContainer.replaceChildren(...members.map(createMemberItem));
+    } catch (error) {
+        if (requestId !== memberRequestId) return;
+        console.error('Failed to load project members:', error);
+        setMemberListMessage(
+            membersListContainer,
+            error.message || 'Could not load project members.',
+            true,
+        );
     }
 }
 
 document.addEventListener('member:loaded', (event) => {
-    renderMembers(event.detail || {});
+    loadProjectMembers(event.detail || {});
 });

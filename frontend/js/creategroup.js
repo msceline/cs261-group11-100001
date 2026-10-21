@@ -1,3 +1,5 @@
+
+
 document.addEventListener('creategroup:loaded', (event) => {
     const form = document.querySelector('#contentBox #createProjectForm');
     if (!form) return;
@@ -35,7 +37,7 @@ document.addEventListener('creategroup:loaded', (event) => {
         const dueDate = atDate?.value || '';
 
         if (!groupName || !subject || !dueDate) {
-            alert('กรุณากรอกข้อมูลให้ครบถ้วนก่อนไปขั้นตอนถัดไปครับ');
+            alert('กรุณากรอกข้อมูลให้ครบถ้วนก่อนไปขั้นตอนถัดไป');
             return;
         }
 

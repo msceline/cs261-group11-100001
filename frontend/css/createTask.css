@@ -81,10 +81,22 @@
 
 .create-task-page .task-card {
     padding: 12px 28px 14px;
-    background: #fff;
-    border: 2px solid #969696;
-    border-radius: 16px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
+    border-radius: 21px;
+
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.07),
+        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
+
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .create-task-page .task-card-header {
@@ -132,8 +144,7 @@
 }
 
 .create-task-page .task-title input:focus {
-    outline: 2px solid #575df0;
-    outline-offset: 2px;
+    outline: none;
 }
 
 .create-task-page .due-date {
@@ -247,7 +258,7 @@
     gap: 16px;
     margin-top: 12px;
     padding: 8px 0 2px;
-    background: #fff;
+    background: none;
 }
 
 /* Assign-member dropdown */
@@ -256,7 +267,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap;
 }
 
 .create-task-page .assignment-label {
@@ -332,8 +342,8 @@
 
 .create-task-page .btn-submit,
 .create-task-page .back-to-tasks {
-    width: 198px;
-    min-height: 36px;
+    width: 160px;
+    min-height: 20px;
     padding: 5px 24px;
     color: #fff;
     background: #050505;
@@ -387,6 +397,14 @@
     display: none;
 }
 
+.create-task-page .sumit-create-page-btn{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: end;
+}
+
 @media (max-width: 650px) {
     .create-task-page {
         padding: 20px 16px;
@@ -425,7 +443,7 @@
         padding: 12px;
     }
 
-    .create-task-page .action-footer {
+    .create-task-page .action-footer{
         flex-direction: column;
         box-sizing: border-box;
 
@@ -434,7 +452,7 @@
     .create-task-page .action-footer .btn-submit,
     .create-task-page .action-footer .back-to-tasks {
         width: 50%;
-        min-width: 100px;
+        min-width: 150px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -443,5 +461,9 @@
     .create-task-page .btn-submit,
     .create-task-page .back-to-tasks {
         width: 100%;
+    }
+
+    .create-task-page .sumit-create-page-btn{
+        justify-content: center;
     }
 }

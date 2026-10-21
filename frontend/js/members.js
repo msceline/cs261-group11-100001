@@ -1,9 +1,17 @@
 const membersScriptUrl = document.currentScript?.src || window.location.href;
 
-const courseData = {
-    code: 'CS261',
-    groupName: 'SoftWhere?',
-};
+let memberRequestId = 0;
+
+function getMemberInitials(name) {
+    const initials = String(name || '?')
+        .trim()
+        .split(/\s+/)
+        .map((part) => Array.from(part)[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase();
+    return initials || '?';
+}
 
 function createMemberItem(member) {
     const item = document.createElement('div');
@@ -35,14 +43,6 @@ function createMemberItem(member) {
     return item;
 }
 
-function hasStoredAuthToken() {
-    try {
-        return Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
-    } catch {
-        return false;
-    }
-}
-
 function loadProjectApiForMembers() {
     if (window.projectApi) return Promise.resolve(window.projectApi);
 
@@ -55,41 +55,15 @@ function loadProjectApiForMembers() {
     });
 }
 
-const roleLabels = { host: 'Host', member: 'Member' };
-
-function showMembersMessage(container, text) {
+function setMemberListMessage(container, text) {
     const message = document.createElement('p');
     message.className = 'members-empty-message';
     message.textContent = text;
     container.replaceChildren(message);
 }
 
-// The members of the opened project from the backend (GET /api/projects/{id}/members).
-async function loadMembersFromBackend(memberPage, data) {
-    const container = memberPage.querySelector('#members-list');
-    if (!container) return;
-
-    showMembersMessage(container, 'Loading...');
-    try {
-        const api = await loadProjectApiForMembers();
-        const members = await api.getProjectMembers(data.projectId);
-        if (!container.isConnected) return;
-
-        if (!members.length) {
-            showMembersMessage(container, 'No members have been added to this project yet.');
-            return;
-        }
-        container.replaceChildren(...members.map((member) => createMemberItem({
-            name: member.displayName,
-            tu_id: member.tu_id,
-            role: roleLabels[member.roleInProject] || member.roleInProject,
-        })));
-    } catch (error) {
-        if (container.isConnected) showMembersMessage(container, error.message);
-    }
-}
-
-function renderMembers(data = {}) {
+// Shows the members of the opened project (GET /api/projects/{id}/members).
+async function renderMembers(data = {}) {
     const memberPage = document.querySelector('#contentBox .course-container');
     if (!memberPage) return;
 
@@ -98,42 +72,33 @@ function renderMembers(data = {}) {
     const membersListContainer = memberPage.querySelector('#members-list');
 
     if (courseCodeElem) {
-        courseCodeElem.textContent = project.subjectCode || project.subject || 'Project';
+        courseCodeElem.textContent = data.subjectCode || data.subject || 'Project';
     }
     if (courseGroupElem) {
-        courseGroupElem.textContent = project.groupName || project.projectName || '';
+        courseGroupElem.textContent = data.groupName || data.projectName || '';
     }
     if (!membersListContainer) return;
 
-    const projectId = Number(project.projectId);
+    const projectId = Number(data.projectId);
     if (!Number.isInteger(projectId) || projectId <= 0) {
-        setMemberListMessage(membersListContainer, 'Select a project to view its members.', true);
-        return;
-    }
-    if (!window.memberApi) {
-        setMemberListMessage(membersListContainer, 'Member service is unavailable.', true);
+        setMemberListMessage(membersListContainer, 'Select a project to view its members.');
         return;
     }
 
+    memberRequestId += 1;
+    const requestId = memberRequestId;
     setMemberListMessage(membersListContainer, 'Loading members...');
 
     try {
-        const members = await window.memberApi.getProjectMembers(projectId);
+        const api = await loadProjectApiForMembers();
+        const members = await api.getProjectMembers(projectId);
         if (!Array.isArray(members)) {
             throw new Error('The member service returned an invalid response.');
         }
 
-        if (requestId !== memberRequestId || !document.querySelector('#contentBox .course-container')) return;
+        // A newer request, or another page, has taken over: drop this result.
+        if (requestId !== memberRequestId || !membersListContainer.isConnected) return;
 
-    // A project that comes from the backend has an id: ask the backend who its members are.
-    if (membersListContainer && hasStoredAuthToken() && data.projectId) {
-        loadMembersFromBackend(memberPage, data);
-        return;
-    }
-
-    if (membersListContainer) {
-        const members = Array.isArray(data.members) ? data.members : [];
-        membersListContainer.replaceChildren(...members.map(createMemberItem));
         if (members.length === 0) {
             setMemberListMessage(membersListContainer, 'No members have been added to this project yet.');
             return;
@@ -141,16 +106,12 @@ function renderMembers(data = {}) {
 
         membersListContainer.replaceChildren(...members.map(createMemberItem));
     } catch (error) {
-        if (requestId !== memberRequestId) return;
+        if (requestId !== memberRequestId || !membersListContainer.isConnected) return;
         console.error('Failed to load project members:', error);
-        setMemberListMessage(
-            membersListContainer,
-            error.message || 'Could not load project members.',
-            true,
-        );
+        setMemberListMessage(membersListContainer, error.message || 'Could not load project members.');
     }
 }
 
 document.addEventListener('member:loaded', (event) => {
-    loadProjectMembers(event.detail || {});
+    renderMembers(event.detail || {});
 });

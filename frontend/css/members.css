@@ -1,0 +1,246 @@
+.course-container {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin: 0 auto;
+    padding: 16px;
+    color: #000;
+    background: linear-gradient(180deg, rgba(255, 209, 186, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(202, 241, 254, 1) 100%);
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
+}
+
+.course-container::-webkit-scrollbar {
+    display: none;
+}
+
+.course-header {
+    min-width: 0;
+    padding: 20px;
+    border-radius: 21px;
+    box-shadow: 0 4px 14px -9px #000;
+
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.07),
+        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.course-info{
+    display: flex;
+	flex-direction: column;
+	align-items: right;
+	flex-wrap: wrap;
+	gap: 5px;
+	min-width: 0;
+    padding: 0 25px;
+}
+
+.course-code {
+
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0;
+
+    background: linear-gradient(135deg, #386aaf 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.course-group-name {
+    font-family: 'Kanit', sans-serif, -apple-system;
+    color: #111;
+    font-size: 20px;
+	font-weight: 700;
+    letter-spacing: -0.03em;
+    margin: 0;
+}
+
+.members-card {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    padding: 32px 40px;
+    border-radius: 21px;
+
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+
+    box-shadow:
+        0 20px 40px -15px rgba(0, 0, 0, 0.07),
+        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
+
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.members-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #386aaf;
+    margin: 0;
+}
+
+#members-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    gap: 10px;
+    margin-top: 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#members-list::-webkit-scrollbar {
+    display: none;
+}
+
+.members-empty-message {
+    margin: 0;
+    padding: 12px;
+    color: #6b7280;
+    text-align: center;
+}
+
+.member-item {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 32px;
+    padding: 5px 12px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.member-item:hover {
+    transform: translateY(-1px) scale(1.01);
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.member-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f8a238 0%, #f6703b 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-right: 16px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.member-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #1f2937;
+    overflow-wrap: anywhere;
+}
+
+.member-id {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.member-role {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .course-header {
+        margin-bottom: 16px;
+    }
+
+    .members-card {
+        padding: 20px 16px;
+        border-radius: 20px;
+    }
+
+    .member-item {
+        gap: 10px;
+        padding: 5px 10px;
+    }
+
+    .member-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+
+    .member-role {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+    }
+}
+
+@media (max-width: 380px) {
+    .course-container {
+        padding: 12px;
+    }
+
+    .members-card {
+        padding: 16px 12px;
+    }
+
+    .course-code {
+        font-size: 1.75rem;
+    }
+
+    .course-group-name {
+        font-size: 18px;
+    }
+}

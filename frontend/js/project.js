@@ -1,0 +1,200 @@
+
+const projectScriptUrl = document.currentScript?.src || window.location.href;
+
+// Shown only while nobody is logged in (no auth token), so the page can still be previewed without the backend.
+const projects = [
+	{ projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 20 },
+    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS213', progress: 55 },
+    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS221', progress: 75 },
+    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'TU109', progress: 85 },
+	{ projectName: 'เว็บไซต์จองห้องเรียน', subjectCode: 'CS331', progress: 100 },
+];
+
+function createProjectCard(project) {
+	const progress = Math.min(100, Math.max(0, Number(project.progress) || 0));
+	const card = document.createElement('article');
+	card.className = 'project-card';
+	card.dataset.projectId = project.projectId ?? '';
+	card.dataset.projectName = project.projectName || '';
+	card.dataset.subjectCode = project.subjectCode || '';
+	card.dataset.progress = String(progress);
+	card.dataset.dueDate = project.dueDate || '';
+	card.dataset.members = JSON.stringify(project.members || []);
+	card.tabIndex = 0;
+	card.setAttribute('role', 'button');
+	card.setAttribute('aria-label', `เปิด dashboard ของ ${project.projectName || 'โปรเจกต์'}`);
+
+	const details = document.createElement('div');
+	details.className = 'project-card__details';
+
+	const subject = document.createElement('h4');
+	subject.className = 'project-card__subject';
+	subject.textContent = project.subjectCode || 'ไม่ระบุวิชา';
+
+	const name = document.createElement('p');
+	name.className = 'project-card__name';
+	name.textContent = project.projectName || 'ไม่ระบุชื่อโปรเจกต์';
+
+	details.append(subject, name);
+
+	if (project.dueDate || project.members?.length) {
+		const metadata = document.createElement('p');
+		metadata.className = 'project-card__meta';
+		const metadataItems = [];
+		metadata.textContent = metadataItems.join(' · ');
+		details.append(metadata);
+	}
+
+	const progressSection = document.createElement('div');
+	progressSection.className = 'project-card__progress';
+
+	const progressLabel = document.createElement('span');
+	progressLabel.className = 'project-card__progress-label';
+	progressLabel.textContent = `${progress}%`;
+    
+	const progressTrack = document.createElement('div');
+	progressTrack.className = 'project-card__progress-track';
+	progressTrack.setAttribute('role', 'progressbar');
+	progressTrack.setAttribute('aria-label', `ความคืบหน้า ${project.projectName || 'โปรเจกต์'}`);
+	progressTrack.setAttribute('aria-valuemin', '0');
+	progressTrack.setAttribute('aria-valuemax', '100');
+	progressTrack.setAttribute('aria-valuenow', String(progress));
+    
+	const progressFill = document.createElement('div');
+	progressFill.className = 'project-card__progress-fill';
+	progressFill.dataset.progressBand = progress < 25
+		? 'red'
+		: progress < 50
+			? 'orange'
+			: progress < 75
+				? 'yellow'
+				: 'green';
+	progressFill.style.width = `${progress}%`;
+	progressTrack.append(progressFill);
+	progressSection.append(progressTrack, progressLabel);
+	card.append(details, progressSection);
+
+	return card;
+}
+
+function renderProjectCards(projectItems) {
+	const processingList = document.getElementById('processTaskList');
+	const completeList = document.getElementById('completeTaskList');
+	if (!processingList || !completeList) return;
+
+	processingList.replaceChildren();
+	completeList.replaceChildren();
+
+	projectItems.forEach((project) => {
+		const list = Number(project.progress) >= 100 ? completeList : processingList;
+		list.append(createProjectCard(project));
+	});
+}
+
+function hasStoredAuthToken() {
+	try {
+		return Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+	} catch {
+		return false;
+	}
+}
+
+function loadProjectApi() {
+	if (window.projectApi) return Promise.resolve(window.projectApi);
+
+	return new Promise((resolve, reject) => {
+		const script = document.createElement('script');
+		script.src = new URL('../api/project-api.js', projectScriptUrl).href;
+		script.onload = () => resolve(window.projectApi);
+		script.onerror = () => reject(new Error('โหลดบริการข้อมูลโปรเจกต์ไม่สำเร็จ'));
+		document.head.append(script);
+	});
+}
+
+function showProjectMessage(text) {
+	const processingList = document.getElementById('processTaskList');
+	const completeList = document.getElementById('completeTaskList');
+	if (!processingList || !completeList) return;
+
+	const message = document.createElement('p');
+	message.textContent = text;
+	processingList.replaceChildren(message);
+	completeList.replaceChildren();
+}
+
+// A project created while logged in is saved through the backend; the project list waits for that to finish.
+let pendingCreate = Promise.resolve();
+let createError = null;
+
+// Every project the logged-in user belongs to (GET /api/projects), or the sample list without a login.
+async function loadProjects() {
+	if (!hasStoredAuthToken()) {
+		renderProjectCards(projects);
+		return;
+	}
+
+	showProjectMessage('Loading...');
+	try {
+		await pendingCreate;
+		const api = await loadProjectApi();
+		const items = await api.getProjects();
+		if (!document.getElementById('processTaskList')) return;
+
+		if (!items.length) {
+			showProjectMessage('ยังไม่มีโปรเจกต์');
+		} else {
+			renderProjectCards(items);
+		}
+
+		if (createError) {
+			const message = document.createElement('p');
+			message.textContent = createError.message;
+			document.getElementById('processTaskList').prepend(message);
+			createError = null;
+		}
+	} catch (error) {
+		if (document.getElementById('processTaskList')) showProjectMessage(error.message);
+	}
+}
+
+// Creates the project, then invites every chosen member (POST /api/projects/{id}/members, host only).
+async function createProjectWithMembers(project) {
+	try {
+		const api = await loadProjectApi();
+		const created = await api.createProject({ projectName: project.projectName, subjectCode: project.subjectCode });
+
+		const me = await api.getCurrentUser();
+		const ids = [...new Set((project.members || []).map((member) => member.studentId))]
+			.filter((id) => id && id !== me.tu_id && id !== me.studentId);
+
+		const failures = [];
+		for (const id of ids) {
+			try {
+				await api.addProjectMember(created.projectId, id);
+			} catch (error) {
+				failures.push(`${id}: ${error.message}`);
+			}
+		}
+		if (failures.length) createError = new Error(`เพิ่มสมาชิกไม่สำเร็จ - ${failures.join(' / ')}`);
+	} catch (error) {
+		createError = error;
+	}
+}
+
+document.addEventListener('project:loaded', loadProjects);
+
+document.addEventListener('project:create', (event) => {
+	const project = event.detail || {};
+	if (!project.projectName || !project.subjectCode) return;
+
+	if (hasStoredAuthToken()) {
+		pendingCreate = createProjectWithMembers(project);
+		return;
+	}
+
+	projects.push({
+		...project,
+		projectId: Date.now(),
+		progress: Number(project.progress) || 0,
+	});
+});

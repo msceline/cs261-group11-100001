@@ -12,18 +12,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 30px 60px;
-    color: #000;
-    background: rgba(255, 247, 236, 0.438);
-    backdrop-filter: blur(22px) saturate(170%);
-    -webkit-backdrop-filter: blur(22px) saturate(170%);
-
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-    border-right: 1px solid rgba(255, 255, 255, 0.35);
-
-    box-shadow:
-        0 24px 48px -12px rgba(0, 0, 0, 0.2),
-        0 0 24px rgba(255, 255, 255, 0.5) inset;
+    background: #D2E8FC;
 
     transform: translateY(-5px);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -39,11 +28,10 @@
 .create-group-card .title {
     width: 100%;
     margin: 0;
-    color: #000;
+    color: #8A443D;
     text-align: center;
-    font-size: 48px;
+    font-size: 3.5rem;
     font-weight: 700;
-    line-height: 1;
     white-space: nowrap;
 }
 
@@ -67,7 +55,7 @@
 .create-group-card .duedate-input label {
     width: 171px;
     height: 30px;
-    color: #000;
+    color: #303030;
     font-size: 20px;
     font-style: normal;
     font-weight: 500;
@@ -78,19 +66,10 @@
     width: 100%;
     min-height: 48px;
     padding: 0 30px;
-    
-    background: rgba(255, 254, 248, 0.35);
-    backdrop-filter: blur(22px) saturate(170%);
-    -webkit-backdrop-filter: blur(22px) saturate(170%);
 
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-    border-right: 1px solid rgba(255, 255, 255, 0.35);
+    background: #ffff;
+    border: none;
 
-    box-shadow: 
-        0 24px 48px -12px rgba(0, 0, 0, 0.2),
-        0 0 24px rgba(255, 255, 255, 0.5) inset;
-    
     transform: translateY(-5px);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 20px;
@@ -104,21 +83,26 @@
     line-height: normal;
 }
 
+.create-group-card .input-field #dueDate {
+    background: none;
+}
+
 .create-group-card .input-field input:focus-visible {
     border-color: #000;
-    box-shadow: 0 0 0 3px rgba(36, 118, 90, 0.16);
+    box-shadow:
+        0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .create-group-card .create-group-next-btn {
     min-height: 48px;
     margin-top: 43px;
     color: #ffffff;
-    background: #000;
+    background: #8A443D;
     border: 0;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: 650;
+    font-size: 1.5rem;
+    font-weight: 500;
     transition: background-color 150ms ease, transform 150ms ease;
 }
 
@@ -184,7 +168,6 @@
     .create-group-card {
         height: auto;
         min-height: 0;
-        padding: 24px;
         gap: 24px;
     }
 

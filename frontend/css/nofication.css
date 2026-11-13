@@ -11,13 +11,14 @@ body::-webkit-scrollbar {
 
 .notification-card {
   box-sizing: border-box;
-  font-family: "League Spartan", sans-serif ;
+  font-family: "League Spartan", sans-serif;
   width: min(390px, 100%);
   max-width: 390px;
   background: #ffffff25;
   backdrop-filter: blur(2px);
   border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0px 4px 6px -1px rgba(0, 0, 0, 0.1);
   padding: 24px 20px 16px 20px;
   display: flex;
   flex-direction: column;
@@ -40,7 +41,7 @@ body::-webkit-scrollbar {
   flex-direction: column;
 }
 
-.notification-list::-webkit-scrollbar{
+.notification-list::-webkit-scrollbar {
   display: none;
 }
 
@@ -88,7 +89,7 @@ body::-webkit-scrollbar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background-color: #eb9525; 
+  background-color: #eb9525;
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -98,7 +99,8 @@ body::-webkit-scrollbar {
   letter-spacing: 0.03em;
   margin-right: 14px;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+  box-shadow:
+    0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .notification-content {
@@ -140,7 +142,7 @@ body::-webkit-scrollbar {
 .btn-show-all:hover {
   border-color: #94a3b8;
   color: #1e293b;
-  background-color: #f8fafc;     
+  background-color: #f8fafc;
 }
 
 .btn-show-all:active {

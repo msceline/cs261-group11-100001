@@ -12,9 +12,10 @@
 	margin: 0 auto;
 	padding: 16px;
 	color: #000;
-	background: linear-gradient(180deg,rgba(255, 209, 186, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(202, 241, 254, 1) 100%);
+	background: none;
 	border-radius: 20px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	box-shadow:
+		0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 	font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
 }
 
@@ -33,26 +34,26 @@
 
 .dashBoardpage .subject-head {
 	margin: 0;
-	color: #000;
-	font-size: 2rem;
+	font-size: 3rem;
 	font-weight: 800;
-	letter-spacing: -0.03em;
+	letter-spacing: -0.04em;
 	text-transform: uppercase;
 	overflow-wrap: anywhere;
 
-	background: linear-gradient(135deg, #386aaf 0%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+	background: #F05805;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
 }
 
 .dashBoardpage .group-name-head {
 	margin: 0;
 	font-size: 20px;
 	font-weight: 700;
-	line-height: normal;
+	line-height: 5px;
 	letter-spacing: -0.03em;
 	overflow-wrap: anywhere;
+	color: #303030;
 }
 
 .dashBoardpage .progress-container,
@@ -60,20 +61,11 @@
 .dashBoardpage .your-task-list {
 	min-width: 0;
 	padding: 20px;
-	border-radius: 21px;
-	box-shadow: 0 4px 14px -9px #000;
+	border-radius: 20px;
+	box-shadow:
+		0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 
-	background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
-
-    box-shadow:
-        0 20px 40px -15px rgba(0, 0, 0, 0.07),
-        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
+	background: #FFFFFF;
 }
 
 .dashBoardpage .progress-head,
@@ -82,7 +74,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	padding: 0 25px;
+	padding: 0 10px;
 }
 
 .dashBoardpage .progress-head,
@@ -113,7 +105,7 @@
 	font-size: 1.5rem;
 	font-weight: 700;
 	line-height: 1;
-	color: #386aaf;
+	color: #303030;
 }
 
 .dashBoardpage .percent {
@@ -131,7 +123,7 @@
 	height: 15px;
 	margin-top: 0;
 	overflow: hidden;
-	background: #e8efec;
+	background: #E8E2E2;
 	border: 1px solid;
 	border-radius: 999px;
 }
@@ -169,8 +161,8 @@
 	min-height: 0;
 }
 
-.dashBoardpage .list-container > .upcoming-list,
-.dashBoardpage .list-container > .your-task-list {
+.dashBoardpage .list-container>.upcoming-list,
+.dashBoardpage .list-container>.your-task-list {
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
@@ -205,33 +197,31 @@
 	min-width: 0;
 	text-align: left;
 	border-radius: 28px;
-	background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+	background: #ffffff;
+	box-shadow:
+		0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	cursor: pointer;
 	padding: 25px 35px;
 }
 
-.dashBoardpage .dashboard-task-card:hover{
+.dashBoardpage .dashboard-task-card:hover {
 	transform: translateY(-2px) scale(1.01);
-    background: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+	background: rgba(255, 255, 255, 0.75);
 }
 
 .dashBoardpage .dashboard-task-card__title {
 	margin: 0;
-	font-size: 16px;
+	font-size: 1.5rem;
 	font-weight: 700;
 	overflow-wrap: anywhere;
+	color: #303030;
 }
 
 .dashBoardpage .dashboard-task-card__description {
 	margin: 6px 0 0;
-	color: #52615c;
-	font-size: 13px;
+	color: #303030;
+	font-size: 1rem;
 	line-height: 1.4;
 	overflow-wrap: anywhere;
 }
@@ -289,7 +279,7 @@
 		padding: 12px;
 	}
 
-	.dashBoardpage .head-title{
-		font-size: 1.3rem;
+	.dashBoardpage .head-title {
+		font-size: 1.5rem;
 	}
 }

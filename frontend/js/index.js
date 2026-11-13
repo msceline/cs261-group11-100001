@@ -45,7 +45,6 @@ const pageScriptPromises = {};
 const pageApiScriptPromises = {};
 let selectedProject = null;
 let projectDraft = null;
-let dropdownCloseTimer = null;
 let activeDropdown = null;
 
 document.title = pageTitles.project;
@@ -71,11 +70,6 @@ function positionDropdown(trigger, dropdown) {
 }
 
 function closeDropdown() {
-	if (dropdownCloseTimer !== null) {
-		window.clearTimeout(dropdownCloseTimer);
-		dropdownCloseTimer = null;
-	}
-
 	if (activeDropdown === 'profile') {
 		profileDropdown.hidden = true;
 		userProfile?.setAttribute('aria-expanded', 'false');
@@ -86,34 +80,13 @@ function closeDropdown() {
 	activeDropdown = null;
 }
 
-function clearDropdownCloseTimer() {
-	if (dropdownCloseTimer === null) return;
-
-	window.clearTimeout(dropdownCloseTimer);
-	dropdownCloseTimer = null;
-}
-
-function scheduleDropdownClose(name) {
-	clearDropdownCloseTimer();
-	if (activeDropdown !== name) return;
-	const trigger = name === 'profile' ? userProfile : notificationTrigger;
-	const dropdown = name === 'profile' ? profileDropdown : notificationDropdown;
-	if (trigger?.matches(':hover') || dropdown?.matches(':hover')) return;
-
-	dropdownCloseTimer = window.setTimeout(() => {
-		if (activeDropdown === name) closeDropdown();
-	}, 2000);
-}
-
 function toggleDropdown(name) {
 	if (activeDropdown === name) {
 		closeDropdown();
 		return;
 	}
-
 	closeDropdown();
 	activeDropdown = name;
-	clearDropdownCloseTimer();
 
 	if (name === 'profile') {
 		profileDropdown.hidden = false;
@@ -125,21 +98,10 @@ function toggleDropdown(name) {
 		notificationTrigger?.setAttribute('aria-expanded', 'true');
 		positionDropdown(notificationTrigger, notificationDropdown);
 	}
-
-	scheduleDropdownClose(name);
 }
 
 notificationTrigger?.addEventListener('click', () => toggleDropdown('notification'));
 userProfile?.addEventListener('click', () => toggleDropdown('profile'));
-[
-	['notification', notificationTrigger],
-	['notification', notificationDropdown],
-	['profile', userProfile],
-	['profile', profileDropdown],
-].forEach(([name, element]) => {
-	element?.addEventListener('mouseenter', () => clearDropdownCloseTimer());
-	element?.addEventListener('mouseleave', () => scheduleDropdownClose(name));
-});
 notificationTrigger?.addEventListener('keydown', (event) => {
 	if (event.key !== 'Enter' && event.key !== ' ') return;
 	event.preventDefault();
@@ -396,19 +358,13 @@ setProjectContextLinksVisible(false);
 loadPage('project');
 
 if (mainContainer && sidebar) {
-	let collapseTimer = null;
-
-	sidebar.addEventListener('mouseenter', () => {
-		if (collapseTimer !== null) return;
-		mainContainer.classList.add('is-expanded');
-	});
-
-	sidebar.addEventListener('mouseleave', () => {
-		if (collapseTimer !== null) return;
-
-		collapseTimer = window.setTimeout(() => {
-			mainContainer.classList.remove('is-expanded');
-			collapseTimer = null;
-		}, 1000);
+	sidebar.addEventListener('click', (event) => {
+		if (event.target.closest('.sidebar-link')) {
+			if (window.matchMedia('(max-width: 850px)').matches) {
+				mainContainer.classList.remove('is-expanded');
+			}
+			return;
+		}
+		mainContainer.classList.toggle('is-expanded');
 	});
 }

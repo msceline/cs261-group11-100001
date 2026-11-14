@@ -182,6 +182,7 @@ document.addEventListener('calendar:loaded', async (event) => {
   const currentDate = new Date();
   let visibleYear = currentDate.getFullYear();
   let visibleMonth = currentDate.getMonth();
+  let projectDueDate = null;
   let tasks = [];
   let meetings = [];
 
@@ -193,7 +194,7 @@ document.addEventListener('calendar:loaded', async (event) => {
       month: 'long',
       year: 'numeric',
     });
-    renderCalendarDays(daysContainer, visibleYear, visibleMonth, tasks, meetings, project.dueDate, message);
+    renderCalendarDays(daysContainer, visibleYear, visibleMonth, tasks, meetings, projectDueDate, message);
   }
 
   calendar.querySelector('#calendar-previous-month').addEventListener('click', () => {
@@ -219,10 +220,15 @@ document.addEventListener('calendar:loaded', async (event) => {
   message.textContent = 'Loading calendar events...';
 
   try {
-    const [allTasks, projectMeetings] = await Promise.all([
+    const [allTasks, projectMeetings, projects] = await Promise.all([
       window.taskApi.getTasks(),
       window.meetingApi.getMeetings(project.projectId),
+      window.taskApi.getProjects(),
     ]);
+    const savedProject = projects.find((item) => String(item.projectId) === String(project.projectId));
+    if (!savedProject) throw new Error('Project not found for this account.');
+
+    projectDueDate = savedProject.dueDate || null;
     tasks = allTasks.filter((task) => String(task.projectId) === String(project.projectId));
     meetings = projectMeetings;
     render();

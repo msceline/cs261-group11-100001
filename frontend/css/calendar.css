@@ -140,7 +140,7 @@
 }
 
 .calendar-page .calendar-month {
-  display: flex;
+  
   min-height: 0;
   flex: 1;
   flex-direction: column;
@@ -177,6 +177,7 @@
   min-height: 0;
   flex: 1;
   grid-auto-rows: minmax(0, 1fr);
+  font-size: 16px;
 }
 
 .calendar-page .calendar-day {
@@ -203,7 +204,7 @@
   min-height: 1.15em;
   place-items: center;
   color: #ed530d;
-  font-size: clamp(1.25rem, 3vw, 3.5rem);
+  font-size: 16px;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
@@ -240,7 +241,7 @@
 .calendar-page .calendar-task-count,
 .calendar-page .calendar-meeting-count {
   color: #111;
-  font-size: clamp(0.85rem, 2.4vw, 2rem);
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
   font-weight: 800;
   line-height: 1.05;
 }
@@ -251,7 +252,7 @@
   gap: 2px;
   min-width: 0;
   color: #222;
-  font-size: clamp(0.8rem, 2vw, 1.7rem);
+  font-size: clamp(0.75rem, 0.9vw, 0.85rem);
   line-height: 1.15;
 }
 
@@ -351,9 +352,9 @@
   }
 
   .calendar-page .calendar-day-number.is-project-due-date {
-    width: 42px;
-    height: 42px;
-    font-size: 1.7rem;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
   }
 
   .calendar-page .calendar-day-summary {

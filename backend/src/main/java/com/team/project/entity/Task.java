@@ -28,7 +28,7 @@ public class Task {
     private Project project;
 
     @Nationalized
-    @Column(name = "title", length = 200, nullable = false)
+    @Column(name = "task_title", length = 200, nullable = false)
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,18 +41,14 @@ public class Task {
     @Column(name = "due_date")
     private LocalDateTime dueDate;
 
-    @Nationalized
-    @Column(name = "task_description", columnDefinition = "NVARCHAR(MAX)")
+    @Column(name = "task_description", length = 255)
     private String taskDescription;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 
     public Task() {
     }
 
-    public Task(Integer taskId, Project project, String title, User assignee, String status,
-                LocalDateTime dueDate, String taskDescription, LocalDateTime createdAt) {
+    public Task(Integer taskId, Project project, String title, User assignee,
+                String status, LocalDateTime dueDate, String taskDescription) {
         this.taskId = taskId;
         this.project = project;
         this.title = title;
@@ -60,14 +56,10 @@ public class Task {
         this.status = status != null ? status : "todo";
         this.dueDate = dueDate;
         this.taskDescription = taskDescription;
-        this.createdAt = createdAt;
     }
 
     @PrePersist
     protected void onCreate() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
         if (this.status == null) {
             this.status = "todo";
         }
@@ -128,13 +120,4 @@ public class Task {
     public void setTaskDescription(String taskDescription) {
         this.taskDescription = taskDescription;
     }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }
-

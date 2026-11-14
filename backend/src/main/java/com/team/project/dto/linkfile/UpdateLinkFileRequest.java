@@ -1,8 +1,9 @@
 package com.team.project.dto.linkfile;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import com.team.project.validation.ValidHttpUrl;
 
 public class UpdateLinkFileRequest {
 
@@ -12,10 +13,7 @@ public class UpdateLinkFileRequest {
 
     @NotBlank(message = "Link URL is required")
     @Size(max = 2048, message = "Link URL must not exceed 2048 characters")
-    @Pattern(
-        regexp = "^https?://\\S+$",
-        message = "Link URL must start with http:// or https://"
-    )
+    @ValidHttpUrl
     private String linkUrl;
 
     @Size(max = 500, message = "Description must not exceed 500 characters")

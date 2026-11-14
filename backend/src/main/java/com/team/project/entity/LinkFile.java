@@ -10,25 +10,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.Nationalized;
+import org.hibernate.generator.EventType;
 
 @Entity
-@Table(name = "linkfiles")
+@Table(name = "link_files")
 public class LinkFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "linkfile_id")
+    @Column(name = "link_file_id")
     private Integer linkFileId;
 
     @Nationalized
     @Column(name = "link_name", length = 200, nullable = false)
     private String linkName;
 
-    @Column(name = "link_url", length = 2048, nullable = false)
+    @Column(name = "link_url", columnDefinition = "varchar(2048)", nullable = false)
     private String linkUrl;
 
     @Nationalized
@@ -43,15 +44,27 @@ public class LinkFile {
     @JoinColumn(name = "uploader_id", nullable = false)
     private User uploader;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Generated(event = EventType.INSERT)
+    @Column(
+        name = "created_at",
+        columnDefinition = "datetime2",
+        nullable = false,
+        insertable = false,
+        updatable = false
+    )
     private LocalDateTime createdAt;
 
     public LinkFile() {
     }
 
-    public LinkFile(Integer linkFileId, String linkName, String linkUrl,
-                    String description, Project project, User uploader,
-                    LocalDateTime createdAt) {
+    public LinkFile(
+            Integer linkFileId,
+            String linkName,
+            String linkUrl,
+            String description,
+            Project project,
+            User uploader,
+            LocalDateTime createdAt) {
         this.linkFileId = linkFileId;
         this.linkName = linkName;
         this.linkUrl = linkUrl;
@@ -59,13 +72,6 @@ public class LinkFile {
         this.project = project;
         this.uploader = uploader;
         this.createdAt = createdAt;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
     }
 
     public Integer getLinkFileId() {

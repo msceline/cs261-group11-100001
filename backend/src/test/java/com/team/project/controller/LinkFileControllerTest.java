@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.team.project.dto.linkfile.CreateLinkFileRequest;
 import com.team.project.dto.linkfile.UpdateLinkFileRequest;
 import com.team.project.dto.linkfile.LinkFileResponse;
+import com.team.project.exception.GlobalExceptionHandler;
 import com.team.project.service.LinkFileService;
 
 class LinkFileControllerTest {
@@ -33,16 +34,13 @@ class LinkFileControllerTest {
     private LinkFileService linkFileService;
     private MockMvc mockMvc;
 
-    private static final String BASE_URL =
-            "/api/projects/1/linkfiles";
+    private static final String BASE_URL = "/api/projects/1/linkfiles";
 
-    private static final String CREATE_BODY =
-            "{\"linkName\":\"Documentation\","
+    private static final String CREATE_BODY = "{\"linkName\":\"Documentation\","
             + "\"linkUrl\":\"https://example.com\","
             + "\"description\":\"Project docs\"}";
 
-    private static final String UPDATE_BODY =
-            "{\"linkName\":\"Updated Docs\","
+    private static final String UPDATE_BODY = "{\"linkName\":\"Updated Docs\","
             + "\"linkUrl\":\"https://example.com/updated\","
             + "\"description\":\"Updated description\"}";
 
@@ -52,6 +50,7 @@ class LinkFileControllerTest {
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(new LinkFileController(linkFileService))
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
@@ -63,8 +62,7 @@ class LinkFileControllerTest {
                 "https://example.com",
                 "Project docs",
                 1,
-                LocalDateTime.of(2026, 11, 14, 10, 0)
-        );
+                LocalDateTime.of(2026, 11, 14, 10, 0));
     }
 
     @Test
@@ -72,8 +70,7 @@ class LinkFileControllerTest {
         when(linkFileService.list(1, 1))
                 .thenReturn(List.of(
                         linkFile(1, "Docs"),
-                        linkFile(2, "GitHub")
-                ));
+                        linkFile(2, "GitHub")));
 
         mockMvc.perform(get(BASE_URL)
                 .requestAttr("userId", 1))
@@ -92,7 +89,10 @@ class LinkFileControllerTest {
 
         mockMvc.perform(get(BASE_URL)
                 .requestAttr("userId", 5))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("FORBIDDEN"))
+                .andExpect(jsonPath("$.message")
+                        .value("You do not have permission to access this linkfile"));
     }
 
     @Test
@@ -117,12 +117,16 @@ class LinkFileControllerTest {
 
         mockMvc.perform(get(BASE_URL + "/10")
                 .requestAttr("userId", 5))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("FORBIDDEN"))
+                .andExpect(jsonPath("$.message")
+                        .value("You do not have permission to access this linkfile"));
     }
 
     @Test
     void createReturns201() throws Exception {
-        when(linkFileService.create(eq(1), eq(1), any(CreateLinkFileRequest.class)))
+        when(linkFileService.create(
+                eq(1), eq(1), any(CreateLinkFileRequest.class)))
                 .thenReturn(linkFile(10, "Documentation"));
 
         mockMvc.perform(post(BASE_URL)
@@ -163,7 +167,10 @@ class LinkFileControllerTest {
                 .requestAttr("userId", 2)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(UPDATE_BODY))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("FORBIDDEN"))
+                .andExpect(jsonPath("$.message")
+                        .value("You do not have permission to access this linkfile"));
     }
 
     @Test
@@ -183,6 +190,27 @@ class LinkFileControllerTest {
 
         mockMvc.perform(delete(BASE_URL + "/10")
                 .requestAttr("userId", 2))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.error").value("FORBIDDEN"))
+                .andExpect(jsonPath("$.message")
+                        .value("You do not have permission to access this linkfile"));
+    }
+
+    @Test
+    void createReturns400ForInvalidLinkUrl() throws Exception {
+        String invalidBody = "{\"linkName\":\"Documentation\","
+                + "\"linkUrl\":\"https://?\","
+                + "\"description\":\"Project docs\"}";
+
+        mockMvc.perform(post(BASE_URL)
+                .requestAttr("userId", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("Invalid link URL"))
+                .andExpect(jsonPath("$.details[0].field").value("linkUrl"))
+                .andExpect(jsonPath("$.details[0].message")
+                        .value("Must be a valid HTTP or HTTPS URL"));
     }
 }

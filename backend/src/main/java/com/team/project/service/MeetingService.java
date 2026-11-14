@@ -30,7 +30,7 @@ import com.team.project.repository.ProjectRepository;
 import com.team.project.repository.UserRepository;
 
 /**
- * Project members can create and view meetings; only the creator or the project host can edit or cancel.
+ * Project members can view meetings; only the project host can create, edit or cancel them.
  * Dates are stored in UTC.
  */
 @Service
@@ -59,7 +59,7 @@ public class MeetingService {
         }
         Project project = projectRepository.findById(req.projectId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
-        requireMember(userId, project.getProjectId());
+        requireHost(userId, project);
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or missing token"));
 
@@ -173,7 +173,7 @@ public class MeetingService {
             throw badRequest("At least one field must be provided");
         }
         Meeting meeting = find(meetingId);
-        requireCreatorOrHost(userId, meeting);
+        requireHost(userId, meeting.getProject());
         requireEditable(meeting, "edited");
 
         if (req.meetingTopic() != null) meeting.setMeetingTopic(validTopic(req.meetingTopic()));
@@ -186,7 +186,7 @@ public class MeetingService {
     /** Soft cancel: the row is kept with status CANCELLED. */
     public Meeting cancel(int userId, int meetingId) {
         Meeting meeting = find(meetingId);
-        requireCreatorOrHost(userId, meeting);
+        requireHost(userId, meeting.getProject());
         requireEditable(meeting, "cancelled");
         meeting.cancel();
         return meetingRepository.save(meeting);
@@ -205,12 +205,10 @@ public class MeetingService {
         }
     }
 
-    private void requireCreatorOrHost(int userId, Meeting meeting) {
-        boolean creator = meeting.getCreatedBy().getUserId().equals(userId);
-        boolean host = meeting.getProject().getHost().getUserId().equals(userId);
-        if (!creator && !host) {
+    private void requireHost(int userId, Project project) {
+        if (!project.getHost().getUserId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Only the meeting creator or the project host can do this");
+                    "Only the project host can create, edit or cancel meetings");
         }
     }
 

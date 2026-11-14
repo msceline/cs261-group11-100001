@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +55,13 @@ public class TaskController {
         return taskService.updateTask(userId, id, request)
                 .<ResponseEntity<?>>map(t -> ResponseEntity.ok(TaskResponse.from(t)))
                 .orElseGet(TaskController::notFound);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTask(@RequestAttribute("userId") int userId, @PathVariable int id) {
+        return taskService.deleteTask(userId, id)
+                ? ResponseEntity.noContent().build()
+                : notFound();
     }
 
     private static ResponseEntity<?> notFound() {

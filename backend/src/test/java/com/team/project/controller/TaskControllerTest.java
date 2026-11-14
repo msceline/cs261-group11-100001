@@ -51,7 +51,7 @@ class TaskControllerTest {
     }
 
     private Task task(int id, String title) {
-        return new Task(id, project, title, assignee, "doing", LocalDateTime.of(2026, 12, 1, 10, 0), "d", null);
+        return new Task(id, project, title, assignee, "doing", LocalDateTime.of(2026, 12, 1, 10, 0), "d");
     }
 
     @Test

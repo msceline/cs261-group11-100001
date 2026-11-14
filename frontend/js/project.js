@@ -161,7 +161,11 @@ async function loadProjects() {
 async function createProjectWithMembers(project) {
 	try {
 		const api = await loadProjectApi();
-		const created = await api.createProject({ projectName: project.projectName, subjectCode: project.subjectCode });
+		const created = await api.createProject({
+			projectName: project.projectName,
+			subjectCode: project.subjectCode,
+			dueDate: project.dueDate,
+		});
 
 		const me = await api.getCurrentUser();
 		const ids = [...new Set((project.members || []).map((member) => member.studentId))]

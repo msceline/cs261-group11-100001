@@ -18,6 +18,8 @@ const pageUrls = {
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
 	members: new URL('../pages/members.html', scriptUrl),
 	task: new URL('../pages/task.html', scriptUrl),
+	calendar: new URL('../pages/calender.html', scriptUrl),
+	meeting: new URL('../pages/meeting.html', scriptUrl),
 	createtask: new URL('../pages/createTask.html', scriptUrl),
 };
 const pageScriptUrls = {
@@ -27,6 +29,8 @@ const pageScriptUrls = {
 	addmember: new URL('../js/addmember.js', scriptUrl),
 	members: new URL('../js/members.js', scriptUrl),
 	task: new URL('../js/task.js', scriptUrl),
+	calendar: new URL('../js/calendar.js', scriptUrl),
+	meeting: new URL('../js/meeting.js', scriptUrl),
 	createtask: new URL('../js/createTask.js', scriptUrl),
 };
 const pageApiScriptUrls = {
@@ -39,6 +43,8 @@ const pageTitles = {
 	dashboard: 'Dashboard',
 	members: 'Members',
 	task: 'Tasks',
+	calendar: 'Calendar',
+	meeting: 'Create Meeting',
 	createtask: 'Task',
 };
 const pageScriptPromises = {};
@@ -222,7 +228,8 @@ function loadPageApiScript(page) {
 
 async function loadPage(page, pageData = null) {
 	if (!contentBox) return;
-	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page);
+	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page
+		|| (page === 'meeting' && link.dataset.page === 'calendar'));
 	if (requiresProject && !pageData && !selectedProject) return;
 
 	const pageUrl = pageUrls[page];
@@ -253,7 +260,8 @@ async function loadPage(page, pageData = null) {
 		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup' && page !== 'addmember');
 
 		pageButtons.forEach((button) => {
-			const isActive = button.dataset.page === page;
+			const isActive = button.dataset.page === page
+				|| (page === 'meeting' && button.dataset.page === 'calendar');
 			button.classList.toggle('sidebar-link-active', isActive);
 			if (isActive) {
 				button.setAttribute('aria-current', 'page');
@@ -290,6 +298,16 @@ async function loadPage(page, pageData = null) {
 			document.dispatchEvent(new CustomEvent('task:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
+		} else if (page === 'calendar') {
+			await loadPageScript('calendar');
+			document.dispatchEvent(new CustomEvent('calendar:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
+		} else if (page === 'meeting') {
+			await loadPageScript('meeting');
+			document.dispatchEvent(new CustomEvent('meeting:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		} else if (page === 'createtask') {
 			await loadPageScript('createtask');
 			document.dispatchEvent(new CustomEvent('createtask:loaded', {
@@ -312,6 +330,10 @@ document.addEventListener('addmember:back', () => {
 
 document.addEventListener('createtask:done', (event) => {
 	loadPage('task', event.detail || selectedProject);
+});
+
+document.addEventListener('meeting:created', (event) => {
+	loadPage('calendar', event.detail || selectedProject);
 });
 
 document.addEventListener('addmember:create', async (event) => {
@@ -348,6 +370,11 @@ logo?.addEventListener('keydown', (event) => {
 });
 
 contentBox?.addEventListener('click', (event) => {
+	if (event.target.closest('.calendar-create-meeting')) {
+		loadPage('meeting', selectedProject);
+		return;
+	}
+
 	if (event.target.closest('#createGroupIcon')) {
 		loadPage('creategroup');
 		return;

@@ -1,0 +1,37 @@
+<section class="calendar-page" aria-labelledby="calendar-course-code">
+  <header class="calendar-course-header">
+    <h1 class="calendar-course-code" id="calendar-course-code"></h1>
+    <p class="calendar-course-name" id="calendar-course-name"></p>
+  </header>
+
+  <section class="calendar-panel" aria-label="Project calendar">
+    <div class="calendar-toolbar">
+      <h2>Calendar</h2>
+      <div class="calendar-controls">
+        <div class="calendar-month-control" aria-label="Calendar month">
+          <button class="calendar-month-button" id="calendar-previous-month" type="button" aria-label="Previous month">‹</button>
+          <p id="calendar-month-label" aria-live="polite"></p>
+          <button class="calendar-month-button" id="calendar-next-month" type="button" aria-label="Next month">›</button>
+        </div>
+        <button class="calendar-create-meeting" type="button">
+          <span>Create Meeting</span>
+          <span class="calendar-create-icon" aria-hidden="true">+</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="calendar-month" role="grid" aria-label="Calendar dates">
+      <div class="calendar-weekdays" role="row">
+        <span role="columnheader">SUN</span>
+        <span role="columnheader">MON</span>
+        <span role="columnheader">TUE</span>
+        <span role="columnheader">WED</span>
+        <span role="columnheader">THU</span>
+        <span role="columnheader">FRI</span>
+        <span role="columnheader">SAT</span>
+      </div>
+      <div class="calendar-days" id="calendar-days" role="rowgroup"></div>
+    </div>
+    <p class="calendar-message" id="calendar-message" role="status" aria-live="polite" hidden></p>
+  </section>
+</section>

@@ -36,8 +36,8 @@ class MemberControllerTest {
     @Test
     void listReturnsMembersWithRoles() throws Exception {
         when(memberService.list(1, 1)).thenReturn(List.of(
-                new MemberResponse(1, 1, 1, "host", "6609650001", "A"),
-                new MemberResponse(2, 1, 2, "member", "6609650002", "B")));
+                new MemberResponse(1, 1, 1, "host", "6609650001", "A", "accepted"),
+                new MemberResponse(2, 1, 2, "member", "6609650002", "B", "accepted")));
 
         mockMvc.perform(get("/api/projects/1/members").requestAttr("userId", 1))
                 .andExpect(status().isOk())
@@ -57,7 +57,7 @@ class MemberControllerTest {
     @Test
     void addReturns201ForHost() throws Exception {
         when(memberService.add(eq(1), eq(1), any()))
-                .thenReturn(new MemberResponse(3, 1, 3, "member", "9900000001", "V"));
+                .thenReturn(new MemberResponse(3, 1, 3, "member", "9900000001", "V", "pending"));
 
         mockMvc.perform(post("/api/projects/1/members").requestAttr("userId", 1)
                         .contentType(MediaType.APPLICATION_JSON)

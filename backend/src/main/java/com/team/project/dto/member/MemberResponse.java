@@ -9,11 +9,12 @@ public record MemberResponse(int id,
                              int userId,
                              String roleInProject,
                              @JsonProperty("tu_id") String tu_id,
-                             String displayName) {
+                             String displayName,
+                             String status) {
 
     public static MemberResponse from(ProjectMember m, User u) {
         return new MemberResponse(m.getId(), m.getProjectId(), m.getUserId(), m.getRoleInProject(),
-                u.getTu_id(), u.getDisplayName());
+                u.getTu_id(), u.getDisplayName(), m.getStatus());
     }
 
     public String tuId() {

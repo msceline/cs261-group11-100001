@@ -21,6 +21,9 @@ import jakarta.persistence.UniqueConstraint;
 )
 public class ProjectMember {
 
+    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_ACCEPTED = "accepted";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -37,6 +40,10 @@ public class ProjectMember {
     @Column(name = "role_in_project", length = 20, nullable = false)
     private String roleInProject = "member";
 
+    /** "pending" until the invited user accepts, then "accepted". Existing rows count as accepted. */
+    @Column(name = "status", length = 20, nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'accepted'")
+    private String status = STATUS_ACCEPTED;
+
     @Column(name = "joined_at", nullable = false, updatable = false)
     private LocalDateTime joinedAt;
 
@@ -44,6 +51,12 @@ public class ProjectMember {
     }
 
     public ProjectMember(Integer id, User user, Project project, String roleInProject, LocalDateTime joinedAt) {
+        this(id, user, project, roleInProject, STATUS_ACCEPTED, joinedAt);
+    }
+
+    public ProjectMember(Integer id, User user, Project project, String roleInProject, String status,
+                         LocalDateTime joinedAt) {
+        this.status = status != null ? status : STATUS_ACCEPTED;
         this.id = id;
         this.user = user;
         this.project = project;
@@ -58,6 +71,9 @@ public class ProjectMember {
         }
         if (this.roleInProject == null) {
             this.roleInProject = "member";
+        }
+        if (this.status == null) {
+            this.status = STATUS_ACCEPTED;
         }
     }
 
@@ -99,6 +115,14 @@ public class ProjectMember {
 
     public void setRoleInProject(String roleInProject) {
         this.roleInProject = roleInProject;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDateTime getJoinedAt() {

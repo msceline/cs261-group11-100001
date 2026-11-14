@@ -80,7 +80,54 @@ class MeetingServiceTest {
     }
 
     @Test
-    void createRejectsMissingFieldsAndNonMembers() {
+    void hostCanUpdateMeeting() {
+        Meeting existing = new Meeting(20, project, "Old topic", LocalDateTime.of(2026, 11, 20, 14, 30),
+                "Old room", "Old details", LocalDateTime.of(2026, 11, 1, 0, 0));
+        when(meetingRepository.findByMeetingIdAndProject_ProjectId(20, 10)).thenReturn(Optional.of(existing));
+
+        MeetingResponse updated = meetingService.update(1, 10, 20,
+                new CreateMeetingRequest(" New topic ", LocalDateTime.of(2026, 11, 21, 15, 0),
+                        " New room ", " New details "));
+
+        assertEquals("New topic", updated.topic());
+        assertEquals(LocalDateTime.of(2026, 11, 21, 15, 0), updated.dateTime());
+        assertEquals("New room", updated.location());
+        assertEquals("New details", updated.description());
+        verify(meetingRepository).save(existing);
+    }
+
+    @Test
+    void onlyHostCanUpdateMeeting() {
+        ResponseStatusException forbidden = assertThrows(ResponseStatusException.class,
+                () -> meetingService.update(2, 10, 20,
+                        new CreateMeetingRequest("Planning", LocalDateTime.now(), null, null)));
+
+        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(forbidden.getStatusCode().value()));
+        verify(meetingRepository, never()).save(any(Meeting.class));
+    }
+
+    @Test
+    void hostCanDeleteMeeting() {
+        Meeting existing = new Meeting(20, project, "Planning", LocalDateTime.of(2026, 11, 20, 14, 30),
+                "Room 1", null, LocalDateTime.of(2026, 11, 1, 0, 0));
+        when(meetingRepository.findByMeetingIdAndProject_ProjectId(20, 10)).thenReturn(Optional.of(existing));
+
+        meetingService.delete(1, 10, 20);
+
+        verify(meetingRepository).delete(existing);
+    }
+
+    @Test
+    void onlyHostCanDeleteMeeting() {
+        ResponseStatusException forbidden = assertThrows(ResponseStatusException.class,
+                () -> meetingService.delete(2, 10, 20));
+
+        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(forbidden.getStatusCode().value()));
+        verify(meetingRepository, never()).delete(any(Meeting.class));
+    }
+
+    @Test
+    void createRejectsMissingFields() {
         ResponseStatusException missingTopic = assertThrows(ResponseStatusException.class,
                 () -> meetingService.create(1, 10,
                         new CreateMeetingRequest("  ", LocalDateTime.now(), null, null)));
@@ -89,11 +136,16 @@ class MeetingServiceTest {
         ResponseStatusException missingDate = assertThrows(ResponseStatusException.class,
                 () -> meetingService.create(1, 10, new CreateMeetingRequest("Planning", null, null, null)));
         assertEquals(HttpStatus.BAD_REQUEST, HttpStatus.valueOf(missingDate.getStatusCode().value()));
+    }
 
-        ResponseStatusException notMember = assertThrows(ResponseStatusException.class,
+    @Test
+    void onlyHostCanCreateMeetingEvenIfUserIsProjectMember() {
+        when(memberRepository.existsByProject_ProjectIdAndUser_UserId(10, 2)).thenReturn(true);
+
+        ResponseStatusException forbidden = assertThrows(ResponseStatusException.class,
                 () -> meetingService.create(2, 10,
-                        new CreateMeetingRequest("Planning", LocalDateTime.now(), null, null)));
-        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(notMember.getStatusCode().value()));
+                        new CreateMeetingRequest("Planning", LocalDateTime.of(2026, 11, 20, 14, 30), null, null)));
+        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(forbidden.getStatusCode().value()));
         verify(meetingRepository, never()).save(any(Meeting.class));
     }
 }

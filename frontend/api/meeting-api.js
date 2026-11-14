@@ -54,7 +54,20 @@
     });
   }
 
-  const meetingApi = { getMeetings, createMeeting };
+  function updateMeeting(projectId, meetingId, meeting) {
+    return request(`/projects/${encodeURIComponent(projectId)}/meetings/${encodeURIComponent(meetingId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(meeting),
+    });
+  }
+
+  function deleteMeeting(projectId, meetingId) {
+    return request(`/projects/${encodeURIComponent(projectId)}/meetings/${encodeURIComponent(meetingId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  const meetingApi = { getMeetings, createMeeting, updateMeeting, deleteMeeting };
   if (typeof module !== 'undefined' && module.exports) module.exports = meetingApi;
   window.meetingApi = meetingApi;
 }());

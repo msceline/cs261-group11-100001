@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,21 @@ public class MeetingController {
                                                   @PathVariable int projectId,
                                                   @RequestBody CreateMeetingRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(meetingService.create(userId, projectId, request));
+    }
+
+    @PutMapping("/{meetingId}")
+    public MeetingResponse update(@RequestAttribute("userId") int userId,
+                                 @PathVariable int projectId,
+                                 @PathVariable int meetingId,
+                                 @RequestBody CreateMeetingRequest request) {
+        return meetingService.update(userId, projectId, meetingId, request);
+    }
+
+    @DeleteMapping("/{meetingId}")
+    public ResponseEntity<Void> delete(@RequestAttribute("userId") int userId,
+                                       @PathVariable int projectId,
+                                       @PathVariable int meetingId) {
+        meetingService.delete(userId, projectId, meetingId);
+        return ResponseEntity.noContent().build();
     }
 }

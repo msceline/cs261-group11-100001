@@ -8,14 +8,26 @@ document.addEventListener('meeting:loaded', (event) => {
   if (!form) return;
 
   const project = event.detail || {};
+  const editingMeeting = project.meeting || null;
   const topicInput = document.getElementById('meeting-topic');
   const dateTimeInput = document.getElementById('meeting-date-time');
   const locationInput = document.getElementById('meeting-location');
   const descriptionInput = document.getElementById('meeting-description');
   const submitButton = document.getElementById('meeting-submit');
   const message = document.getElementById('meeting-message');
+  const title = document.getElementById('meeting-page-title');
 
-  dateTimeInput.value = formatLocalDateTime(new Date());
+  if (editingMeeting) {
+    document.title = 'Edit Meeting';
+    title.textContent = 'Edit Meeting';
+    submitButton.textContent = 'Save Changes';
+    topicInput.value = editingMeeting.topic || '';
+    dateTimeInput.value = formatLocalDateTime(new Date(editingMeeting.dateTime));
+    locationInput.value = editingMeeting.location || '';
+    descriptionInput.value = editingMeeting.description || '';
+  } else {
+    dateTimeInput.value = formatLocalDateTime(new Date());
+  }
 
   function showMessage(text, isError = false) {
     message.textContent = text;
@@ -34,20 +46,36 @@ document.addEventListener('meeting:loaded', (event) => {
     }
 
     submitButton.disabled = true;
-    submitButton.textContent = 'Submitting...';
+    submitButton.textContent = editingMeeting ? 'Saving...' : 'Submitting...';
 
     try {
-      await window.meetingApi.createMeeting(project.projectId, {
+      const meeting = {
         topic: topicInput.value.trim(),
         dateTime: dateTimeInput.value,
         location: locationInput.value.trim(),
         description: descriptionInput.value.trim(),
-      });
-      document.dispatchEvent(new CustomEvent('meeting:created', { detail: project }));
+      };
+      if (editingMeeting) {
+        const updatedMeeting = await window.meetingApi.updateMeeting(
+          project.projectId,
+          editingMeeting.meetingId,
+          meeting,
+        );
+        const updatedDate = new Date(updatedMeeting?.dateTime || meeting.dateTime);
+        const returnProject = { ...project };
+        if (!Number.isNaN(updatedDate.getTime())) {
+          returnProject.calendarYear = updatedDate.getFullYear();
+          returnProject.calendarMonth = updatedDate.getMonth();
+        }
+        document.dispatchEvent(new CustomEvent('meeting:updated', { detail: returnProject }));
+      } else {
+        await window.meetingApi.createMeeting(project.projectId, meeting);
+        document.dispatchEvent(new CustomEvent('meeting:created', { detail: project }));
+      }
     } catch (error) {
-      showMessage(error.message || 'Could not create meeting.', true);
+      showMessage(error.message || 'Could not save meeting.', true);
       submitButton.disabled = false;
-      submitButton.textContent = 'Submit';
+      submitButton.textContent = editingMeeting ? 'Save Changes' : 'Submit';
     }
   });
 });

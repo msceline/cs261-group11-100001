@@ -39,6 +39,31 @@ public class MeetingService {
     }
 
     public MeetingResponse create(int userId, int projectId, CreateMeetingRequest request) {
+        Project project = requireHost(userId, projectId);
+        Meeting meeting = new Meeting();
+        applyRequest(meeting, request);
+        meeting.setProject(project);
+        return MeetingResponse.from(meetingRepository.save(meeting));
+    }
+
+    public MeetingResponse update(int userId, int projectId, int meetingId, CreateMeetingRequest request) {
+        requireHost(userId, projectId);
+        Meeting meeting = findMeeting(projectId, meetingId);
+        applyRequest(meeting, request);
+        return MeetingResponse.from(meetingRepository.save(meeting));
+    }
+
+    public void delete(int userId, int projectId, int meetingId) {
+        requireHost(userId, projectId);
+        meetingRepository.delete(findMeeting(projectId, meetingId));
+    }
+
+    private Meeting findMeeting(int projectId, int meetingId) {
+        return meetingRepository.findByMeetingIdAndProject_ProjectId(meetingId, projectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Meeting not found"));
+    }
+
+    private static void applyRequest(Meeting meeting, CreateMeetingRequest request) {
         if (request == null) throw bad("Request body is required");
 
         String topic = request.topic() == null ? "" : request.topic().trim();
@@ -54,17 +79,10 @@ public class MeetingService {
             throw bad("location must be at most 1000 characters");
         }
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
-        requireMember(userId, projectId);
-
-        Meeting meeting = new Meeting();
-        meeting.setProject(project);
         meeting.setTopic(topic);
         meeting.setDateTime(request.dateTime());
         meeting.setLocation(location);
         meeting.setDescription(blankToNull(request.description()));
-        return MeetingResponse.from(meetingRepository.save(meeting));
     }
 
     private void requireMember(int userId, int projectId) {
@@ -74,6 +92,15 @@ public class MeetingService {
         if (!memberRepository.existsByProject_ProjectIdAndUser_UserId(projectId, userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a member of this project");
         }
+    }
+
+    private Project requireHost(int userId, int projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
+        if (!project.getHost().getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the project host can manage meetings");
+        }
+        return project;
     }
 
     private static String blankToNull(String value) {

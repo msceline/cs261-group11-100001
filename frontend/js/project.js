@@ -3,11 +3,11 @@ const projectScriptUrl = document.currentScript?.src || window.location.href;
 
 // Shown only while nobody is logged in (no auth token), so the page can still be previewed without the backend.
 const projects = [
-	{ projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 20 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS213', progress: 55 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS221', progress: 75 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'TU109', progress: 85 },
-	{ projectName: 'เว็บไซต์จองห้องเรียน', subjectCode: 'CS331', progress: 100 },
+	{ projectId: 26001, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 25 },
+    { projectId: 26002, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS213', progress: 55 },
+    { projectId: 26003, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS221', progress: 75 },
+    { projectId: 26004, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'TU109', progress: 85 },
+	{ projectId: 26005, projectName: 'เว็บไซต์จองห้องเรียน', subjectCode: 'CS331', progress: 100 },
 ];
 
 function createProjectCard(project) {

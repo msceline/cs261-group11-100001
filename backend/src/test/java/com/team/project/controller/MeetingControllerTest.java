@@ -6,6 +6,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,5 +61,23 @@ class MeetingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].topic").value("Planning"));
+    }
+
+    @Test
+    void updateReturnsUpdatedMeeting() throws Exception {
+        when(meetingService.update(eq(1), eq(10), eq(20), any())).thenReturn(meeting());
+
+        mockMvc.perform(put("/api/projects/10/meetings/20").requestAttr("userId", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"topic\":\"Planning\",\"dateTime\":\"2026-11-20T14:30\",\"location\":\"https://meet.example/room\",\"description\":\"Review milestones\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.meetingId").value(20))
+                .andExpect(jsonPath("$.topic").value("Planning"));
+    }
+
+    @Test
+    void deleteReturnsNoContent() throws Exception {
+        mockMvc.perform(delete("/api/projects/10/meetings/20").requestAttr("userId", 1))
+                .andExpect(status().isNoContent());
     }
 }

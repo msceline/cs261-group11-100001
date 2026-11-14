@@ -16,30 +16,21 @@
 	height: 557px;
 	min-height: 0;
 	padding: 30px 60px;
-	background: rgba(255, 247, 236, 0.438);
-    backdrop-filter: blur(22px) saturate(170%);
-    -webkit-backdrop-filter: blur(22px) saturate(170%);
-
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-    border-right: 1px solid rgba(255, 255, 255, 0.35);
-
-    box-shadow:
-        0 24px 48px -12px rgba(0, 0, 0, 0.2),
-        0 0 24px rgba(255, 255, 255, 0.5) inset;
+	background: #D2E7FC;
 	border-radius: 20px;
-    transform: translateY(-5px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-	box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.5);
+	transform: translateY(-5px);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	box-shadow:
+		0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 	box-sizing: border-box;
 	animation: create-group-enter 240ms ease-out both;
 }
 
 .addmember-page #groupNameAddMember {
 	width: 100%;
-	color: #000;
-	font-size: 32px;
-	font-weight: bold;
+	color: #353535;
+	font-size: 3rem;
+	font-weight: bolder;
 	text-align: center;
 	overflow-wrap: anywhere;
 }
@@ -51,9 +42,9 @@
 	min-height: 0;
 }
 
-.addmember-page .invite-input{
-    border-bottom: 1px solid #000;
-    padding-bottom: 14px;
+.addmember-page .invite-input {
+	border-bottom: 1px solid #000;
+	padding-bottom: 14px;
 }
 
 .addmember-page .invite-input form {
@@ -63,15 +54,15 @@
 }
 
 .addmember-page .invite-input label,
-.addmember-page .invited-member > p {
+.addmember-page .invited-member>p {
 	margin: 0;
-	color: #000;
+	color: #494949;
 	font-size: 20px;
 	font-weight: normal;
 }
 
-.addmember-page .invited-member{
-    margin: 14px;
+.addmember-page .invited-member {
+	margin: 14px;
 }
 
 .addmember-page .addmember-card .input {
@@ -85,31 +76,23 @@
 	min-width: 0;
 	min-height: 48px;
 	padding: 0 16px;
-	background: rgba(255, 247, 236, 0.438);
-    backdrop-filter: blur(22px) saturate(170%);
-    -webkit-backdrop-filter: blur(22px) saturate(170%);
-
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-    border-right: 1px solid rgba(255, 255, 255, 0.35);
-
-    box-shadow:
-        0 24px 48px -12px rgba(0, 0, 0, 0.2),
-        0 0 24px rgba(255, 255, 255, 0.5) inset;
-	border-radius: 20px;
+	background: #fff;
+	border-radius: 10px;
+	border: none;
 	outline: none;
-    transform: translateY(-5px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-size: 14px;
+	transform: translateY(-5px);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	font-size: 14px;
 }
 
 .addmember-page .addmember-card button {
 	min-height: 48px;
 	padding: 8px 14px;
 	color: #fff;
-	background: #000;
-	border: 0;
-	border-radius: 20px;
+	background: #8A443D;
+	border: none;
+	outline: none;
+	border-radius: 10px;
 	cursor: pointer;
 	font-weight: 700;
 	transition: transform 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
@@ -123,10 +106,18 @@
 	margin: 0;
 }
 
+.addmember-page .invited-member>p {
+	margin-bottom: 5px;
+	color: #494949;
+	font-size: 1.2rem;
+	font-weight: normal;
+}
+
 .addmember-page #invitedMember {
 	display: grid;
 	min-height: 0;
-	gap: 6px;
+	padding-top: 10px;
+	gap: 5px;
 	align-content: start;
 	overflow-y: auto;
 	scrollbar-width: none;
@@ -141,24 +132,13 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 12px;
 	min-width: 0;
-	margin: 10px;
 	padding: 8px 12px;
-	background: rgba(255, 247, 236, 0.438);
-    backdrop-filter: blur(22px) saturate(170%);
-    -webkit-backdrop-filter: blur(22px) saturate(170%);
+	background: #fff;
+	border: 1px solid #494949;
 
-    border: 1px solid rgba(255, 255, 255, 0.65);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-    border-right: 1px solid rgba(255, 255, 255, 0.35);
-
-    box-shadow:
-        0 24px 48px -12px rgba(0, 0, 0, 0.2),
-        0 0 24px rgba(255, 255, 255, 0.5) inset;
-
-    transform: translateY(-5px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+	transform: translateY(-5px);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
 	border-radius: 20px;
 }
 
@@ -210,41 +190,35 @@
 	align-items: flex-end;
 	height: 100%;
 	gap: 6px;
-    font-size: 20px;
+	font-size: 20px;
 }
 
-.addmember-page .direction button:nth-child(1){
-    background: #B7B7B7;
-    color: #000;
-    font-weight: 700;
+.addmember-page .direction button:nth-child(1) {
+	background: #E1E1E1;
+	color: #000;
+	font-weight: 700;
 }
 
-.addmember-page .direction button:nth-child(2){
-    color: #FFFFFF;
+.addmember-page .direction button:nth-child(2) {
+	color: #FFFFFF;
 }
 
 .addmember-page .addmember-card button:hover {
 	transform: translateY(-1px);
-	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
 
 .addmember-page .addmember-card .input button:hover,
 .addmember-page .direction button:nth-child(2):hover {
-	background: #262626;
+	background: #703732;
 }
 
 .addmember-page .direction button:nth-child(1):hover {
-	background: #a5a5a5;
+	background: #d4d4d4;
 }
 
 .addmember-page .addmember-card button:active {
 	transform: translateY(0);
 	box-shadow: none;
-}
-
-.addmember-page .addmember-card button:focus-visible {
-	outline: 3px solid #9bd4c8;
-	outline-offset: 2px;
 }
 
 .addmember-page .addmember-card .invited-member-card__remove-btn {
@@ -286,7 +260,6 @@
 		gap: 14px;
 		height: auto;
 		min-height: 0;
-		padding: 24px;
 	}
 
 	.addmember-page #groupNameAddMember {
@@ -314,7 +287,7 @@
 	}
 
 	.addmember-page .invite-input label,
-	.addmember-page .invited-member > p {
+	.addmember-page .invited-member>p {
 		font-size: 17px;
 	}
 

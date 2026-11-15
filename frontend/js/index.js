@@ -37,6 +37,7 @@ const pageScriptUrls = {
 };
 const pageApiScriptUrls = {
 	members: new URL('../client-api/member-api.js', scriptUrl),
+	resources: new URL('../api/resource-api.js', scriptUrl),
 };
 const pageTitles = {
 	project: 'Projects',
@@ -280,7 +281,7 @@ async function loadPage(page, pageData = null) {
 			}));
 		} else if (page === 'resources') {
             await loadPageScript('resources');
-            await loadPageApiScript('resources').catch(() => {});
+            await loadPageApiScript('resources');
             document.dispatchEvent(new CustomEvent('resources:loaded', {
                 detail: pageData || selectedProject || {},
             }));

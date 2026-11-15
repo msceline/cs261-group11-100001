@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: project
+  datasource:
+    # Overridden in Docker by SPRING_DATASOURCE_* env vars (see docker-compose.yml)
+    url: jdbc:sqlserver://localhost:${DB_PORT:1433};databaseName=${DB_NAME:master};encrypt=true;trustServerCertificate=true
+    username: sa
+    password: ${MSSQL_SA_PASSWORD:}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.SQLServerDialect
+
+jwt:
+  # No default on purpose: the app refuses to start without JWT_SECRET (min 32 characters).
+  secret: ${JWT_SECRET}
+
+tu:
+  api:
+    url: https://restapi.tu.ac.th/api/v1
+    key: ${TU_API_KEY:}
+
+server:
+  port: 8080

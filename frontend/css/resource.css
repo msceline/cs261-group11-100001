@@ -232,11 +232,11 @@
 }
 
 .resources-page .empty-box-icon {
-  width: 120px;
-  height: 100px;
-  margin-bottom: 8px;
+  width: 220px;
+  height: 180px;
+  object-fit: contain;
+  margin-bottom: 12px;
 }
-
 .resources-page .resource-empty-state h3 {
   font-size: 20px;
   font-weight: 700;

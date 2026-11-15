@@ -27,10 +27,12 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "notification_title", length = 255)
+    @Nationalized
+    @Column(name = "title", length = 150, nullable = false)
     private String title;
 
-    @Column(name = "notification_message", length = 255)
+    @Nationalized
+    @Column(name = "message", length = 500, nullable = false)
     private String message;
 
     @Column(name = "type", length = 50, nullable = false)
@@ -46,7 +48,7 @@ public class Notification {
     }
 
     public Notification(Integer id, User user, String title, String message, String type,
-            Boolean isRead, LocalDateTime createdAt) {
+                        Boolean isRead, LocalDateTime createdAt) {
         this.id = id;
         this.user = user;
         this.title = title;
@@ -122,3 +124,4 @@ public class Notification {
         this.createdAt = createdAt;
     }
 }
+

@@ -55,10 +55,10 @@
   }
 
   /** POST /api/projects: the caller becomes the host. createdAt (yyyy-MM-dd) is optional. */
-  function createProject({ projectName, subjectCode, createdAt }, token) {
+  function createProject({ projectName, subjectCode, createdAt, dueDate }, token) {
     return request('/projects', token, {
       method: 'POST',
-      body: JSON.stringify({ projectName, subjectCode, createdAt }),
+      body: JSON.stringify({ projectName, subjectCode, createdAt, dueDate }),
     });
   }
 

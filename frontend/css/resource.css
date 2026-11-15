@@ -245,11 +245,13 @@
   font-size: 20px;
   font-weight: 700;
   color: #111827;
+  margin: 0 0 8px;
 }
 
 .resources-page .resource-empty-state p {
   font-size: 14px;
   color: #4b5563;
+  margin: 0;
 }
 
 

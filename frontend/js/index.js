@@ -21,6 +21,7 @@ const pageUrls = {
 	calendar: new URL('../pages/calender.html', scriptUrl),
 	meeting: new URL('../pages/meeting.html', scriptUrl),
 	createtask: new URL('../pages/createTask.html', scriptUrl),
+	resources: new URL('../pages/resource.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
@@ -32,6 +33,7 @@ const pageScriptUrls = {
 	calendar: new URL('../js/calendar.js', scriptUrl),
 	meeting: new URL('../js/meeting.js', scriptUrl),
 	createtask: new URL('../js/createTask.js', scriptUrl),
+	resources: new URL('../js/resource.js', scriptUrl),
 };
 const pageApiScriptUrls = {
 	members: new URL('../client-api/member-api.js', scriptUrl),

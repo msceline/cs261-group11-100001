@@ -123,4 +123,4 @@
   const resourceApi = { getResources, createResource, updateResource, deleteResource };
   if (typeof module !== 'undefined' && module.exports) module.exports = resourceApi;
   window.ResourceAPI = resourceApi;
-}());
+})();

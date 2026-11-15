@@ -420,6 +420,7 @@
   height: 115px;
   object-fit: contain;
   mix-blend-mode: multiply;
+  margin-bottom: -18px;
 }
 
 .resources-page .status-popup h4 {

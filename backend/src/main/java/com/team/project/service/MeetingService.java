@@ -1,6 +1,5 @@
 package com.team.project.service;
 
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -251,20 +250,12 @@ public class MeetingService {
         return description;
     }
 
-    /** Blank becomes null; otherwise must be an https URL. */
+    /** Blank becomes null. Any text is accepted (a link or a plain location), up to 500 characters. */
     private static String validLink(String link) {
         if (link == null || link.isBlank()) return null;
         String l = link.trim();
         if (l.length() > 500) {
             throw badRequest("Validation failed: field 'meetingLink' must be at most 500 characters");
-        }
-        try {
-            URI uri = new URI(l);
-            if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null) {
-                throw new IllegalArgumentException();
-            }
-        } catch (Exception ex) {
-            throw badRequest("Validation failed: field 'meetingLink' must be a valid https URL");
         }
         return l;
     }

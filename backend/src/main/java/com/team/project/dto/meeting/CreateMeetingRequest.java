@@ -1,5 +1,7 @@
 package com.team.project.dto.meeting;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
-public record CreateMeetingRequest(String topic, LocalDateTime dateTime, String location, String description) {}
+/** meetingDescription and meetingLink are optional; the creator and status are set by the server. */
+public record CreateMeetingRequest(Integer projectId, String meetingTopic, String meetingDescription,
+                                   OffsetDateTime meetingDate, String meetingLink) {}

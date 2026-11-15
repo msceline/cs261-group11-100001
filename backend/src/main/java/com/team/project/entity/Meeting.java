@@ -1,6 +1,7 @@
 package com.team.project.entity;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,62 +9,122 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.Nationalized;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+/**
+ * Meeting entity. All date-time columns are stored in UTC and converted to
+ * +07:00 (Asia/Bangkok) only when displayed.
+ */
 @Entity
-@Table(name = "meetings")
+@Table(name = "meetings", indexes = {
+        @Index(name = "idx_meeting_project_date", columnList = "project_id, meeting_date"),
+        @Index(name = "idx_meeting_project_status_date", columnList = "project_id, status, meeting_date"),
+        @Index(name = "idx_meeting_created_by", columnList = "created_by")
+})
 public class Meeting {
+
+    public static final String STATUS_SCHEDULED = "SCHEDULED";
+    public static final String STATUS_CANCELLED = "CANCELLED";
+    public static final String TYPE_MEETING = "meeting";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meeting_id")
     private Integer meetingId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // ON DELETE CASCADE: deleting a project removes its meetings
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @Nationalized
-    @Column(name = "topic", length = 200, nullable = false)
-    private String topic;
-
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
+    // ON DELETE RESTRICT (default): a user who created meetings cannot be deleted
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
 
     @Nationalized
-    @Column(name = "location", length = 1000)
-    private String location;
+    @Column(name = "meeting_topic", length = 255, nullable = false)
+    private String meetingTopic;
 
     @Nationalized
-    @Column(name = "description", columnDefinition = "NVARCHAR(MAX)")
-    private String description;
+    @Column(name = "meeting_description", columnDefinition = "NVARCHAR(MAX)")
+    private String meetingDescription;
+
+    @Column(name = "meeting_date", nullable = false)
+    private LocalDateTime meetingDate;
+
+    @Column(name = "meeting_link", length = 500)
+    private String meetingLink;
+
+    @Column(name = "type", length = 20, nullable = false)
+    private String type = TYPE_MEETING;
+
+    @Column(name = "status", length = 20, nullable = false)
+    private String status = STATUS_SCHEDULED;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
     public Meeting() {
     }
 
-    public Meeting(Integer meetingId, Project project, String topic, LocalDateTime dateTime,
-                   String location, String description, LocalDateTime createdAt) {
+    public Meeting(Integer meetingId, Project project, User createdBy, String meetingTopic,
+                   String meetingDescription, LocalDateTime meetingDate, String meetingLink,
+                   String type, String status, LocalDateTime cancelledAt,
+                   LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.meetingId = meetingId;
         this.project = project;
-        this.topic = topic;
-        this.dateTime = dateTime;
-        this.location = location;
-        this.description = description;
+        this.createdBy = createdBy;
+        this.meetingTopic = meetingTopic;
+        this.meetingDescription = meetingDescription;
+        this.meetingDate = meetingDate;
+        this.meetingLink = meetingLink;
+        this.type = type != null ? type : TYPE_MEETING;
+        this.status = status != null ? status : STATUS_SCHEDULED;
+        this.cancelledAt = cancelledAt;
         this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     @PrePersist
     protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        if (this.createdAt == null) {
+            this.createdAt = now;
         }
+        this.updatedAt = now;
+        if (this.type == null) {
+            this.type = TYPE_MEETING;
+        }
+        if (this.status == null) {
+            this.status = STATUS_SCHEDULED;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now(ZoneOffset.UTC);
+    }
+
+    /** Soft cancel: sets status and cancelledAt together. */
+    public void cancel() {
+        this.status = STATUS_CANCELLED;
+        this.cancelledAt = LocalDateTime.now(ZoneOffset.UTC);
     }
 
     public Integer getMeetingId() {
@@ -82,36 +143,68 @@ public class Meeting {
         this.project = project;
     }
 
-    public String getTopic() {
-        return topic;
+    public User getCreatedBy() {
+        return createdBy;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public String getMeetingTopic() {
+        return meetingTopic;
     }
 
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
+    public void setMeetingTopic(String meetingTopic) {
+        this.meetingTopic = meetingTopic;
     }
 
-    public String getLocation() {
-        return location;
+    public String getMeetingDescription() {
+        return meetingDescription;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setMeetingDescription(String meetingDescription) {
+        this.meetingDescription = meetingDescription;
     }
 
-    public String getDescription() {
-        return description;
+    public LocalDateTime getMeetingDate() {
+        return meetingDate;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setMeetingDate(LocalDateTime meetingDate) {
+        this.meetingDate = meetingDate;
+    }
+
+    public String getMeetingLink() {
+        return meetingLink;
+    }
+
+    public void setMeetingLink(String meetingLink) {
+        this.meetingLink = meetingLink;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -120,5 +213,13 @@ public class Meeting {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

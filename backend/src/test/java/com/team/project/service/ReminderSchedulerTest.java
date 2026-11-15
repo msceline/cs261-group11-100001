@@ -43,7 +43,7 @@ class ReminderSchedulerTest {
     }
 
     private static Task task(int id, User assignee, String status, LocalDateTime dueDate) {
-        return new Task(id, null, "Report", assignee, status, dueDate, null, null);
+        return new Task(id, null, "Report", assignee, status, dueDate, null);
     }
 
     private static LocalDateTime tenMinuteReminderDue() {

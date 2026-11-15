@@ -26,3 +26,6 @@ replay_pid*
 node_modules/
 
 .env
+
+# Local application configuration
+**/application-local.yml

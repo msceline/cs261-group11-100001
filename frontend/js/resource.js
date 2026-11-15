@@ -1,5 +1,21 @@
 (() => {
   let currentProject = {};
+  let cachedItems = [];
+
+  function getCurrentUserName() {
+    // ดึงชื่อผู้ใช้จริงจาก DOM แถบโปรไฟล์ด้านล่างของ Sidebar หรือจาก Storage
+    const profileNameEl = document.querySelector('.user-profile .profile-name, .user-profile span, #profileName');
+    const domName = profileNameEl?.textContent?.trim();
+    if (domName) return domName;
+
+    try {
+      const userObj = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null');
+      if (userObj?.name || userObj?.username) return userObj.name || userObj.username;
+    } catch {
+      // ข้ามหากไม่มีข้อมูลใน Storage
+    }
+    return 'Member';
+  }
 
   function getEls() {
     return {
@@ -25,15 +41,24 @@
     };
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function showMainListView(items) {
     const els = getEls();
     if (!els.list) return;
 
+    cachedItems = items || [];
     els.skeleton.hidden = true;
     els.formView.hidden = true;
     els.openUploadBtn.hidden = false;
 
-    if (!items || items.length === 0) {
+    if (cachedItems.length === 0) {
       els.list.hidden = true;
       els.empty.hidden = false;
       return;
@@ -41,19 +66,19 @@
 
     els.empty.hidden = true;
     els.list.hidden = false;
-    els.list.innerHTML = items
+    els.list.innerHTML = cachedItems
       .map(
         (item) => `
-        <article class="resource-card" data-id="${item.id}">
+        <article class="resource-card" data-id="${escapeHtml(item.id)}">
           <div class="resource-card-top">
             <span class="resource-bullet" aria-hidden="true"></span>
-            <a class="resource-link-title" href="${item.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>
+            <a class="resource-link-title" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>
             <span class="resource-short-desc">${escapeHtml(item.description || '')}</span>
             <div class="resource-actions">
-              <button type="button" class="icon-action-btn btn-edit-resource" data-id="${item.id}" aria-label="Edit resource" title="Edit">
+              <button type="button" class="icon-action-btn btn-edit-resource" data-id="${escapeHtml(item.id)}" aria-label="Edit resource" title="Edit">
                 <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </button>
-              <button type="button" class="icon-action-btn btn-delete-resource" data-id="${item.id}" aria-label="Delete resource" title="Delete">
+              <button type="button" class="icon-action-btn btn-delete-resource" data-id="${escapeHtml(item.id)}" aria-label="Delete resource" title="Delete">
                 <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </button>
             </div>
@@ -119,16 +144,14 @@
     els.formView.hidden = true;
     els.skeleton.hidden = false;
 
-    const items = await window.ResourceAPI.getResources(currentProject.projectId);
-    showMainListView(items);
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    try {
+      const items = window.ResourceAPI
+        ? await window.ResourceAPI.getResources(currentProject.projectId)
+        : [];
+      showMainListView(items);
+    } catch {
+      showMainListView([]);
+    }
   }
 
   function bindEvents() {
@@ -136,13 +159,9 @@
     if (!els.openUploadBtn || els.openUploadBtn.dataset.bound) return;
     els.openUploadBtn.dataset.bound = 'true';
 
-    
     els.openUploadBtn.addEventListener('click', () => openFormView('upload'));
-
-    
     els.cancelBtn.addEventListener('click', () => refreshResources());
 
-    
     els.formView.addEventListener('submit', async (e) => {
       e.preventDefault();
       const url = els.linkInput.value.trim();
@@ -159,37 +178,48 @@
       els.submitBtn.textContent = isEdit ? 'saving...' : 'uploading...';
 
       try {
+        if (!window.ResourceAPI) throw new Error('API service unavailable');
+
         if (isEdit) {
-          await window.ResourceAPI.updateResource(currentProject.projectId, els.editingId.value, { url, title });
+          await window.ResourceAPI.updateResource(currentProject.projectId, els.editingId.value, {
+            url,
+            title,
+          });
           showPopup('success', 'Your link has been updated successfully!');
         } else {
-          await window.ResourceAPI.createResource(currentProject.projectId, { url, title });
+          await window.ResourceAPI.createResource(currentProject.projectId, {
+            url,
+            title,
+            uploadedBy: getCurrentUserName(),
+          });
           showPopup('success', 'Your link has been added successfully!');
         }
       } catch {
         els.cancelBtn.disabled = false;
         els.submitBtn.disabled = false;
         els.submitBtn.textContent = isEdit ? 'save' : 'upload';
-        showPopup('error', 'Something went wrong... Please check your URL.');
+        showPopup('error', 'Something went wrong... Please check your URL or connection.');
       }
     });
 
-    
     els.list.addEventListener('click', async (e) => {
-      if (e.target.closest('.resource-link-title')) return; // กดชื่อลิงก์ -> เปิดแท็บใหม่ทันที
+      if (e.target.closest('.resource-link-title')) return;
 
       const editBtn = e.target.closest('.btn-edit-resource');
       if (editBtn) {
-        const items = await window.ResourceAPI.getResources(currentProject.projectId);
-        const target = items.find((item) => item.id === editBtn.dataset.id);
+        const target = cachedItems.find((item) => String(item.id) === String(editBtn.dataset.id));
         if (target) openFormView('edit', target);
         return;
       }
 
       const deleteBtn = e.target.closest('.btn-delete-resource');
       if (deleteBtn) {
-        await window.ResourceAPI.deleteResource(currentProject.projectId, deleteBtn.dataset.id);
-        await refreshResources();
+        try {
+          await window.ResourceAPI.deleteResource(currentProject.projectId, deleteBtn.dataset.id);
+          await refreshResources();
+        } catch {
+          showPopup('error', 'Unable to delete this link.');
+        }
         return;
       }
 
@@ -199,7 +229,6 @@
       }
     });
 
-    
     els.successBtn.addEventListener('click', () => {
       closePopups();
       refreshResources();
@@ -227,6 +256,4 @@
     bindEvents();
     refreshResources();
   }
-
 })();
-

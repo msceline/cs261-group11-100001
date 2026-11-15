@@ -58,11 +58,10 @@
 .resources-page .resources-panel {
   display: flex;
   flex-direction: column;
-  width: 878px;
-  max-width: 100%;
-  justify-self: center;
+  width: 100%;
   min-width: 0;
   min-height: 0;
+  padding: 0 36px; 
 }
 
 .resources-page .resources-header {
@@ -236,10 +235,10 @@
 }
 
 .resources-page .empty-box-icon {
-  width: 160px;
-  height: 135px;
+  width: 220px;
+  height: 180px;
   object-fit: contain;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .resources-page .resource-empty-state h3 {

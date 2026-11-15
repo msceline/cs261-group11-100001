@@ -416,8 +416,10 @@
 }
 
 .resources-page .cat-icon {
-  width: 96px;
-  height: 72px;
+  width: 150px;
+  height: 115px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
 }
 
 .resources-page .status-popup h4 {

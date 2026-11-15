@@ -12,7 +12,7 @@
       const userObj = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || 'null');
       if (userObj?.name || userObj?.username) return userObj.name || userObj.username;
     } catch {
-      // ข้ามหากไม่มีข้อมูลใน Storage
+      
     }
     return 'Member';
   }
@@ -169,7 +169,7 @@
       const isEdit = Boolean(els.editingId.value);
 
       if (!url || !title) {
-        showPopup('error', 'Please enter both link URL and title.');
+        showPopup('error');
         return;
       }
 
@@ -198,7 +198,7 @@
         els.cancelBtn.disabled = false;
         els.submitBtn.disabled = false;
         els.submitBtn.textContent = isEdit ? 'save' : 'upload';
-        showPopup('error', 'Something went wrong... Please check your URL or connection.');
+        showPopup('error');
       }
     });
 

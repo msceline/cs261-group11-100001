@@ -1,19 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="../asset/image/logo2.png">
-  <link rel="stylesheet" href="../css/resource.css">
-
-  <title>Resource Management</title>
-</head>
-<body>
-
-  <section class="resources-page">
- 
+<section class="resources-page">
   <header class="course-header">
-    <div class="resource-header-container"> </div>
+    <div class="resource-header-container">
+      <h1 class="course-code" id="resource-course-code"></h1>
+      <h2 class="course-name" id="resource-course-name"></h2>
+    </div>
   </header>
 
   <section class="resources-panel" aria-labelledby="resources-heading">
@@ -29,24 +19,20 @@
       </button>
     </div>
 
-    
     <div class="resource-skeleton-list" id="resourceSkeleton" hidden>
       <div class="resource-skeleton-card"></div>
       <div class="resource-skeleton-card"></div>
       <div class="resource-skeleton-card"></div>
     </div>
 
-    
     <div class="resource-list" id="resourceList" aria-live="polite"></div>
 
-   
     <div class="resource-empty-state" id="resourceEmptyState" hidden>
       <img class="empty-box-icon" src="../asset/image/empty cabinet.svg" alt="Empty cabinet">
       <h3>Nothing here yet!</h3>
       <p>Upload a file link to share with your team.</p>
     </div>
 
-    
     <form class="resource-form-view" id="resourceFormView" hidden novalidate>
       <input type="hidden" id="editingResourceId" value="">
       <div class="link-input-box">
@@ -70,7 +56,6 @@
     </form>
   </section>
 
-  
   <div class="status-modal-backdrop" id="statusModalBackdrop" hidden>
     <!-- Success Popup -->
     <div class="status-popup" id="successPopup" hidden role="dialog" aria-modal="true">
@@ -80,7 +65,6 @@
       <button type="button" class="popup-btn btn-continue" id="successContinueBtn">CONTINUE</button>
     </div>
 
-    
     <div class="status-popup" id="errorPopup" hidden role="dialog" aria-modal="true">
       <img class="cat-icon" src="../asset/image/error cat.svg" alt="Error cat">
       <h4>FAILURE</h4>
@@ -89,8 +73,3 @@
     </div>
   </div>
 </section>
-
-  <script src="../api/resource-api.js"></script>
-
-</body>
-</html>

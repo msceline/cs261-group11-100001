@@ -48,6 +48,7 @@ const pageTitles = {
 	calendar: 'Calendar',
 	meeting: 'Create Meeting',
 	createtask: 'Task',
+	resources: 'Resource',
 };
 const pageScriptPromises = {};
 const pageApiScriptPromises = {};
@@ -277,7 +278,13 @@ async function loadPage(page, pageData = null) {
 			document.dispatchEvent(new CustomEvent('createtask:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
-		}
+		} else if (page === 'resources') {
+            await loadPageScript('resources');
+            await loadPageApiScript('resources').catch(() => {});
+            document.dispatchEvent(new CustomEvent('resources:loaded', {
+                detail: pageData || selectedProject || {},
+            }));
+        }
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
 	}

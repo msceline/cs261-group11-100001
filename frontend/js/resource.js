@@ -213,13 +213,20 @@
   document.addEventListener('resources:loaded', (event) => {
     currentProject = event.detail || {};
     const els = getEls();
-    if (els.courseCode && currentProject.subjectCode) {
-      els.courseCode.textContent = currentProject.subjectCode;
+    if (els.courseCode) {
+      els.courseCode.textContent = currentProject.subjectCode || currentProject.subject || '';
     }
-    if (els.courseName && currentProject.groupName) {
-      els.courseName.textContent = currentProject.groupName;
+    if (els.courseName) {
+      els.courseName.textContent = currentProject.groupName || currentProject.projectName || '';
     }
     bindEvents();
     refreshResources();
   });
+
+  if (document.getElementById('openUploadBtn')) {
+    bindEvents();
+    refreshResources();
+  }
+
 })();
+

@@ -21,6 +21,8 @@
   border-radius: 20px;
   box-shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1);
   font-family: "League Spartan", "Kanit", sans-serif, -apple-system;
+  padding: 28px 0 36px;
+  margin-top: 18px;
 }
 
 .resources-page::-webkit-scrollbar {
@@ -28,8 +30,9 @@
 }
 
 .resources-page .course-header {
-  padding: 10px;
-  border-bottom: 1px solid #000;
+  padding: 0 36px 14px;
+  border-bottom: 1.5px solid #2b2623; 
+  margin-bottom: 20px;
 }
 
 .resources-page .resource-header-container {
@@ -45,6 +48,7 @@
   letter-spacing: -0.04em;
   line-height: normal;
   color: #F05805;
+  margin: 0;
 }
 
 .resources-page .course-name {
@@ -52,12 +56,14 @@
   font-weight: 700;
   letter-spacing: -0.03em;
   color: #303030;
+  margin: 4px 0 0; 
+  line-height: 1.2;
 }
 
 .resources-page .resources-panel {
   display: flex;
   flex-direction: column;
-  padding: 21px 40px;
+  padding: 0 36px;
   min-height: 0;
   overflow-y: auto;
 }
@@ -67,12 +73,15 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 18px;
+  margin-top: 0;
+  margin-bottom: 20px;
 }
 
 .resources-page #resources-heading {
   font-size: 22px;
   font-weight: 700;
   color: #792C24;
+  margin: 0;
 }
 
 .resources-page .upload-trigger-btn {

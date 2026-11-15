@@ -240,20 +240,38 @@
   }
 
   document.addEventListener('resources:loaded', (event) => {
-    currentProject = event.detail || {};
+    const incoming = event.detail || {};
+    
+    if (Object.keys(incoming).length > 0) {
+      currentProject = incoming;
+      sessionStorage.setItem('activeResourceProject', JSON.stringify(incoming));
+    } else {
+      try {
+        currentProject = JSON.parse(sessionStorage.getItem('activeResourceProject') || '{}');
+      } catch {
+        currentProject = {};
+      }
+    }
+
     const els = getEls();
     if (els.courseCode) {
-      els.courseCode.textContent = currentProject.subjectCode || currentProject.subject || '';
+      els.courseCode.textContent =
+        currentProject.subjectCode ||
+        currentProject.courseCode ||
+        currentProject.subject ||
+        currentProject.code ||
+        currentProject.title ||
+        '';
     }
     if (els.courseName) {
-      els.courseName.textContent = currentProject.groupName || currentProject.projectName || '';
+      els.courseName.textContent =
+        currentProject.groupName ||
+        currentProject.projectName ||
+        currentProject.group ||
+        currentProject.name ||
+        '';
     }
     bindEvents();
     refreshResources();
   });
-
-  if (document.getElementById('openUploadBtn')) {
-    bindEvents();
-    refreshResources();
-  }
 })();

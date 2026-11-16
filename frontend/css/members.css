@@ -201,7 +201,7 @@
 }
 
 .member-progress-bar {
-    flex: 1 1 auto;
+    flex: 1 0 auto;
     min-width: 0;
     height: 15px;
     overflow: hidden;
@@ -244,13 +244,15 @@
 }
 
 .member-role {
-    flex-shrink: 0;
+    flex: 0 0 80px;
+    box-sizing: border-box;
     font-size: 0.9rem;
     font-weight: 600;
     padding: 4px 10px;
     background: none;
     color: #000000;
     white-space: nowrap;
+    text-align: center;
 }
 
 @media (max-width: 600px) {
@@ -275,6 +277,7 @@
     }
 
     .member-role {
+        flex-basis: 72px;
         font-size: 0.8rem;
         padding: 3px 8px;
     }

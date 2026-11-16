@@ -80,7 +80,6 @@ function createProjectCard(project) {
 function renderProjectCards(projectItems) {
 	const processingList = document.getElementById('processTaskList');
 	const completeList = document.getElementById('completeTaskList');
-	renderSidebarProjects(projectItems);
 	if (!processingList || !completeList) return;
 
 	processingList.replaceChildren();
@@ -90,70 +89,7 @@ function renderProjectCards(projectItems) {
 		const list = Number(project.progress) >= 100 ? completeList : processingList;
 		list.append(createProjectCard(project));
 	});
-
-	filterProjectCards();
 }
-
-function filterProjectCards() {
-	const searchInput = document.getElementById('searchListInput');
-	if (!searchInput) return;
-
-	const query = searchInput.value.trim().toLocaleLowerCase();
-	const projectLists = [
-		document.getElementById('processTaskList'),
-		document.getElementById('completeTaskList'),
-	].filter(Boolean);
-
-	projectLists.forEach((list) => {
-		const cards = Array.from(list.querySelectorAll('.project-card'));
-		let visibleCount = 0;
-
-		cards.forEach((card) => {
-			const searchableText = `${card.dataset.subjectCode} ${card.dataset.projectName}`.toLocaleLowerCase();
-			const matches = !query || searchableText.includes(query);
-			card.hidden = !matches;
-			if (matches) visibleCount += 1;
-		});
-
-		list.querySelector('.project-search-empty')?.remove();
-		if (query && cards.length > 0 && visibleCount === 0) {
-			const message = document.createElement('p');
-			message.className = 'project-search-empty';
-			message.textContent = 'No projects match your search.';
-			list.append(message);
-		}
-	});
-}
-
-document.addEventListener('input', (event) => {
-	if (event.target.id === 'searchListInput') filterProjectCards();
-});
-
-function renderSidebarProjects(projectItems) {
-	const list = document.getElementById('sidebarProjectList');
-	if (!list) return;
-
-	const processingProjects = projectItems.filter((project) => !(Number(project.progress) >= 100));
-	list.replaceChildren(...processingProjects.map((project) => {
-		const item = document.createElement('button');
-		item.type = 'button';
-		item.className = 'sidebar-project-link';
-		item.dataset.projectId = project.projectId ?? '';
-		item.dataset.projectName = project.projectName || '';
-		item.dataset.subjectCode = project.subjectCode || '';
-		item.dataset.progress = String(Number(project.progress) || 0);
-		item.dataset.dueDate = project.dueDate || '';
-		item.dataset.members = JSON.stringify(project.members || []);
-		item.textContent = `${project.subjectCode || 'ไม่ระบุวิชา'} | ${project.projectName || 'ไม่ระบุชื่อโปรเจกต์'}`;
-		item.title = item.textContent;
-		item.setAttribute('aria-label', `เปิด dashboard ของ ${item.textContent}`);
-		return item;
-	}));
-}
-
-document.addEventListener('projects:updated', (event) => {
-	renderSidebarProjects(event.detail || []);
-});
 
 function hasStoredAuthToken() {
 	try {
@@ -228,7 +164,6 @@ async function createProjectWithMembers(project) {
 		const created = await api.createProject({
 			projectName: project.projectName,
 			subjectCode: project.subjectCode,
-			createdAt: project.createdAt,
 			dueDate: project.dueDate,
 		});
 

@@ -57,10 +57,10 @@ public class MemberService {
         if (req == null || req.tu_id() == null || req.tu_id().isBlank()) throw bad("tu_id is required");
         User user = tuStudentService.findOrCreateUser(req.tu_id().trim())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No such student id in TU"));
-        if (memberRepository.existsByProject_ProjectIdAndUser_UserId(projectId, user.getUserId())) {
-            ProjectMember existing = memberRepository.findAnyStatus(projectId, user.getUserId()).orElse(null);
+        ProjectMember existing = memberRepository.findAnyStatus(projectId, user.getUserId()).orElse(null);
+        if (existing != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    existing != null && ProjectMember.STATUS_PENDING.equals(existing.getStatus())
+                    ProjectMember.STATUS_PENDING.equals(existing.getStatus())
                             ? "User has already been invited" : "User is already a member");
         }
         ProjectMember saved = memberRepository.save(

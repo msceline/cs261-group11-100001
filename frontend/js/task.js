@@ -3,7 +3,6 @@ let taskMessage = null;
 let taskRows = [];
 let projectMembers = new Map();
 let currentProjectId = null;
-let currentProjectIsHost = false;
 let selectedTaskStatuses = new Set(['todo', 'doing', 'done']);
 let taskStatusFilterCleanup = null;
 const sampleTasks = [
@@ -381,10 +380,28 @@ function createStatusSelect(task) {
   return { control, select };
 }
 
+function createReadonlyTaskStatus(task) {
+  const control = document.createElement('div');
+  control.className = 'task-status-control';
+
+  const status = document.createElement('span');
+  const normalizedStatus = normalizeTaskFilterStatus(task.status);
+  status.className = 'task-status-readonly';
+  status.dataset.status = normalizedStatus;
+  status.textContent = getStatusLabel(normalizedStatus);
+  status.setAttribute('role', 'status');
+
+  control.append(status);
+  return control;
+}
+
 function createTaskRow(task, currentUserId) {
   const article = document.createElement('article');
   article.className = 'task-item';
-  if (currentUserId !== null && String(task.assigneeId) === String(currentUserId)) {
+  const isAssignedToCurrentUser = currentUserId !== null
+    && task.assigneeId != null
+    && String(task.assigneeId) === String(currentUserId);
+  if (isAssignedToCurrentUser) {
     article.classList.add('task-item--assigned-to-me');
   }
 
@@ -400,14 +417,16 @@ function createTaskRow(task, currentUserId) {
   title.className = 'task-title-text';
   title.textContent = task.taskTitle;
 
-  const statusControl = createStatusSelect(task);
+  const statusControl = isAssignedToCurrentUser
+    ? createStatusSelect(task).control
+    : createReadonlyTaskStatus(task);
   const deadline = document.createElement('time');
   deadline.className = 'task-deadline';
   deadline.textContent = formatDueDate(task.dueDate);
   if (task.dueDate) deadline.dateTime = task.dueDate;
 
   nameButton.append(title);
-  row.append(nameButton, statusControl.control, deadline);
+  row.append(nameButton, statusControl, deadline);
 
   const more = document.createElement('div');
   more.className = 'task-item-more';
@@ -432,19 +451,16 @@ function createTaskRow(task, currentUserId) {
     }));
   });
 
-  actions.append(editButton);
-  if (currentProjectIsHost) {
-    const deleteButton = createTaskActionButton(
-      'delete',
-      'Delete task',
-      'M4 7h16 M10 11v6 M14 11v6 M5 7l1 14h12l1-14 M9 7V4h6v3',
-    );
-    deleteButton.addEventListener('click', (event) => {
-      event.stopPropagation();
-      deleteTask(task, article, deleteButton);
-    });
-    actions.append(deleteButton);
-  }
+  const deleteButton = createTaskActionButton(
+    'delete',
+    'Delete task',
+    'M4 7h16 M10 11v6 M14 11v6 M5 7l1 14h12l1-14 M9 7V4h6v3',
+  );
+  deleteButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    deleteTask(task, article, deleteButton);
+  });
+  actions.append(editButton, deleteButton);
   more.append(moreLabel, actions);
 
   const details = document.createElement('div');
@@ -602,7 +618,6 @@ async function loadTasks(selected) {
     }
 
     currentProjectId = project.projectId;
-    currentProjectIsHost = String(project.hostId) === String(getCurrentTaskUserId());
     document.getElementById('course-code').textContent = project.subjectCode || '';
     document.getElementById('course-name').textContent = project.projectName || '';
 
@@ -634,7 +649,6 @@ document.addEventListener('task:loaded', (event) => {
   const selected = event.detail || {};
   if (!hasTaskAuthToken()) {
     currentProjectId = selected.projectId || null;
-    currentProjectIsHost = true;
     document.getElementById('course-code').textContent = selected.subjectCode || selected.subject || '';
     document.getElementById('course-name').textContent = selected.projectName || selected.groupName || '';
     projectMembers = new Map(sampleTaskMembers.map((member) => [member.userId, member]));

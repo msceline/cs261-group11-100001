@@ -1,3 +1,12 @@
+// Sign out: forget the token and user before the link goes to login.html.
+document.addEventListener('click', (event) => {
+    if (!event.target.closest('.sign-out-button')) return;
+    ['authToken', 'token', 'authUser'].forEach((key) => {
+        try { localStorage.removeItem(key); } catch { /* storage unavailable */ }
+        try { sessionStorage.removeItem(key); } catch { /* storage unavailable */ }
+    });
+});
+
 const profileCard = document.querySelector('.profile-card');
 const themeButton = document.getElementById('theme-button');
 const profileName = document.getElementById('profileName');

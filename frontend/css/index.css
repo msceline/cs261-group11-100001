@@ -424,3 +424,18 @@ aside {
     background: rgb(135 194 254 / 55%);
   }
 }
+#countNoti {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #e5322d;
+  pointer-events: none;
+}
+
+#countNoti[hidden] {
+  display: none;
+}

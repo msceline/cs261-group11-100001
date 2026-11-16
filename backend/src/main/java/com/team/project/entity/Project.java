@@ -1,6 +1,5 @@
 package com.team.project.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -38,9 +37,6 @@ public class Project {
     @Column(name = "progress", nullable = false)
     private Integer progress = 0;
 
-    @Column(name = "due_date")
-    private LocalDate dueDate;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -49,18 +45,12 @@ public class Project {
 
     public Project(Integer projectId, String projectName, String subjectId, User host, Integer progress,
                    LocalDateTime createdAt) {
-        this(projectId, projectName, subjectId, host, progress, createdAt, null);
-    }
-
-    public Project(Integer projectId, String projectName, String subjectId, User host, Integer progress,
-                   LocalDateTime createdAt, LocalDate dueDate) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.subjectId = subjectId;
         this.host = host;
         this.progress = progress != null ? progress : 0;
         this.createdAt = createdAt;
-        this.dueDate = dueDate;
     }
 
     @PrePersist
@@ -111,14 +101,6 @@ public class Project {
 
     public void setProgress(Integer progress) {
         this.progress = progress;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
     }
 
     public LocalDateTime getCreatedAt() {

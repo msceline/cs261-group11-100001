@@ -93,7 +93,7 @@ class TaskServiceTest {
     }
 
     private Task storedTask(int id) {
-        Task task = new Task(id, project1, "Old", null, "todo", null, null, null);
+        Task task = new Task(id, project1, "Old", null, "todo", null, null);
         when(taskRepository.findById(id)).thenReturn(Optional.of(task));
         return task;
     }
@@ -150,7 +150,7 @@ class TaskServiceTest {
 
     @Test
     void listReturnsTasksOfTheUsersProjectsOnly() {
-        Task task = new Task(5, project1, "T", null, "todo", null, null, null);
+        Task task = new Task(5, project1, "T", null, "todo", null, null);
         when(taskRepository.findByProject_ProjectId(1)).thenReturn(List.of(task));
 
         assertEquals(List.of(task), taskService.listForMember(2));

@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,8 +35,7 @@ class ProjectControllerTest {
     }
 
     private static ProjectResponse project(int id, String name, int hostId) {
-        return new ProjectResponse(id, name, "CS261", hostId, 12, LocalDateTime.of(2026, 2, 1, 0, 0),
-                LocalDate.of(2026, 2, 15));
+        return new ProjectResponse(id, name, "CS261", hostId, 12, LocalDateTime.of(2026, 2, 1, 0, 0));
     }
 
     @Test
@@ -46,12 +44,11 @@ class ProjectControllerTest {
 
         mockMvc.perform(post("/api/projects").requestAttr("userId", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"projectName\":\"New\",\"subjectCode\":\"CS261\",\"createdAt\":\"2026-02-01\",\"dueDate\":\"2026-02-15\"}"))
+                        .content("{\"projectName\":\"New\",\"subjectCode\":\"CS261\",\"createdAt\":\"2026-02-01\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.projectId").value(3))
                 .andExpect(jsonPath("$.hostId").value(1))
-                .andExpect(jsonPath("$.progress").value(12))
-                .andExpect(jsonPath("$.dueDate").value("2026-02-15"));
+                .andExpect(jsonPath("$.progress").value(12));
     }
 
     @Test

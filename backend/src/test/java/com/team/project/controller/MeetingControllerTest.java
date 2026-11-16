@@ -54,7 +54,6 @@ class MeetingControllerTest {
                 "Discuss backlog",
                 LocalDateTime.of(2026, 12, 20, 7, 0),
                 "https://meet.example.com/cs261",
-                Meeting.TYPE_MEETING,
                 status,
                 cancelledAt,
                 LocalDateTime.of(2026, 11, 16, 7, 0),

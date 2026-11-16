@@ -87,7 +87,7 @@ class MeetingServiceTest {
 
     private Meeting scheduledMeeting(int id, LocalDateTime utcDate) {
         return new Meeting(id, project1, host, "Sprint Sync", "Agenda", utcDate,
-                "https://meet.example.com/1", Meeting.TYPE_MEETING, Meeting.STATUS_SCHEDULED,
+                "https://meet.example.com/1", Meeting.STATUS_SCHEDULED,
                 null, LocalDateTime.now(ZoneOffset.UTC), LocalDateTime.now(ZoneOffset.UTC));
     }
 

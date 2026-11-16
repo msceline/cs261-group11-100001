@@ -115,7 +115,7 @@ class TaskServiceTest {
 
     @Test
     void createWithoutAssigneeOrStatusUsesDefaults() {
-        Task task = taskService.createTask(2, new CreateTaskRequest(1, "Task", null, null, null, null));
+        Task task = taskService.createTask(1, new CreateTaskRequest(1, "Task", null, null, null, null));
 
         assertNull(task.getAssignee());
         assertNull(task.getDueDate());
@@ -180,7 +180,7 @@ class TaskServiceTest {
     void updateChangesEditableFields() {
         storedTask(5);
 
-        Task updated = taskService.updateTask(2, 5, new CreateTaskRequest(1, "New", "desc", 2, "done", DUE))
+        Task updated = taskService.updateTask(1, 5, new CreateTaskRequest(1, "New", "desc", 2, "done", DUE))
                 .orElseThrow();
 
         assertEquals("New", updated.getTitle());
@@ -255,6 +255,18 @@ class TaskServiceTest {
         verify(taskRepository, never()).save(any());
     }
 
+    @Test
+    void memberCannotCreateOrUpdateTasks() {
+        storedTask(5);
+
+        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(assertThrows(ResponseStatusException.class,
+                () -> taskService.createTask(2, new CreateTaskRequest(1, "T", null, null, null, null)))
+                .getStatusCode().value()));
+        assertEquals(HttpStatus.FORBIDDEN, HttpStatus.valueOf(assertThrows(ResponseStatusException.class,
+                () -> taskService.updateTask(2, 5, new CreateTaskRequest(1, "T", null, null, "done", null)))
+                .getStatusCode().value()));
+    }
+
     // ---------- progress ----------
 
     @Test
@@ -263,7 +275,7 @@ class TaskServiceTest {
         when(taskRepository.countByProject_ProjectId(1)).thenReturn(3L);
         when(taskRepository.countByProject_ProjectIdAndStatus(1, "done")).thenReturn(1L);
 
-        taskService.updateTask(2, 5, new CreateTaskRequest(1, "T", null, null, "done", null));
+        taskService.updateTask(1, 5, new CreateTaskRequest(1, "T", null, null, "done", null));
 
         assertEquals(33, project1.getProgress());
     }
@@ -283,7 +295,7 @@ class TaskServiceTest {
         project1.setProgress(50);
         storedTask(5);
 
-        taskService.updateTask(2, 5, new CreateTaskRequest(1, "T", null, null, "todo", null));
+        taskService.updateTask(1, 5, new CreateTaskRequest(1, "T", null, null, "todo", null));
 
         assertEquals(0, project1.getProgress());
     }

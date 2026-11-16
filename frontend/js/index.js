@@ -36,7 +36,7 @@ const pageScriptUrls = {
 	resources: new URL('../js/resource.js', scriptUrl),
 };
 const pageApiScriptUrls = {
-	members: new URL('../client-api/member-api.js', scriptUrl),
+	members: new URL('../api/member-api.js', scriptUrl),
 	resources: new URL('../api/resource-api.js', scriptUrl),
 };
 const pageTitles = {

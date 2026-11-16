@@ -11,10 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * Validates the Bearer token on protected /api routes and exposes "userId" as a
- * request attribute.
- */
+/** Validates the Bearer token on protected /api routes and exposes "userId" as a request attribute. */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -29,10 +26,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-
         return !path.startsWith("/api/")
                 || path.equals("/api/auth/login")
-                || path.equals("/api/dev/mock-token")
                 || "OPTIONS".equalsIgnoreCase(request.getMethod());
     }
 
@@ -50,9 +45,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        response.getWriter().write(
-                "{\"error\":\"UNAUTHORIZED\",\"message\":\"Authentication is required\"}");
+        response.getWriter().write("{\"error\":\"Unauthorized\"}");
     }
 }

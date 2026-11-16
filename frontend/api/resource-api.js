@@ -80,15 +80,14 @@
     };
   }
 
-  async function getResources(projectId) {
-    const path = projectLinkFilesPath(projectId);
-    const [linkFiles, members, currentUser] = await Promise.all([
-      request(path),
-      request(`/projects/${Number(projectId)}/members`),
+  async function getPageContext(projectId) {
+    const id = Number(projectId);
+    const [members, currentUser] = await Promise.all([
+      request(`/projects/${id}/members`),
       request('/auth/me'),
     ]);
 
-    if (!Array.isArray(linkFiles) || !Array.isArray(members)) {
+    if (!Array.isArray(members)) {
       throw new Error('รูปแบบข้อมูล LinkFile จาก backend ไม่ถูกต้อง');
     }
     if (!currentUser || currentUser.userId == null) {
@@ -100,7 +99,34 @@
         .filter((member) => member.userId != null)
         .map((member) => [Number(member.userId), member.displayName]),
     );
-    return linkFiles.map((linkFile) => toPageItem(linkFile, memberNames, currentUser.userId));
+    return { memberNames, currentUserId: currentUser.userId };
+  }
+
+  async function getResources(projectId) {
+    const path = projectLinkFilesPath(projectId);
+    const [linkFiles, context] = await Promise.all([
+      request(path),
+      getPageContext(projectId),
+    ]);
+
+    if (!Array.isArray(linkFiles)) {
+      throw new Error('รูปแบบข้อมูล LinkFile จาก backend ไม่ถูกต้อง');
+    }
+
+    return linkFiles.map((linkFile) =>
+      toPageItem(linkFile, context.memberNames, context.currentUserId),
+    );
+  }
+
+  async function getResource(projectId, linkFileId) {
+    const linkFile = await request(linkFilePath(projectId, linkFileId));
+    const context = await getPageContext(projectId);
+
+    if (!linkFile || typeof linkFile !== 'object' || Array.isArray(linkFile)) {
+      throw new Error('รูปแบบข้อมูล LinkFile จาก backend ไม่ถูกต้อง');
+    }
+
+    return toPageItem(linkFile, context.memberNames, context.currentUserId);
   }
 
   function toLinkFileRequest(resource) {
@@ -131,7 +157,7 @@
     });
   }
 
-  const resourceApi = { getResources, createResource, updateResource, deleteResource };
+  const resourceApi = { getResources, getResource, createResource, updateResource, deleteResource };
   if (typeof module !== 'undefined' && module.exports) module.exports = resourceApi;
   window.ResourceAPI = resourceApi;
 })();

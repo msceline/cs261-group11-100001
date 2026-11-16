@@ -85,7 +85,7 @@ class ProjectServiceTest {
     }
 
     private static CreateProjectRequest req(String name, String subject) {
-        return new CreateProjectRequest(name, subject, LocalDate.of(2026, 2, 1));
+        return new CreateProjectRequest(name, subject, LocalDate.of(2026, 2, 1), LocalDate.of(2026, 2, 28));
     }
 
     private static HttpStatus statusOf(ResponseStatusException e) {
@@ -109,6 +109,7 @@ class ProjectServiceTest {
         assertEquals(3, created.hostId());
         assertEquals(0, created.progress());
         assertEquals(LocalDateTime.of(2026, 2, 1, 0, 0), created.createdAt());
+        assertEquals(LocalDate.of(2026, 2, 28), created.dueDate());
 
         ArgumentCaptor<ProjectMember> saved = ArgumentCaptor.forClass(ProjectMember.class);
         verify(memberRepository).save(saved.capture());

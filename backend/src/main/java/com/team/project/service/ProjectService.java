@@ -41,7 +41,7 @@ public class ProjectService {
         User host = userRepository.getReferenceById(userId);
         LocalDateTime createdAt = req.createdAt() != null ? req.createdAt().atStartOfDay() : LocalDateTime.now();
         Project project = projectRepository.save(
-                new Project(null, name, subject, host, 0, createdAt));
+                new Project(null, name, subject, host, 0, createdAt, req.dueDate()));
         memberRepository.save(new ProjectMember(null, host, project, "host", null));
         return ProjectResponse.from(project);
     }

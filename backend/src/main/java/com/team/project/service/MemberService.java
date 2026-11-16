@@ -67,6 +67,53 @@ public class MemberService {
         return MemberResponse.from(saved, user);
     }
 
+    /** The invited user confirms: pending becomes accepted and the host is told. */
+    public MemberResponse accept(int userId, int projectId) {
+        Project project = findProject(projectId);
+        ProjectMember member = memberRepository.findAnyStatus(projectId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No invitation for this project"));
+        if (ProjectMember.STATUS_ACCEPTED.equals(member.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You are already a member");
+        }
+        member.setStatus(ProjectMember.STATUS_ACCEPTED);
+        ProjectMember saved = memberRepository.save(member);
+        User user = saved.getUser();
+        if (notificationService != null && !project.getHost().getUserId().equals(userId)) {
+            notificationService.createSystemNotification(
+                    "สมาชิกตอบรับคำเชิญ",
+                    user.getDisplayName() + " ได้เข้าร่วมกลุ่มโปรเจกต์ \"" + project.getProjectName() + "\"",
+                    "invite_accepted",
+                    project.getHost().getUserId());
+        }
+        return MemberResponse.from(saved, user);
+    }
+
+    /** The invited user refuses: the pending row is removed and the host is told. */
+    public void decline(int userId, int projectId) {
+        Project project = findProject(projectId);
+        ProjectMember member = memberRepository.findAnyStatus(projectId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No invitation for this project"));
+        if (ProjectMember.STATUS_ACCEPTED.equals(member.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "You are already a member");
+        }
+        User user = member.getUser();
+        memberRepository.delete(member);
+        if (notificationService != null && !project.getHost().getUserId().equals(userId)) {
+            notificationService.createSystemNotification(
+                    "สมาชิกปฏิเสธคำเชิญ",
+                    user.getDisplayName() + " ปฏิเสธคำเชิญเข้าร่วมกลุ่มโปรเจกต์ \"" + project.getProjectName() + "\"",
+                    "invite_declined",
+                    project.getHost().getUserId());
+        }
+    }
+
+    /** Invitations the caller has not answered yet. */
+    public List<InvitationResponse> pendingInvitations(int userId) {
+        return memberRepository.findByUser_UserIdAndStatus(userId, ProjectMember.STATUS_PENDING).stream()
+                .map(m -> InvitationResponse.from(m.getProject()))
+                .toList();
+    }
+
     private Project findProject(int projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));

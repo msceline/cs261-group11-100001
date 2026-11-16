@@ -31,6 +31,19 @@ public class MemberController {
         return memberService.list(userId, projectId);
     }
 
+    /** The invited user confirms they join the project. */
+    @PostMapping("/accept")
+    public MemberResponse accept(@RequestAttribute("userId") int userId, @PathVariable int projectId) {
+        return memberService.accept(userId, projectId);
+    }
+
+    /** The invited user refuses the invitation. */
+    @PostMapping("/decline")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void decline(@RequestAttribute("userId") int userId, @PathVariable int projectId) {
+        memberService.decline(userId, projectId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MemberResponse add(@RequestAttribute("userId") int userId, @PathVariable int projectId,

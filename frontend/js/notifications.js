@@ -48,6 +48,37 @@ function getListElement() {
   return document.getElementById('notification-list') || document.getElementById('notiList');
 }
 
+// Pending invitations of the signed-in user; refreshed on every load.
+let pendingInvitations = [];
+
+// The invite notification only carries the project name in quotes, so match the pending invitation by it.
+function findPendingInvitation(item) {
+  if (item.type !== 'invite') return null;
+  return pendingInvitations.find((invitation) => (
+    item.message?.includes(`"${invitation.projectName}"`)
+  )) || null;
+}
+
+function createInviteButtons(invitation) {
+  const actions = document.createElement('div');
+  actions.className = 'invite-actions';
+
+  const accept = document.createElement('button');
+  accept.type = 'button';
+  accept.className = 'invite-accept-button';
+  accept.dataset.projectId = String(invitation.projectId);
+  accept.textContent = 'ยืนยัน';
+
+  const decline = document.createElement('button');
+  decline.type = 'button';
+  decline.className = 'invite-decline-button';
+  decline.dataset.projectId = String(invitation.projectId);
+  decline.textContent = 'ปฏิเสธ';
+
+  actions.append(accept, decline);
+  return actions;
+}
+
 function createNotificationElement(item, index, compact) {
   const row = document.createElement('div');
   row.className = compact ? 'noti-item' : 'notification-item';
@@ -82,6 +113,8 @@ function createNotificationElement(item, index, compact) {
     time.textContent = timeText;
 
     content.append(message, time);
+    const invitation = findPendingInvitation(item);
+    if (invitation) content.append(createInviteButtons(invitation));
     row.append(avatar, content);
   } else {
     const avatar = document.createElement('div');
@@ -101,6 +134,8 @@ function createNotificationElement(item, index, compact) {
     time.textContent = timeText;
 
     content.append(message, time);
+    const invitation = findPendingInvitation(item);
+    if (invitation) content.append(createInviteButtons(invitation));
     row.append(avatar, content);
   }
 
@@ -150,18 +185,71 @@ async function loadNotifications() {
   }
 
   try {
-    const items = await window.notificationApi.getNotificationsByUserId(userId);
+    const [items, invitations] = await Promise.all([
+      window.notificationApi.getNotificationsByUserId(userId),
+      window.notificationApi.getPendingInvitations().catch(() => []),
+    ]);
+    pendingInvitations = Array.isArray(invitations) ? invitations : [];
     if (!Array.isArray(items)) {
       throw new Error('The notification service returned an invalid response.');
     }
     renderNotifications(items);
+    if (window.parent !== window) {
+      window.parent.postMessage({
+        type: 'notifications:unread',
+        count: items.filter((item) => !item.isRead).length,
+      }, window.location.origin);
+    }
   } catch (error) {
     console.error('Failed to load notifications:', error);
     renderNotifications([], error.message || 'Could not load notifications.');
   }
 }
 
+function showListMessage(text) {
+  const list = getListElement();
+  if (!list) return;
+  const status = document.createElement('p');
+  status.className = 'notification-status';
+  status.setAttribute('role', 'alert');
+  status.textContent = text;
+  list.prepend(status);
+}
+
+async function handleInviteAnswer(event) {
+  const button = event.target.closest('.invite-accept-button, .invite-decline-button');
+  if (!button) return;
+  event.stopPropagation();
+
+  const accepting = button.classList.contains('invite-accept-button');
+  const buttons = button.parentElement.querySelectorAll('button');
+  const labels = [...buttons].map((item) => item.textContent);
+  buttons.forEach((item) => { item.disabled = true; });
+  button.textContent = accepting ? 'Joining...' : 'Declining...';
+
+  try {
+    if (accepting) {
+      await window.notificationApi.acceptInvitation(button.dataset.projectId);
+    } else {
+      await window.notificationApi.declineInvitation(button.dataset.projectId);
+    }
+    const row = button.closest('[data-id]');
+    if (row?.classList.contains('is-unread')) {
+      await window.notificationApi.markAsRead(row.dataset.id).catch(() => {});
+    }
+    await loadNotifications();
+  } catch (error) {
+    console.error('Failed to answer invitation:', error);
+    buttons.forEach((item, index) => {
+      item.disabled = false;
+      item.textContent = labels[index];
+    });
+    showListMessage(error.message || 'Could not answer the invitation.');
+  }
+}
+
 async function handleNotificationActivation(event) {
+  if (event.target.closest('.invite-accept-button, .invite-decline-button')) return;
   const row = event.target.closest('[data-id].is-unread');
   if (!row || !getListElement()?.contains(row)) return;
   if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
@@ -216,6 +304,7 @@ function initNotificationDropdown() {
     renderNotifications([], 'Notification service is unavailable.');
   }
 
+  document.addEventListener('click', handleInviteAnswer);
   document.addEventListener('click', handleNotificationActivation);
   document.addEventListener('keydown', handleNotificationActivation);
 }

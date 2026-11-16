@@ -98,6 +98,31 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.member-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 10px;
+}
+
+.member-card-header .addMember-btn {
+    flex: 0 0 auto;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding-right: 10px;
+}
+
+.member-card-header .addMember-btn svg {
+    display: block;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    fill: #F05805;
+}
+
 
 .members-title {
     font-size: 20px;

@@ -1,4 +1,11 @@
 <section class="resources-page">
+  <style>
+    
+    .resources-page [hidden] {
+      display: none !important;
+    }
+  </style>
+
   <header class="course-header">
     <div class="resource-header-container">
       <h1 class="course-code" id="resource-course-code"></h1>
@@ -57,7 +64,7 @@
   </section>
 
   <div class="status-modal-backdrop" id="statusModalBackdrop" hidden>
-    <!-- Success Popup -->
+    
     <div class="status-popup" id="successPopup" hidden role="dialog" aria-modal="true">
       <img class="cat-icon" src="../asset/image/success cat.svg" alt="Success cat">
       <h4>SUCCESS!</h4>
@@ -72,4 +79,48 @@
       <button type="button" class="popup-btn btn-try-again" id="errorRetryBtn">TRY AGAIN</button>
     </div>
   </div>
+
+  <script>
+    (() => {
+      const listEl = document.getElementById('resourceList');
+      const emptyEl = document.getElementById('resourceEmptyState');
+      const formEl = document.getElementById('resourceFormView');
+      const openBtn = document.getElementById('openUploadBtn');
+      const cancelBtn = document.getElementById('cancelFormBtn');
+
+      if (!listEl || !formEl) return;
+
+      const syncView = () => {
+        const isFormOpen = !formEl.hidden;
+        if (isFormOpen) {
+          listEl.hidden = true;
+          if (emptyEl) emptyEl.hidden = true;
+          if (openBtn) openBtn.hidden = true;
+        } else {
+          if (openBtn) openBtn.hidden = false;
+          const hasItems = listEl.children.length > 0;
+          listEl.hidden = !hasItems;
+          if (emptyEl) emptyEl.hidden = hasItems;
+        }
+      };
+
+      
+      const observer = new MutationObserver(syncView);
+      observer.observe(formEl, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+
+      if (openBtn) {
+        openBtn.addEventListener('click', () => {
+          formEl.hidden = false;
+          syncView();
+        });
+      }
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          formEl.hidden = true;
+          syncView();
+        });
+      }
+    })();
+  </script>
 </section>

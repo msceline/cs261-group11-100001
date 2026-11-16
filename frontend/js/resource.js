@@ -35,6 +35,11 @@
       .replace(/"/g, '&quot;');
   }
 
+  function formatDateOnly(rawDate) {
+    if (!rawDate) return '';
+    return String(rawDate).split('T')[0];
+  }
+
   function showMainListView(items) {
     const els = getEls();
     if (!els.list) return;
@@ -72,7 +77,7 @@
           <div class="resource-card-details">
             <p class="resource-full-desc">${escapeHtml(item.description || item.url)}</p>
             <div class="resource-meta">
-              Uploaded ${escapeHtml(item.uploadedAt)}
+              Uploaded ${escapeHtml(formatDateOnly(item.uploadedAt))}
               <span>by ${escapeHtml(item.uploadedBy)}</span>
             </div>
           </div>

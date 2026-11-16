@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,9 +12,11 @@
   <link rel="stylesheet" href="../css/addmember.css">
   <link rel="stylesheet" href="../css/task.css">
   <link rel="stylesheet" href="../css/createTask.css">
+  <link rel="stylesheet" href="../css/calendar.css?v=calendar-host-create-meeting">
+  <link rel="stylesheet" href="../css/meeting.css">
+  <link rel="stylesheet" href="../css/resource.css">
   <title>Document</title>
 </head>
-
 <body>
   <!-- Navigation Bar-->
   <nav>
@@ -23,19 +24,22 @@
       <img src="../asset/image/logo2.png" alt="logo">
     </div>
     <div class="right-nav">
-      <button class="noti-icon" id="notificationTrigger" type="button" aria-label="Open notifications"
-        aria-haspopup="dialog" aria-expanded="false" aria-controls="notificationDropdown">
+      <button class="noti-icon" id="notificationTrigger" type="button" aria-label="Open notifications" aria-haspopup="dialog" aria-expanded="false" aria-controls="notificationDropdown">
         <img src="../asset/image/notification.svg" alt="notification">
         <div id="countNoti"></div>
       </button>
-      <div class="user-profile" role="button" tabindex="0" aria-label="Open profile menu" aria-haspopup="menu"
-        aria-expanded="false" aria-controls="profileDropdown">
+      <div class="user-profile" role="button" tabindex="0" aria-label="Open profile menu" aria-haspopup="menu" aria-expanded="false" aria-controls="profileDropdown">
         <img src="../asset/image/Profile 1.svg" alt="profile1">
       </div>
     </div>
   </nav>
-  <iframe class="notification-dropdown" id="notificationDropdown" title="Notifications" src="notification.html"
-    hidden></iframe>
+  <iframe
+    class="notification-dropdown"
+    id="notificationDropdown"
+    title="Notifications"
+    src="notification.html"
+    hidden
+  ></iframe>
   <section class="profile-dropdown" id="profileDropdown" aria-label="Profile menu" hidden>
     <div class="profile-card">
       <div class="user-summary">
@@ -51,8 +55,7 @@
       </div>
       <a class="menu-item sign-out-button" href="login.html">
         <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor"
-            stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
         </svg>
         <span>Sign Out</span>
       </a>
@@ -63,79 +66,62 @@
   <div class="main-container">
     <aside>
       <div id="slideBarMenu">
-        <button class="sidebar-link sidebar-link-active" type="button" data-page="project" aria-current="page"
-          aria-label="Home" title="Home">
+        <button class="sidebar-link sidebar-link-active" type="button" data-page="project" aria-current="page" aria-label="Home" title="Home">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor"
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
           </svg>
           <span>Home</span>
         </button>
-        <button class="sidebar-link" type="button" data-page="creategroup" aria-label="Create Group"
-          title="Create Group">
+        <button class="sidebar-link" type="button" data-page="creategroup" aria-label="Create Group" title="Create Group">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" />
           </svg>
           <span>Create Group</span>
         </button>
-        <button class="sidebar-link" type="button" data-page="dashboard" data-project-context hidden
-          aria-label="Dashboard" title="Dashboard">
+        <button class="sidebar-link" type="button" data-page="dashboard" data-project-context hidden aria-label="Dashboard" title="Dashboard">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M4 19V5m0 14h16M8 15v-4m4 4V7m4 8v-6" fill="none" stroke="currentColor"
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            <path d="M4 19V5m0 14h16M8 15v-4m4 4V7m4 8v-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
           </svg>
           <span>Dashboard</span>
         </button>
-        <button class="sidebar-link" type="button" data-page="task" data-project-context hidden aria-label="Tasks"
-          title="Tasks">
+        <button class="sidebar-link" type="button" data-page="members" data-project-context hidden aria-label="Members" title="Members">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" fill="none" stroke="currentColor"
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
-          </svg>
-          <span>Tasks</span>
-        </button>
-        <button class="sidebar-link" type="button" data-page="members" data-project-context hidden aria-label="Members"
-          title="Members">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path
-              d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2m6-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-3a4 4 0 0 1 0 8m2 1h1a3 3 0 0 1 3 3v1"
-              fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2m6-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-3a4 4 0 0 1 0 8m2 1h1a3 3 0 0 1 3 3v1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
           </svg>
           <span>Members</span>
         </button>
-        <section class="sidebar-projects" id="sidebarProjects" aria-label="Processing projects">
-          <button class="sidebar-link sidebar-projects__header" type="button" aria-label="Projects" title="Projects">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive"
-              viewBox="0 0 16 16">
-              <path
-                d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
-            </svg>
-            <span>Projects</span>
-          </button>
-          <div class="sidebar-projects__list" id="sidebarProjectList" aria-label="Projects in progress"></div>
-        </section>
-      </div>
-      <div class="sidebar-user">
-        <img class="sidebar-user__avatar" src="../asset/image/Profile 1.svg" alt="Profile">
-        <div class="sidebar-user__details">
-          <span class="sidebar-user__name" data-profile-name>Name</span>
-          <span class="sidebar-user__student-id" data-profile-student-id>รหัสนักศึกษา</span>
-        </div>
-        <a class="sidebar-user__sign-out" href="login.html" aria-label="Sign Out" title="Sign Out">
+        <button class="sidebar-link" type="button" data-page="task" data-project-context hidden aria-label="Tasks" title="Tasks">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M10 17l5-5-5-5m5 5H3m9-9h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7" fill="none" stroke="currentColor"
-              stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
           </svg>
-        </a>
+          <span>Tasks</span>
+        </button>
+        <button class="sidebar-link" type="button" data-page="calendar" data-project-context hidden aria-label="Calendar" title="Calendar">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7 3v3m10-3v3M4 9h16M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            <path d="m8 15 2.2 2.2L16 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          </svg>
+          <span>Calendar</span>
+        </button>
+        <button class="sidebar-link" type="button" data-page="resources" data-project-context hidden aria-label="Resources" title="Resources">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            <path d="M14 2v6h6M10 13a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1-2.8 2.8l-1-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          </svg>
+          <span>Resources</span>
+        </button>
       </div>
     </aside>
     <!--Display Box-->
     <main id="contentBox"></main>
   </div>
   <script src="../api/task-api.js"></script>
+  <script src="../api/meeting-api.js"></script>
   <script src="../js/index.js"></script>
+  <script src="../api/notification-api.js"></script>
+  <script src="../js/notification-badge.js"></script>
   <script src="../api/profile-api.js"></script>
   <script src="../js/profile.js"></script>
+  <script src="../js/resource.js"></script>
 </body>
-
 </html>

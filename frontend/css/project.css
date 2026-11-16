@@ -39,59 +39,6 @@
     overflow-wrap: anywhere;
 }
 
-.project-page .rightElement{
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    gap: 10px;
-    padding: 0 20px;
-    width: 45%;
-}
-
-.project-page .search-wrap{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #E3E3E3;
-    padding: 0 15px;
-    border-radius: 20px;
-    width: 100%;
-    min-width: 0;
-}
-
-.project-page .search-wrap svg{
-    width: 22px;
-    height: 22px;
-    flex: 0 0 22px;
-    margin-left: auto;
-}
-
-.project-page #searchListInput {
-    flex: 1 1 0;
-    width: 0;
-    max-width: none;
-    min-width: 0;
-    padding: 9px 2px;
-    color: #303030;
-    background: none;
-    border: none;
-    border-radius: 10px;
-    font: inherit;
-    margin: 0;
-}
-
-.project-page #searchListInput:focus-visible {
-    outline: none;
-    outline-offset: none;
-}
-
-.project-page .project-search-empty {
-    margin: 0;
-    padding: 16px;
-    color: #6b7280;
-    text-align: center;
-}
-
 .project-page #createGroupIcon {
     display: inline-flex;
     width: 32px;
@@ -147,6 +94,7 @@
 .project-page #processTaskList>*,
 .project-page #completeTaskList>* {
     padding: 16px;
+    background: #f8faf9;
     border: none;
     border-radius: 20px;
 }
@@ -157,7 +105,7 @@
     min-height: 120px;
     place-items: center;
     padding: 20px;
-    background: none;
+    background: #f8faf9;
     border-radius: 20px;
     font-size: 14px;
     text-align: center;
@@ -185,10 +133,6 @@
     box-shadow:
         0px 4px 6px -1px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-}
-
-.project-page .project-card[hidden] {
-    display: none;
 }
 
 .project-page .project-card:hover {

@@ -172,7 +172,7 @@ function renderNotifications(items, messageText = '') {
     return;
   }
 
-  const compact = list.id === 'notiList' || window.parent !== window;
+  const compact = list.id === 'notiList';
   list.replaceChildren(...items.map((item, index) => createNotificationElement(item, index, compact)));
 }
 
@@ -277,8 +277,7 @@ async function handleNotificationActivation(event) {
 function initNotificationDropdown() {
   const icon = document.querySelector('.noti-icon');
   const dropdown = document.getElementById('notiDropdown');
-  const showAllButton = document.getElementById('showAllNotiBtn')
-    || document.getElementById('btn-show-all');
+  const showAllButton = document.getElementById('showAllNotiBtn');
 
   if (icon && dropdown) {
     icon.addEventListener('click', (event) => {

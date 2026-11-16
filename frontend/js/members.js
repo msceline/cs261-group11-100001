@@ -2,15 +2,9 @@ const membersScriptUrl = document.currentScript?.src || window.location.href;
 
 let memberRequestId = 0;
 
-function getMemberInitials(name) {
-    const initials = String(name || '?')
-        .trim()
-        .split(/\s+/)
-        .map((part) => Array.from(part)[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
-    return initials || '?';
+function getMemberInitial(name) {
+    const firstName = String(name || '').trim().split(/\s+/)[0];
+    return Array.from(firstName || '?')[0].toUpperCase();
 }
 
 function createMemberItem(member) {
@@ -19,7 +13,7 @@ function createMemberItem(member) {
 
     const avatar = document.createElement('div');
     avatar.className = 'member-avatar';
-    avatar.textContent = getMemberInitials(member.displayName);
+    avatar.textContent = getMemberInitial(member.displayName);
 
     const details = document.createElement('div');
     details.className = 'member-details';

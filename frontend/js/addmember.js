@@ -24,7 +24,7 @@ function loadProjectApiForInvite() {
 function describeInvitedMember(memberId, displayName) {
     const name = displayName || memberId;
     return {
-        avatarText: Array.from(name).slice(0, 2).join('').toUpperCase(),
+        avatarText: Array.from(String(name).trim().split(/\s+/)[0] || '?')[0].toUpperCase(),
         name,
         role: 'Member',
     };

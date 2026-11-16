@@ -18,7 +18,7 @@ import com.team.project.repository.ProjectRepository;
 import com.team.project.repository.TaskRepository;
 import com.team.project.repository.UserRepository;
 
-/** Members of a project can read its tasks; only the project host can create, edit and delete them. */
+/** Project members can read, create and edit tasks; only the host can delete them. */
 @Service
 public class TaskService {
 
@@ -65,7 +65,7 @@ public class TaskService {
         }
         Project project = projectRepository.findById(req.projectId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
-        requireHost(userId, project);
+        requireMember(userId, project.getProjectId());
         Task task = new Task();
         task.setProject(project);
         applyCreate(task, req);
@@ -85,7 +85,7 @@ public class TaskService {
     /** Updates the editable fields of an existing task; empty when the task does not exist. */
     public Optional<Task> updateTask(int userId, int taskId, CreateTaskRequest req) {
         return taskRepository.findById(taskId).map(task -> {
-            requireHost(userId, task.getProject());
+            requireMember(userId, task.getProject().getProjectId());
             Integer oldAssigneeId = task.getAssignee() != null ? task.getAssignee().getUserId() : null;
             applyUpdate(task, req);
             Task saved = taskRepository.save(task);

@@ -128,6 +128,21 @@
 	display: none;
 }
 
+.addmember-page .addmember-message {
+	margin: 6px 0 0;
+	color: #385447;
+	font-size: 14px;
+	overflow-wrap: anywhere;
+}
+
+.addmember-page .addmember-message.is-error {
+	color: #353535;
+}
+
+.addmember-page .addmember-message[hidden] {
+	display: none;
+}
+
 .addmember-page .invited-member-card {
 	display: flex;
 	align-items: center;
@@ -156,10 +171,9 @@
 	width: 34px;
 	height: 34px;
 	place-items: center;
+	color: #fff;
+	background: #28745e;
 	border-radius: 50%;
-    border: 1px solid #000000;
-    background: linear-gradient(135deg, #f8a238 0%, #f6703b 100%);
-    color: #ffffff;
 	font-size: 12px;
 	font-weight: 700;
 }

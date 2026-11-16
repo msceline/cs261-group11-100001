@@ -1,6 +1,6 @@
 <section class="tasks-page">
     <header class="course-header">
-        <div class="task-header-container"> 
+        <div class="task-header-container">
             <h1 class="course-code" id="course-code"></h1>
             <h2 class="course-name" id="course-name"></h2>
         </div>
@@ -9,9 +9,18 @@
     <section class="tasks-panel" aria-labelledby="tasks-heading">
         <div class="tasks-header">
             <h2 id="tasks-heading">TASKS</h2>
-            <button class="add-task" id="createTaskIcon" type="button" aria-label="Create task">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" /></svg>
-            </button>
+
+            <div class="right-side">
+                <div class="checkboxDropdownFilter"></div>
+                <button class="add-task" id="createTaskIcon" type="button" aria-label="Create task">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                    </svg>
+                </button>
+            </div>
         </div>
         <div class="task-list" id="task-list" aria-live="polite"></div>
         <p class="task-list-message" id="task-message" role="status" aria-live="polite" hidden></p>

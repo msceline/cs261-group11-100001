@@ -173,23 +173,6 @@
   color: #0284c7;
   text-decoration: underline;
 }
-.invite-accept-button {
-  align-self: flex-start;
-  margin-top: 6px;
-  padding: 4px 14px;
-  border: 0;
-  border-radius: 6px;
-  background: #2f6fed;
-  color: #fff;
-  font: inherit;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
-.invite-accept-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
 
 .invite-actions {
   display: flex;
@@ -197,28 +180,25 @@
   margin-top: 6px;
 }
 
-.invite-actions .invite-accept-button,
-.invite-actions .invite-decline-button {
-  margin-top: 0;
-}
-
-.invite-decline-button {
-  align-self: flex-start;
-  padding: 4px 14px;
+.invite-actions button {
+  padding: 4px 12px;
   border: 0;
   border-radius: 6px;
-  background: #f46f72;
   color: #fff;
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 
-.invite-decline-button:hover:not(:disabled) {
+.invite-accept-button {
+  background: #2f6fed;
+}
+
+.invite-decline-button {
   background: #e5585c;
 }
 
-.invite-decline-button:disabled {
+.invite-actions button:disabled {
   opacity: 0.6;
   cursor: default;
 }

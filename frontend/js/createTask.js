@@ -4,6 +4,7 @@ document.addEventListener('createtask:loaded', (event) => {
   if (!form) return;
 
   const selected = event.detail || {};
+  const taskToEdit = selected.taskToEdit || null;
   const dueDateDisplay = document.getElementById('due-date-input');
   const dueDatePicker = document.getElementById('due-date-picker');
   const taskTitleInput = document.getElementById('task-title-input');
@@ -16,7 +17,16 @@ document.addEventListener('createtask:loaded', (event) => {
 
   let projectPromise = null;
   let membersLoaded = false;
-  let selectedAssigneeId = null;
+  let selectedAssigneeId = taskToEdit?.assigneeId ?? null;
+  const submitLabel = taskToEdit ? 'Update' : 'Submit';
+  submitButton.textContent = submitLabel;
+  if (taskToEdit) {
+    taskTitleInput.value = taskToEdit.taskTitle || '';
+    taskDescriptionInput.value = taskToEdit.taskDescription || '';
+    assignmentLabel.textContent = taskToEdit.assigneeId
+      ? taskToEdit.assigneeName || 'Loading member...'
+      : 'Select member';
+  }
 
   function formatDueDate(dateValue) {
     if (!dateValue) return '';
@@ -63,6 +73,12 @@ document.addEventListener('createtask:loaded', (event) => {
     const name = document.createElement('span');
     name.textContent = member.displayName || member.studentId || `User ${member.userId}`;
 
+    if (taskToEdit && String(member.userId) === String(taskToEdit.assigneeId)) {
+      radio.checked = true;
+      selectedAssigneeId = member.userId;
+      assignmentLabel.textContent = name.textContent;
+    }
+
     radio.addEventListener('change', () => {
       selectedAssigneeId = member.userId;
       assignmentLabel.textContent = name.textContent;
@@ -101,9 +117,10 @@ document.addEventListener('createtask:loaded', (event) => {
   }
 
   getProject()
-    .then((project) => {
+    .then(async (project) => {
       document.getElementById('course-code').textContent = project.subjectCode || '';
       document.getElementById('course-name').textContent = project.projectName || '';
+      if (taskToEdit?.assigneeId != null) await loadMembers();
     })
     .catch((error) => showSubmitMessage(error.message));
 
@@ -111,11 +128,12 @@ document.addEventListener('createtask:loaded', (event) => {
 
   // The due date starts as today (local date, yyyy-MM-dd).
   const now = new Date();
-  dueDatePicker.value = [
+  const today = [
     now.getFullYear(),
     String(now.getMonth() + 1).padStart(2, '0'),
     String(now.getDate()).padStart(2, '0'),
   ].join('-');
+  dueDatePicker.value = taskToEdit?.dueDate?.split('T')[0] || today;
   dueDateDisplay.value = formatDueDate(dueDatePicker.value);
   taskDescriptionInput.required = true;
 
@@ -161,24 +179,27 @@ document.addEventListener('createtask:loaded', (event) => {
     }
 
     submitButton.disabled = true;
-    submitButton.textContent = 'Submitting...';
+    submitButton.textContent = taskToEdit ? 'Updating...' : 'Submitting...';
 
     try {
       const project = await getProject();
-      await taskApi.createTask({
+      const taskData = {
         projectId: project.projectId,
         taskTitle,
         taskDescription,
         assigneeId: selectedAssigneeId,
-        status: 'todo',
+        status: taskToEdit?.status || 'todo',
         dueDate: `${dueDate}T23:59:00`,
-      });
+      };
+
+      if (taskToEdit) await taskApi.updateTask(taskToEdit.taskId, taskData);
+      else await taskApi.createTask(taskData);
 
       goBackToTasks();
     } catch (error) {
       showSubmitMessage(error.message);
       submitButton.disabled = false;
-      submitButton.textContent = 'Submit';
+      submitButton.textContent = submitLabel;
     }
   });
 });

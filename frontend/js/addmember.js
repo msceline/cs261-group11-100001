@@ -24,7 +24,7 @@ function loadProjectApiForInvite() {
 function describeInvitedMember(memberId, displayName) {
     const name = displayName || memberId;
     return {
-        avatarText: Array.from(String(name).trim().split(/\s+/)[0] || '?')[0].toUpperCase(),
+        avatarText: Array.from(name).slice(0, 2).join('').toUpperCase(),
         name,
         role: 'Member',
     };
@@ -75,11 +75,27 @@ document.addEventListener('addmember:loaded', (event) => {
     const inviteForm = page.querySelector('.invite-input form');
     const submitBtn = page.querySelector('.submition-addmember');
     const backBtn = page.querySelector('.back-to-creategroup');
+    const message = page.querySelector('#addmember-message');
+    const isExistingProject = projectDraft.addToExistingProject === true;
+    const projectId = projectDraft.projectId;
 
     const invitedIds = new Set();
     const invitedMembers = new Map();
 
-    if (groupName) groupName.textContent = projectDraft.groupName || '';
+    if (groupName) {
+        const name = projectDraft.groupName || projectDraft.projectName || '';
+        const subject = projectDraft.subject || projectDraft.subjectCode || '';
+        groupName.textContent = subject ? `${name}` : name;
+    }
+    if (submitBtn && isExistingProject) submitBtn.textContent = 'Add Members';
+    if (backBtn && isExistingProject) backBtn.textContent = 'Back';
+
+    function showMessage(text, isError = false) {
+        if (!message) return;
+        message.textContent = text;
+        message.hidden = !text;
+        message.classList.toggle('is-error', isError);
+    }
 
     inviteForm?.addEventListener('submit', async (submitEvent) => {
         submitEvent.preventDefault();
@@ -90,11 +106,12 @@ document.addEventListener('addmember:loaded', (event) => {
         if (!memberId) return;
 
         if (invitedIds.has(memberId)) {
-            alert('รหัสสมาชิกนี้ถูกเพิ่มในรายการแล้วครับ');
+            showMessage('ขื่อผู้ใช้นี้ถูกเพิ่มในรายการแล้ว', true);
             if (idInput) idInput.value = '';
             return;
         }
 
+        showMessage('');
         let displayName = '';
         if (hasStoredAuthToken()) {
             if (sendBtn) sendBtn.disabled = true;
@@ -103,19 +120,19 @@ document.addEventListener('addmember:loaded', (event) => {
                 // GET /api/users/{tu_id}: only people who have logged in before exist in the database.
                 const user = await api.findUser(memberId);
                 if (!user) {
-                    alert(`ไม่พบรหัสนักศึกษา ${memberId} ในระบบของมหาวิทยาลัย (TU)`);
+                    showMessage(`ไม่พบรหัสนักศึกษา ${memberId} ในระบบของมหาวิทยาลัย (TU)`, true);
                     return;
                 }
 
                 const me = await api.getCurrentUser();
                 if (user.tu_id === me.tu_id) {
-                    alert('คุณเป็นหัวหน้ากลุ่มและเป็นสมาชิกของโปรเจกต์นี้อยู่แล้วครับ');
+                    showMessage('คุณเป็นหัวหน้ากลุ่มและเป็นสมาชิกของโปรเจกต์นี้แล้ว', true);
                     if (idInput) idInput.value = '';
                     return;
                 }
                 displayName = user.displayName;
             } catch (error) {
-                alert(error.message);
+                showMessage(error.message, true);
                 return;
             } finally {
                 if (sendBtn) sendBtn.disabled = false;
@@ -136,22 +153,66 @@ document.addEventListener('addmember:loaded', (event) => {
         if (idInput) idInput.value = '';
     });
 
-    submitBtn?.addEventListener('click', () => {
-        document.dispatchEvent(new CustomEvent('addmember:create', {
-            detail: {
-                groupName: projectDraft.groupName || '',
-                subject: projectDraft.subject || '',
-                dueDate: projectDraft.dueDate || '',
-                invitedMemberIds: [...invitedIds],
-                members: [...invitedIds].map((memberId) => ({
-                    studentId: memberId,
-                    name: invitedMembers.get(memberId).name,
-                    role: invitedMembers.get(memberId).role,
-                    avatarText: invitedMembers.get(memberId).avatarText,
-                })),
-            },
-        }));
-    }, { once: true });
+    if (isExistingProject) {
+        submitBtn?.addEventListener('click', async () => {
+            if (!projectId) {
+                showMessage('ไม่พบรหัสโปรเจกต์ จึงไม่สามารถเพิ่มสมาชิกได้', true);
+                return;
+            }
+            if (!hasStoredAuthToken()) {
+                showMessage('กรุณาเข้าสู่ระบบก่อนเพิ่มสมาชิก', true);
+                return;
+            }
+            if (!invitedIds.size) {
+                showMessage('กรุณาเพิ่มสมาชิกอย่างน้อยหนึ่งคนก่อน', true);
+                return;
+            }
+
+            submitBtn.disabled = true;
+            showMessage('กำลังเพิ่มสมาชิก...');
+            const failures = [];
+            try {
+                const api = await loadProjectApiForInvite();
+                for (const memberId of invitedIds) {
+                    try {
+                        await api.addProjectMember(projectId, memberId);
+                        Array.from(invitedList?.querySelectorAll('[data-member-id]') || [])
+                            .find((card) => card.dataset.memberId === memberId)
+                            ?.remove();
+                        invitedIds.delete(memberId);
+                        invitedMembers.delete(memberId);
+                    } catch (error) {
+                        failures.push(`${memberId}: ${error.message}`);
+                    }
+                }
+            } catch (error) {
+                showMessage(error.message, true);
+                submitBtn.disabled = false;
+                return;
+            }
+            submitBtn.disabled = false;
+            showMessage(failures.length
+                ? `เพิ่มสมาชิกไม่สำเร็จ: ${failures.join(' / ')}`
+                : 'เพิ่มสมาชิกเรียบร้อยแล้ว');
+        });
+    } else {
+        submitBtn?.addEventListener('click', () => {
+            document.dispatchEvent(new CustomEvent('addmember:create', {
+                detail: {
+                    groupName: projectDraft.groupName || '',
+                    subject: projectDraft.subject || '',
+                    dueDate: projectDraft.dueDate || '',
+                    invitedMemberIds: [...invitedIds],
+                    members: [...invitedIds].map((memberId) => ({
+                        studentId: memberId,
+                        name: invitedMembers.get(memberId).name,
+                        role: invitedMembers.get(memberId).role,
+                        avatarText: invitedMembers.get(memberId).avatarText,
+                    })),
+                },
+            }));
+        }, { once: true });
+    }
 
     backBtn?.addEventListener('click', () => {
         document.dispatchEvent(new Event('addmember:back'));

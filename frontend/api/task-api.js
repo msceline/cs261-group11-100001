@@ -74,6 +74,13 @@ function updateTask(taskId, task, token) {
   });
 }
 
+function deleteTask(taskId, token) {
+  return taskApiRequest(`/tasks/${encodeURIComponent(taskId)}`, {
+    method: 'DELETE',
+    token,
+  });
+}
+
 function updateTaskStatus(taskId, status, token) {
   return taskApiRequest(`/tasks/${encodeURIComponent(taskId)}`, {
     // PUT, not PATCH: the backend's CORS config does not allow PATCH, so the browser's request (it sends an Origin header) gets 403.
@@ -97,6 +104,7 @@ const taskApi = {
   getTask,
   createTask,
   updateTask,
+  deleteTask,
   updateTaskStatus,
   getProjects,
   getProjectMembers,

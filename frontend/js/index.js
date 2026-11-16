@@ -6,6 +6,7 @@ const notificationTrigger = document.querySelector('#notificationTrigger');
 const notificationDropdown = document.querySelector('#notificationDropdown');
 const userProfile = document.querySelector('.user-profile');
 const profileDropdown = document.querySelector('#profileDropdown');
+const sidebarProjects = document.querySelector('#sidebarProjects');
 const pageButtons = document.querySelectorAll('.sidebar-link[data-page]');
 const projectContextLinks = sidebar?.querySelectorAll('[data-project-context]') || [];
 const scriptUrl = document.currentScript?.src || window.location.href;
@@ -18,9 +19,9 @@ const pageUrls = {
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
 	members: new URL('../pages/members.html', scriptUrl),
 	task: new URL('../pages/task.html', scriptUrl),
+	createtask: new URL('../pages/createTask.html', scriptUrl),
 	calendar: new URL('../pages/calender.html', scriptUrl),
 	meeting: new URL('../pages/meeting.html', scriptUrl),
-	createtask: new URL('../pages/createTask.html', scriptUrl),
 	resources: new URL('../pages/resource.html', scriptUrl),
 };
 const pageScriptUrls = {
@@ -30,13 +31,14 @@ const pageScriptUrls = {
 	addmember: new URL('../js/addmember.js', scriptUrl),
 	members: new URL('../js/members.js', scriptUrl),
 	task: new URL('../js/task.js', scriptUrl),
+	createtask: new URL('../js/createTask.js', scriptUrl),
 	calendar: new URL('../js/calendar.js', scriptUrl),
 	meeting: new URL('../js/meeting.js', scriptUrl),
-	createtask: new URL('../js/createTask.js', scriptUrl),
 	resources: new URL('../js/resource.js', scriptUrl),
 };
 const pageApiScriptUrls = {
-	members: new URL('../client-api/member-api.js', scriptUrl),
+	calendar: new URL('../api/meeting-api.js', scriptUrl),
+	meeting: new URL('../api/meeting-api.js', scriptUrl),
 	resources: new URL('../api/resource-api.js', scriptUrl),
 };
 const pageTitles = {
@@ -46,10 +48,10 @@ const pageTitles = {
 	dashboard: 'Dashboard',
 	members: 'Members',
 	task: 'Tasks',
+	createtask: 'Task',
 	calendar: 'Calendar',
 	meeting: 'Create Meeting',
-	createtask: 'Task',
-	resources: 'Resource',
+	resources: 'Resources',
 };
 const pageScriptPromises = {};
 const pageApiScriptPromises = {};
@@ -123,6 +125,15 @@ userProfile?.addEventListener('keydown', (event) => {
 	toggleDropdown('profile');
 });
 
+window.addEventListener('message', (event) => {
+	if (event.origin !== window.location.origin || event.data?.type !== 'notifications:unread') return;
+	const badge = document.getElementById('countNoti');
+	if (!badge) return;
+	const count = Math.max(0, Number(event.data.count) || 0);
+	badge.textContent = count > 99 ? '99+' : String(count);
+	badge.hidden = count === 0;
+});
+
 document.addEventListener('click', (event) => {
 	if (
 		notificationTrigger?.contains(event.target)
@@ -173,19 +184,19 @@ function loadPageScript(page) {
 }
 
 function loadPageApiScript(page) {
-	const scriptUrl = pageApiScriptUrls[page];
-	if (!scriptUrl) return Promise.resolve();
+	const apiUrl = pageApiScriptUrls[page];
+	if (!apiUrl) return Promise.resolve();
 
 	if (!pageApiScriptPromises[page]) {
 		pageApiScriptPromises[page] = new Promise((resolve, reject) => {
-			const pageScript = document.createElement('script');
-			pageScript.src = scriptUrl.href;
-			pageScript.onload = resolve;
-			pageScript.onerror = () => {
+			const apiScript = document.createElement('script');
+			apiScript.src = apiUrl.href;
+			apiScript.onload = resolve;
+			apiScript.onerror = () => {
 				pageApiScriptPromises[page] = null;
 				reject(new Error(`Unable to load ${page} API`));
 			};
-			document.body.append(pageScript);
+			document.body.append(apiScript);
 		});
 	}
 
@@ -194,8 +205,8 @@ function loadPageApiScript(page) {
 
 async function loadPage(page, pageData = null) {
 	if (!contentBox) return;
-	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page
-		|| (page === 'meeting' && link.dataset.page === 'calendar'));
+	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page)
+		|| ['calendar', 'meeting', 'resources'].includes(page);
 	if (requiresProject && !pageData && !selectedProject) return;
 
 	const pageUrl = pageUrls[page];
@@ -220,14 +231,15 @@ async function loadPage(page, pageData = null) {
 			selectedProject = pageData;
 		} else if (page === 'members' && pageData) {
 			selectedProject = pageData;
+		} else if (['calendar', 'meeting', 'resources'].includes(page)) {
+			selectedProject = pageData || selectedProject;
 		} else if (page === 'addmember') {
 			projectDraft = pageData || projectDraft;
 		}
 		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup' && page !== 'addmember');
 
 		pageButtons.forEach((button) => {
-			const isActive = button.dataset.page === page
-				|| (page === 'meeting' && button.dataset.page === 'calendar');
+			const isActive = button.dataset.page === page;
 			button.classList.toggle('sidebar-link-active', isActive);
 			if (isActive) {
 				button.setAttribute('aria-current', 'page');
@@ -255,7 +267,7 @@ async function loadPage(page, pageData = null) {
 				detail: projectDraft || {},
 			}));
 		} else if (page === 'members') {
-			await Promise.all([loadPageScript('members'), loadPageApiScript('members')]);
+			await loadPageScript('members');
 			document.dispatchEvent(new CustomEvent('member:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
@@ -264,28 +276,27 @@ async function loadPage(page, pageData = null) {
 			document.dispatchEvent(new CustomEvent('task:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
-		} else if (page === 'calendar') {
-			await loadPageScript('calendar');
-			document.dispatchEvent(new CustomEvent('calendar:loaded', {
-				detail: pageData || selectedProject || {},
-			}));
-		} else if (page === 'meeting') {
-			await loadPageScript('meeting');
-			document.dispatchEvent(new CustomEvent('meeting:loaded', {
-				detail: pageData || selectedProject || {},
-			}));
 		} else if (page === 'createtask') {
 			await loadPageScript('createtask');
 			document.dispatchEvent(new CustomEvent('createtask:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
+		} else if (page === 'calendar') {
+			await Promise.all([loadPageScript('calendar'), loadPageApiScript('calendar')]);
+			document.dispatchEvent(new CustomEvent('calendar:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
+		} else if (page === 'meeting') {
+			await Promise.all([loadPageScript('meeting'), loadPageApiScript('meeting')]);
+			document.dispatchEvent(new CustomEvent('meeting:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		} else if (page === 'resources') {
-            await loadPageScript('resources');
-            await loadPageApiScript('resources');
-            document.dispatchEvent(new CustomEvent('resources:loaded', {
-                detail: pageData || selectedProject || {},
-            }));
-        }
+			await Promise.all([loadPageScript('resources'), loadPageApiScript('resources')]);
+			document.dispatchEvent(new CustomEvent('resources:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
+		}
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
 	}
@@ -297,11 +308,30 @@ document.addEventListener('creategroup:next', (event) => {
 });
 
 document.addEventListener('addmember:back', () => {
+	if (projectDraft?.addToExistingProject) {
+		loadPage('dashboard', projectDraft);
+		return;
+	}
 	loadPage('creategroup', projectDraft);
 });
 
 document.addEventListener('createtask:done', (event) => {
 	loadPage('task', event.detail || selectedProject);
+});
+
+document.addEventListener('task:edit', (event) => {
+	const task = event.detail;
+	if (!task) return;
+
+	loadPage('createtask', {
+		...(selectedProject || {}),
+		projectId: selectedProject?.projectId || task.projectId,
+		taskToEdit: task,
+	});
+});
+
+document.addEventListener('dashboard:create-task', () => {
+	loadPage('createtask', selectedProject);
 });
 
 document.addEventListener('meeting:created', (event) => {
@@ -310,9 +340,8 @@ document.addEventListener('meeting:created', (event) => {
 
 document.addEventListener('calendar:edit-meeting', (event) => {
 	const detail = event.detail || {};
-	const project = detail.project || selectedProject || {};
 	loadPage('meeting', {
-		...project,
+		...(detail.project || selectedProject || {}),
 		meeting: detail.meeting,
 		calendarYear: detail.calendarYear,
 		calendarMonth: detail.calendarMonth,
@@ -359,6 +388,13 @@ logo?.addEventListener('keydown', (event) => {
 contentBox?.addEventListener('click', (event) => {
 	if (event.target.closest('.calendar-create-meeting')) {
 		loadPage('meeting', selectedProject);
+		return;
+	}
+
+	if (event.target.closest('.addMember-btn')) {
+		if (!selectedProject) return;
+		projectDraft = { ...selectedProject, addToExistingProject: true };
+		loadPage('addmember', projectDraft);
 		return;
 	}
 
@@ -411,6 +447,23 @@ loadPage('project');
 
 if (mainContainer && sidebar) {
 	sidebar.addEventListener('click', (event) => {
+		const projectLink = event.target.closest('.sidebar-project-link');
+		if (projectLink) {
+			loadPage('dashboard', {
+				projectId: projectLink.dataset.projectId,
+				groupName: projectLink.dataset.projectName,
+				subject: projectLink.dataset.subjectCode,
+				subjectCode: projectLink.dataset.subjectCode,
+				progress: projectLink.dataset.progress,
+				dueDate: projectLink.dataset.dueDate,
+				members: JSON.parse(projectLink.dataset.members || '[]'),
+			});
+			if (window.matchMedia('(max-width: 850px)').matches) {
+				mainContainer.classList.remove('is-expanded');
+			}
+			return;
+		}
+
 		if (event.target.closest('.sidebar-link')) {
 			if (window.matchMedia('(max-width: 850px)').matches) {
 				mainContainer.classList.remove('is-expanded');

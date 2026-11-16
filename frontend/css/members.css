@@ -148,20 +148,9 @@
 
 .member-details {
     display: flex;
-    flex: 1 1 0;
     flex-direction: column;
+    flex-grow: 1;
     min-width: 0;
-}
-
-.member-name {
-    font-weight: 600;
-    color: #1f2937;
-    overflow-wrap: anywhere;
-}
-
-.member-id {
-    font-size: 0.85rem;
-    color: #6b7280;
 }
 
 .member-progress {
@@ -172,7 +161,8 @@
     min-width: 90px;
 }
 
-.member-progress-label {
+.member-progress-label,
+.member-progress-percentage {
     color: #4b5563;
     font-size: 0.8rem;
     line-height: 1;
@@ -190,17 +180,9 @@
     min-width: 0;
     height: 15px;
     overflow: hidden;
+    border: 1px solid;
     border-radius: 999px;
     background: #e8efec;
-    border: 1px solid;
-}
-
-.member-progress-percentage {
-    flex: 0 0 auto;
-    color: #4b5563;
-    font-size: 0.8rem;
-    line-height: 1;
-    white-space: nowrap;
 }
 
 .member-progress-fill {
@@ -210,24 +192,34 @@
 }
 
 .member-progress-fill[data-progress-band="red"] {
-    background: linear-gradient(89deg, rgba(191, 48, 38, 1) 0%, rgba(247, 42, 27, 1) 50%);
+    background: linear-gradient(89deg, #bf3026, #f72a1b);
 }
 
 .member-progress-fill[data-progress-band="orange"] {
-    background: linear-gradient(89deg, rgba(247, 42, 27, 1) 0%, rgba(255, 132, 56, 1) 50%);
+    background: linear-gradient(89deg, #f72a1b, #ff8438);
 }
 
 .member-progress-fill[data-progress-band="yellow"] {
-    background: linear-gradient(89deg, rgba(255, 132, 56, 1) 0%, rgba(253, 210, 61, 1) 50%);
+    background: linear-gradient(89deg, #ff8438, #fdd23d);
 }
 
 .member-progress-fill[data-progress-band="green"] {
-    background: linear-gradient(89deg, rgba(253, 240, 65, 1) 0%, rgba(137, 255, 69, 1) 50%);
+    background: linear-gradient(89deg, #f0f041, #89ff45);
+}
+
+.member-name {
+    font-weight: 600;
+    color: #1f2937;
+    overflow-wrap: anywhere;
+}
+
+.member-id {
+    font-size: 0.85rem;
+    color: #6b7280;
 }
 
 .member-role {
-    flex: 0 0 88px;
-    box-sizing: border-box;
+    flex-shrink: 0;
     font-size: 0.9rem;
     font-weight: 600;
     padding: 4px 10px;

@@ -202,6 +202,12 @@
     white-space: nowrap;
 }
 
+.member-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .member-progress-bar {
     flex: 1 1 auto;
     min-width: 0;
@@ -210,6 +216,14 @@
     border-radius: 999px;
     background: #e8efec;
     border: 1px solid;
+}
+
+.member-progress-percentage {
+    flex: 0 0 auto;
+    color: #4b5563;
+    font-size: 0.8rem;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .member-progress-fill {

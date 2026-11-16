@@ -57,6 +57,9 @@ function createMemberItem(member, tasks) {
     progressBar.setAttribute('aria-valuemax', '100');
     progressBar.setAttribute('aria-valuenow', String(progressPercent));
 
+    const progressRow = document.createElement('div');
+    progressRow.className = 'member-progress-row';
+
     const progressFill = document.createElement('div');
     progressFill.className = 'member-progress-fill';
     progressFill.dataset.progressBand = progressPercent < 25
@@ -68,7 +71,13 @@ function createMemberItem(member, tasks) {
                 : 'green';
     progressFill.style.width = `${progressPercent}%`;
     progressBar.append(progressFill);
-    memberProgress.append(progressLabel, progressBar);
+
+    const progressPercentage = document.createElement('span');
+    progressPercentage.className = 'member-progress-percentage';
+    progressPercentage.textContent = `${progressPercent}%`;
+
+    progressRow.append(progressBar, progressPercentage);
+    memberProgress.append(progressLabel, progressRow);
 
     const role = document.createElement('span');
     role.className = 'member-role';

@@ -18,6 +18,8 @@ const pageUrls = {
 	dashboard: new URL('../pages/dashboard.html', scriptUrl),
 	members: new URL('../pages/members.html', scriptUrl),
 	task: new URL('../pages/task.html', scriptUrl),
+	calendar: new URL('../pages/calender.html', scriptUrl),
+	meeting: new URL('../pages/meeting.html', scriptUrl),
 	createtask: new URL('../pages/createTask.html', scriptUrl),
 };
 const pageScriptUrls = {
@@ -27,6 +29,8 @@ const pageScriptUrls = {
 	addmember: new URL('../js/addmember.js', scriptUrl),
 	members: new URL('../js/members.js', scriptUrl),
 	task: new URL('../js/task.js', scriptUrl),
+	calendar: new URL('../js/calendar.js', scriptUrl),
+	meeting: new URL('../js/meeting.js', scriptUrl),
 	createtask: new URL('../js/createTask.js', scriptUrl),
 };
 const pageApiScriptUrls = {
@@ -39,13 +43,14 @@ const pageTitles = {
 	dashboard: 'Dashboard',
 	members: 'Members',
 	task: 'Tasks',
+	calendar: 'Calendar',
+	meeting: 'Create Meeting',
 	createtask: 'Task',
 };
 const pageScriptPromises = {};
 const pageApiScriptPromises = {};
 let selectedProject = null;
 let projectDraft = null;
-let dropdownCloseTimer = null;
 let activeDropdown = null;
 
 document.title = pageTitles.project;
@@ -71,11 +76,6 @@ function positionDropdown(trigger, dropdown) {
 }
 
 function closeDropdown() {
-	if (dropdownCloseTimer !== null) {
-		window.clearTimeout(dropdownCloseTimer);
-		dropdownCloseTimer = null;
-	}
-
 	if (activeDropdown === 'profile') {
 		profileDropdown.hidden = true;
 		userProfile?.setAttribute('aria-expanded', 'false');
@@ -86,34 +86,13 @@ function closeDropdown() {
 	activeDropdown = null;
 }
 
-function clearDropdownCloseTimer() {
-	if (dropdownCloseTimer === null) return;
-
-	window.clearTimeout(dropdownCloseTimer);
-	dropdownCloseTimer = null;
-}
-
-function scheduleDropdownClose(name) {
-	clearDropdownCloseTimer();
-	if (activeDropdown !== name) return;
-	const trigger = name === 'profile' ? userProfile : notificationTrigger;
-	const dropdown = name === 'profile' ? profileDropdown : notificationDropdown;
-	if (trigger?.matches(':hover') || dropdown?.matches(':hover')) return;
-
-	dropdownCloseTimer = window.setTimeout(() => {
-		if (activeDropdown === name) closeDropdown();
-	}, 2000);
-}
-
 function toggleDropdown(name) {
 	if (activeDropdown === name) {
 		closeDropdown();
 		return;
 	}
-
 	closeDropdown();
 	activeDropdown = name;
-	clearDropdownCloseTimer();
 
 	if (name === 'profile') {
 		profileDropdown.hidden = false;
@@ -125,21 +104,10 @@ function toggleDropdown(name) {
 		notificationTrigger?.setAttribute('aria-expanded', 'true');
 		positionDropdown(notificationTrigger, notificationDropdown);
 	}
-
-	scheduleDropdownClose(name);
 }
 
 notificationTrigger?.addEventListener('click', () => toggleDropdown('notification'));
 userProfile?.addEventListener('click', () => toggleDropdown('profile'));
-[
-	['notification', notificationTrigger],
-	['notification', notificationDropdown],
-	['profile', userProfile],
-	['profile', profileDropdown],
-].forEach(([name, element]) => {
-	element?.addEventListener('mouseenter', () => clearDropdownCloseTimer());
-	element?.addEventListener('mouseleave', () => scheduleDropdownClose(name));
-});
 notificationTrigger?.addEventListener('keydown', (event) => {
 	if (event.key !== 'Enter' && event.key !== ' ') return;
 	event.preventDefault();
@@ -222,7 +190,8 @@ function loadPageApiScript(page) {
 
 async function loadPage(page, pageData = null) {
 	if (!contentBox) return;
-	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page);
+	const requiresProject = Array.from(projectContextLinks).some((link) => link.dataset.page === page
+		|| (page === 'meeting' && link.dataset.page === 'calendar'));
 	if (requiresProject && !pageData && !selectedProject) return;
 
 	const pageUrl = pageUrls[page];
@@ -253,7 +222,8 @@ async function loadPage(page, pageData = null) {
 		setProjectContextLinksVisible(Boolean(selectedProject) && page !== 'project' && page !== 'creategroup' && page !== 'addmember');
 
 		pageButtons.forEach((button) => {
-			const isActive = button.dataset.page === page;
+			const isActive = button.dataset.page === page
+				|| (page === 'meeting' && button.dataset.page === 'calendar');
 			button.classList.toggle('sidebar-link-active', isActive);
 			if (isActive) {
 				button.setAttribute('aria-current', 'page');
@@ -290,6 +260,16 @@ async function loadPage(page, pageData = null) {
 			document.dispatchEvent(new CustomEvent('task:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
+		} else if (page === 'calendar') {
+			await loadPageScript('calendar');
+			document.dispatchEvent(new CustomEvent('calendar:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
+		} else if (page === 'meeting') {
+			await loadPageScript('meeting');
+			document.dispatchEvent(new CustomEvent('meeting:loaded', {
+				detail: pageData || selectedProject || {},
+			}));
 		} else if (page === 'createtask') {
 			await loadPageScript('createtask');
 			document.dispatchEvent(new CustomEvent('createtask:loaded', {
@@ -312,6 +292,25 @@ document.addEventListener('addmember:back', () => {
 
 document.addEventListener('createtask:done', (event) => {
 	loadPage('task', event.detail || selectedProject);
+});
+
+document.addEventListener('meeting:created', (event) => {
+	loadPage('calendar', event.detail || selectedProject);
+});
+
+document.addEventListener('calendar:edit-meeting', (event) => {
+	const detail = event.detail || {};
+	const project = detail.project || selectedProject || {};
+	loadPage('meeting', {
+		...project,
+		meeting: detail.meeting,
+		calendarYear: detail.calendarYear,
+		calendarMonth: detail.calendarMonth,
+	});
+});
+
+document.addEventListener('meeting:updated', (event) => {
+	loadPage('calendar', event.detail || selectedProject);
 });
 
 document.addEventListener('addmember:create', async (event) => {
@@ -348,6 +347,11 @@ logo?.addEventListener('keydown', (event) => {
 });
 
 contentBox?.addEventListener('click', (event) => {
+	if (event.target.closest('.calendar-create-meeting')) {
+		loadPage('meeting', selectedProject);
+		return;
+	}
+
 	if (event.target.closest('#createGroupIcon')) {
 		loadPage('creategroup');
 		return;
@@ -396,19 +400,13 @@ setProjectContextLinksVisible(false);
 loadPage('project');
 
 if (mainContainer && sidebar) {
-	let collapseTimer = null;
-
-	sidebar.addEventListener('mouseenter', () => {
-		if (collapseTimer !== null) return;
-		mainContainer.classList.add('is-expanded');
-	});
-
-	sidebar.addEventListener('mouseleave', () => {
-		if (collapseTimer !== null) return;
-
-		collapseTimer = window.setTimeout(() => {
-			mainContainer.classList.remove('is-expanded');
-			collapseTimer = null;
-		}, 1000);
+	sidebar.addEventListener('click', (event) => {
+		if (event.target.closest('.sidebar-link')) {
+			if (window.matchMedia('(max-width: 850px)').matches) {
+				mainContainer.classList.remove('is-expanded');
+			}
+			return;
+		}
+		mainContainer.classList.toggle('is-expanded');
 	});
 }

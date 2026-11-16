@@ -10,68 +10,56 @@
 
 .tasks-page {
     display: grid;
-	grid-template-rows: auto minmax(0, 1fr);
-	gap: 20px;
-	width: 100%;
-	height: 100%;
-	min-height: 0;
-	overflow-x: hidden;
-	overflow-y: auto;
-	scrollbar-width: none;
-	-ms-overflow-style: none;
-	margin: 0 auto;
-	padding: 16px;
-	color: #000;
-	background: linear-gradient(180deg,rgba(255, 209, 186, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(202, 241, 254, 1) 100%);
-	border-radius: 20px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-	font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin: 0 auto;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow:
+        0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+    font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
 }
 
-.tasks-page::-webkit-scrollbar{
+.tasks-page::-webkit-scrollbar {
     display: none;
 }
 
 .tasks-page .course-header {
     min-width: 0;
-	padding: 20px;
-	border-radius: 21px;
-	box-shadow: 0 4px 14px -9px #000;
+    padding: 10px;
 
-	background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
-
-    box-shadow:
-        0 20px 40px -15px rgba(0, 0, 0, 0.07),
-        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
+    background: none;
+    border-bottom: 1px solid #000;
 }
 
 .tasks-page .course-header .task-header-container {
     display: flex;
-	flex-direction: column;
-	align-items: right;
-	flex-wrap: wrap;
-	gap: 5px;
-	min-width: 0;
-    padding: 0 25px;
+    flex-direction: column;
+    align-items: right;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-width: 0;
 }
 
 .tasks-page .course-code {
     margin: 0;
     color: #000;
     font-family: "League Spartan", sans-serif;
-    font-size: 2rem;
+    font-size: 3rem;
     font-weight: 800;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
     line-height: normal;
     overflow-wrap: anywhere;
 
-    background: linear-gradient(135deg, #386aaf 0%, #3b82f6 100%);
+    background: #F05805;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -85,6 +73,7 @@
     line-height: normal;
     letter-spacing: -0.03em;
     overflow-wrap: anywhere;
+    color: #303030;
 }
 
 .tasks-page .tasks-panel {
@@ -94,21 +83,10 @@
     min-height: 0;
     padding: 21px 40px;
     overflow-y: auto;
-    background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
-
-    box-shadow:
-        0 20px 40px -15px rgba(0, 0, 0, 0.07),
-        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
-    border-radius: 21px;
+    background: none;
 }
 
-.tasks-page .tasks-panel::-webkit-scrollbar{
+.tasks-page .tasks-panel::-webkit-scrollbar {
     display: none;
 }
 
@@ -124,7 +102,7 @@
     font-family: "League Spartan", sans-serif;
     font-size: 20px;
     font-weight: 700;
-    color: #386aaf;
+    color: #792C24;
 }
 
 .tasks-page .add-task {
@@ -132,8 +110,8 @@
     width: 30px;
     height: 30px;
     place-items: center;
-    color: #fff;
-    background: #dd7703;
+    color: #DD7F5B;
+    background: none;
     border: 0;
     border-radius: 50%;
     cursor: pointer;
@@ -148,7 +126,6 @@
 }
 
 .tasks-page .add-task:hover {
-    background: rgb(189, 84, 52);
     transform: scale(1.06);
 }
 
@@ -184,13 +161,21 @@
     position: relative;
     overflow: visible;
     justify-self: stretch;
-	width: 100%;
-	min-width: 0;
-	text-align: left;
-	border-radius: 28px;
-	background: rgba(255, 255, 255);
-	cursor: pointer;
-	padding: 0 16px;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+    border-radius: 28px;
+    box-shadow:
+        0px 4px 6px -1px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    cursor: pointer;
+    padding: 0 16px;
+}
+
+.tasks-page .task-item:hover {
+    transform: translateY(-1px) scale(1.001);
+    background: rgba(255, 255, 255, 0.75);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tasks-page .task-item.has-open-status-menu {
@@ -235,7 +220,7 @@
     color: #222;
     background: #fff;
     border: 2px solid #d5d5d5;
-    border-radius: 10px;
+    border-radius: 15px;
     font: inherit;
     font-size: 0.9rem;
     cursor: pointer;
@@ -245,7 +230,8 @@
 .tasks-page .task-status-trigger:hover,
 .tasks-page .task-status-trigger[aria-expanded="true"] {
     border-color: #777;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    box-shadow:
+        0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .tasks-page .task-status-trigger:disabled {
@@ -418,6 +404,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .tasks-page .task-details,
     .tasks-page .task-details-content,
     .tasks-page .task-status-trigger,

@@ -156,9 +156,10 @@
 	width: 34px;
 	height: 34px;
 	place-items: center;
-	color: #fff;
-	background: #28745e;
 	border-radius: 50%;
+    border: 1px solid #000000;
+    background: linear-gradient(135deg, #f8a238 0%, #f6703b 100%);
+    color: #ffffff;
 	font-size: 12px;
 	font-weight: 700;
 }

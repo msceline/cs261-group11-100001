@@ -169,7 +169,6 @@ function renderCalendarDays(container, year, month, tasks, meetings, projectDueD
         ...dayMeetings.map((meeting) => ({
           type: 'meeting',
           title: meeting.topic || 'Untitled meeting',
-          location: meeting.location || '',
         })),
       ];
 
@@ -182,19 +181,6 @@ function renderCalendarDays(container, year, month, tasks, meetings, projectDueD
         title.textContent = entry.title;
         if (entry.description) title.title = `${entry.title} · ${entry.description}`;
         item.append(title);
-
-        if (entry.type === 'meeting' && entry.location) {
-          const href = calendarHttpUrl(entry.location);
-          const location = document.createElement(href ? 'a' : 'span');
-          location.className = 'calendar-meeting-location';
-          location.textContent = entry.location;
-          if (href) {
-            location.href = href;
-            location.target = '_blank';
-            location.rel = 'noopener noreferrer';
-          }
-          item.append(location);
-        }
         eventNames.append(item);
       });
 

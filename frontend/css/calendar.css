@@ -448,7 +448,12 @@
 }
 
 .calendar-page .calendar-detail-kind {
+  display: flex;
+  width: 138px;
+  min-height: 34px;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   padding: 5px 12px;
   color: #111;
   background: #8bc4f8;

@@ -33,7 +33,6 @@ public class Meeting {
 
     public static final String STATUS_SCHEDULED = "SCHEDULED";
     public static final String STATUS_CANCELLED = "CANCELLED";
-    public static final String TYPE_MEETING = "meeting";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,9 +64,6 @@ public class Meeting {
     @Column(name = "meeting_link", length = 500)
     private String meetingLink;
 
-    @Column(name = "type", length = 20, nullable = false)
-    private String type = TYPE_MEETING;
-
     @Column(name = "status", length = 20, nullable = false)
     private String status = STATUS_SCHEDULED;
 
@@ -85,7 +81,7 @@ public class Meeting {
 
     public Meeting(Integer meetingId, Project project, User createdBy, String meetingTopic,
                    String meetingDescription, LocalDateTime meetingDate, String meetingLink,
-                   String type, String status, LocalDateTime cancelledAt,
+                   String status, LocalDateTime cancelledAt,
                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.meetingId = meetingId;
         this.project = project;
@@ -94,7 +90,6 @@ public class Meeting {
         this.meetingDescription = meetingDescription;
         this.meetingDate = meetingDate;
         this.meetingLink = meetingLink;
-        this.type = type != null ? type : TYPE_MEETING;
         this.status = status != null ? status : STATUS_SCHEDULED;
         this.cancelledAt = cancelledAt;
         this.createdAt = createdAt;
@@ -108,9 +103,6 @@ public class Meeting {
             this.createdAt = now;
         }
         this.updatedAt = now;
-        if (this.type == null) {
-            this.type = TYPE_MEETING;
-        }
         if (this.status == null) {
             this.status = STATUS_SCHEDULED;
         }
@@ -181,14 +173,6 @@ public class Meeting {
 
     public void setMeetingLink(String meetingLink) {
         this.meetingLink = meetingLink;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getStatus() {

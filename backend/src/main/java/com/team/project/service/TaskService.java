@@ -1,5 +1,6 @@
 package com.team.project.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -17,7 +18,7 @@ import com.team.project.repository.ProjectRepository;
 import com.team.project.repository.TaskRepository;
 import com.team.project.repository.UserRepository;
 
-/** Members of a project can read, create and edit its tasks. */
+/** Members of a project can read its tasks; only the project host can create, edit and delete them. */
 @Service
 public class TaskService {
 
@@ -64,7 +65,7 @@ public class TaskService {
         }
         Project project = projectRepository.findById(req.projectId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
-        requireMember(userId, project.getProjectId());
+        requireHost(userId, project);
         Task task = new Task();
         task.setProject(project);
         applyCreate(task, req);
@@ -84,7 +85,7 @@ public class TaskService {
     /** Updates the editable fields of an existing task; empty when the task does not exist. */
     public Optional<Task> updateTask(int userId, int taskId, CreateTaskRequest req) {
         return taskRepository.findById(taskId).map(task -> {
-            requireMember(userId, task.getProject().getProjectId());
+            requireHost(userId, task.getProject());
             Integer oldAssigneeId = task.getAssignee() != null ? task.getAssignee().getUserId() : null;
             applyUpdate(task, req);
             Task saved = taskRepository.save(task);
@@ -103,12 +104,38 @@ public class TaskService {
         });
     }
 
+    /** Deletes a task; false when it does not exist. */
+    public boolean deleteTask(int userId, int taskId) {
+        Optional<Task> found = taskRepository.findById(taskId);
+        if (found.isEmpty()) {
+            return false;
+        }
+        Task task = found.get();
+        requireHost(userId, task.getProject());
+        taskRepository.delete(task);
+        refreshProgress(task.getProject());
+        return true;
+    }
+
     /** Project progress = done tasks / all tasks * 100 (rounded down), recalculated whenever a task changes. */
     private void refreshProgress(Project project) {
         long total = taskRepository.countByProject_ProjectId(project.getProjectId());
         long done = taskRepository.countByProject_ProjectIdAndStatus(project.getProjectId(), DONE);
         project.setProgress(total == 0 ? 0 : (int) (done * 100 / total));
         projectRepository.save(project);
+    }
+
+    private static void requireNotPast(LocalDateTime dueDate) {
+        if (dueDate != null && dueDate.isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dueDate must not be in the past");
+        }
+    }
+
+    private void requireHost(int userId, Project project) {
+        if (!project.getHost().getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only the project host can create, edit or delete tasks");
+        }
     }
 
     private void requireMember(int userId, int projectId) {
@@ -124,6 +151,7 @@ public class TaskService {
         }
         task.setTitle(title);
         task.setTaskDescription(req.taskDescription());
+        requireNotPast(req.dueDate());
         task.setDueDate(req.dueDate());
         if (req.status() != null) {
             if (!STATUSES.contains(req.status())) {
@@ -148,6 +176,10 @@ public class TaskService {
             task.setTaskDescription(req.taskDescription());
         }
         if (req.dueDate() != null) {
+            // re-sending the existing due date unchanged is fine, even if it has since passed
+            if (!req.dueDate().equals(task.getDueDate())) {
+                requireNotPast(req.dueDate());
+            }
             task.setDueDate(req.dueDate());
         }
         if (req.status() != null) {

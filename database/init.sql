@@ -9,6 +9,19 @@ GO
 
 PRINT '>>> เริ่มต้นใส่ข้อมูลจำลอง (Mock Data) สำหรับ TU WorkSpace (Sprint 1)...';
 
+IF EXISTS (
+    SELECT 1
+    FROM sys.columns c
+    JOIN sys.types t ON c.user_type_id = t.user_type_id
+    WHERE c.object_id = OBJECT_ID(N'dbo.tasks')
+      AND c.name = N'task_description'
+      AND t.name = N'varchar'
+)
+BEGIN
+    ALTER TABLE dbo.tasks ALTER COLUMN task_description NVARCHAR(MAX) NULL;
+END;
+GO
+
 -- ------------------------------------------------------------------------------
 -- 1. Users (ตารางผู้ใช้)
 -- ------------------------------------------------------------------------------

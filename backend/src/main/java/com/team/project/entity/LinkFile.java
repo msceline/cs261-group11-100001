@@ -10,11 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
-import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.Nationalized;
-import org.hibernate.generator.EventType;
 
 @Entity
 @Table(name = "link_files")
@@ -44,13 +43,10 @@ public class LinkFile {
     @JoinColumn(name = "uploader_id", nullable = false)
     private User uploader;
 
-    @Generated(event = EventType.INSERT)
     @Column(
         name = "created_at",
         columnDefinition = "datetime2",
-        nullable = false,
-        insertable = false,
-        updatable = false
+        nullable = false
     )
     private LocalDateTime createdAt;
 
@@ -72,6 +68,13 @@ public class LinkFile {
         this.project = project;
         this.uploader = uploader;
         this.createdAt = createdAt;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
     }
 
     public Integer getLinkFileId() {

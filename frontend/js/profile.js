@@ -5,11 +5,6 @@ const profileStudentId = document.getElementById('profileStudentId');
 const profileNames = document.querySelectorAll('[data-profile-name]');
 const profileStudentIds = document.querySelectorAll('[data-profile-student-id]');
 
-themeButton.addEventListener('click', () => {
-    const isDark = profileCard.classList.toggle('is-dark');
-    themeButton.setAttribute('aria-pressed', String(isDark));
-});
-
 let profileRequest = null;
 
 // Asks the backend (GET /auth/me) who is logged in and shows their name and student id.

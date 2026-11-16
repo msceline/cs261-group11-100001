@@ -39,6 +39,7 @@ const pageScriptUrls = {
 const pageApiScriptUrls = {
 	calendar: new URL('../api/meeting-api.js', scriptUrl),
 	meeting: new URL('../api/meeting-api.js', scriptUrl),
+	members: new URL('../api/member-api.js', scriptUrl),
 	resources: new URL('../api/resource-api.js', scriptUrl),
 };
 const pageTitles = {

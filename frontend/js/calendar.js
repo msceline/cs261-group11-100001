@@ -399,6 +399,15 @@ document.addEventListener('calendar:loaded', async (event) => {
       status.append(option);
     });
     status.value = task.status || 'todo';
+    const updateStatusStyle = (value) => {
+      statusControl.classList.remove('is-todo', 'is-doing', 'is-done');
+      statusControl.classList.add(`is-${value}`);
+    };
+    updateStatusStyle(status.value);
+    const canUpdateStatus = Number.isInteger(currentUserId)
+      && currentUserId > 0
+      && Number(task.assigneeId) === currentUserId;
+    status.disabled = !canUpdateStatus;
     const chevron = document.createElement('span');
     chevron.className = 'calendar-task-status-chevron';
     chevron.setAttribute('aria-hidden', 'true');
@@ -418,19 +427,22 @@ document.addEventListener('calendar:loaded', async (event) => {
     status.addEventListener('change', async () => {
       const previousStatus = task.status || 'todo';
       const nextStatus = status.value;
+      updateStatusStyle(nextStatus);
       status.disabled = true;
       showDetailMessage('');
       try {
         const updatedTask = await window.taskApi.updateTaskStatus(task.taskId, nextStatus);
         task.status = updatedTask?.status || nextStatus;
         status.value = task.status;
+        updateStatusStyle(status.value);
         showDetailMessage(memberWarning);
       } catch (error) {
         task.status = previousStatus;
         status.value = previousStatus;
+        updateStatusStyle(previousStatus);
         showDetailMessage(error.message || 'Could not update task status.', true);
       } finally {
-        status.disabled = false;
+        status.disabled = !canUpdateStatus;
       }
     });
     return card;

@@ -539,9 +539,20 @@
   text-align: center;
 }
 
+.calendar-page .calendar-task-status-control.is-todo .calendar-task-status {
+  background: #FF9090;
+}
+
+.calendar-page .calendar-task-status-control.is-doing .calendar-task-status {
+  background: #FEFFAB;
+}
+
+.calendar-page .calendar-task-status-control.is-done .calendar-task-status {
+  background: #B2FFAB;
+}
+
 .calendar-page .calendar-task-status:disabled {
-  cursor: wait;
-  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .calendar-page .calendar-task-status-chevron {

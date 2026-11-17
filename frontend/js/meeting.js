@@ -16,6 +16,11 @@ document.addEventListener('meeting:loaded', (event) => {
   const submitButton = document.getElementById('meeting-submit');
   const message = document.getElementById('meeting-message');
   const title = document.getElementById('meeting-page-title');
+  const backButton = document.getElementById('meeting-back');
+
+  backButton?.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('meeting:back', { detail: project }));
+  });
 
   if (editingMeeting) {
     document.title = 'Edit Meeting';

@@ -21,7 +21,7 @@ public record ProjectProgressResponse(int projectId,
     }
 
     /** Returns completed / total as an integer percentage (rounded to nearest integer), or 0 when total is 0. */
-    public static int calculatePercentage(int completedTasks, int totalTasks) {
+    public static int calculatePercentage(long completedTasks, long totalTasks) {
         if (totalTasks <= 0 || completedTasks <= 0) {
             return 0;
         }

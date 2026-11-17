@@ -296,6 +296,17 @@ class TaskServiceTest {
     }
 
     @Test
+    void progressRoundsToNearestIntegerLikeProgressService() {
+        storedTask(5);
+        when(taskRepository.countByProject_ProjectId(1)).thenReturn(3L);
+        when(taskRepository.countByProject_ProjectIdAndStatus(1, "done")).thenReturn(2L);
+
+        taskService.updateTask(1, 5, new CreateTaskRequest(1, "T", null, null, "done", null));
+
+        assertEquals(67, project1.getProgress());
+    }
+
+    @Test
     void creatingTaskRecalculatesProjectProgress() {
         when(taskRepository.countByProject_ProjectId(1)).thenReturn(2L);
         when(taskRepository.countByProject_ProjectIdAndStatus(1, "done")).thenReturn(2L);

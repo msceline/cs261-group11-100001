@@ -21,6 +21,7 @@ const pageUrls = {
 	calendar: new URL('../pages/calender.html', scriptUrl),
 	meeting: new URL('../pages/meeting.html', scriptUrl),
 	createtask: new URL('../pages/createTask.html', scriptUrl),
+	resources: new URL('../pages/resource.html', scriptUrl),
 };
 const pageScriptUrls = {
 	project: new URL('../js/project.js', scriptUrl),
@@ -32,9 +33,11 @@ const pageScriptUrls = {
 	calendar: new URL('../js/calendar.js', scriptUrl),
 	meeting: new URL('../js/meeting.js', scriptUrl),
 	createtask: new URL('../js/createTask.js', scriptUrl),
+	resources: new URL('../js/resource.js', scriptUrl),
 };
 const pageApiScriptUrls = {
-	members: new URL('../client-api/member-api.js', scriptUrl),
+	members: new URL('../api/member-api.js', scriptUrl),
+	resources: new URL('../api/resource-api.js', scriptUrl),
 };
 const pageTitles = {
 	project: 'Projects',
@@ -46,6 +49,7 @@ const pageTitles = {
 	calendar: 'Calendar',
 	meeting: 'Create Meeting',
 	createtask: 'Task',
+	resources: 'Resource',
 };
 const pageScriptPromises = {};
 const pageApiScriptPromises = {};
@@ -275,7 +279,13 @@ async function loadPage(page, pageData = null) {
 			document.dispatchEvent(new CustomEvent('createtask:loaded', {
 				detail: pageData || selectedProject || {},
 			}));
-		}
+		} else if (page === 'resources') {
+            await loadPageScript('resources');
+            await loadPageApiScript('resources');
+            document.dispatchEvent(new CustomEvent('resources:loaded', {
+                detail: pageData || selectedProject || {},
+            }));
+        }
 	} catch {
 		contentBox.textContent = `ไม่สามารถโหลดหน้า ${page} ได้`;
 	}

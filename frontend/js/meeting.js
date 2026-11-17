@@ -22,6 +22,9 @@ document.addEventListener('meeting:loaded', (event) => {
     document.dispatchEvent(new CustomEvent('meeting:back', { detail: project }));
   });
 
+  const now = new Date();
+  dateTimeInput.min = formatLocalDateTime(now);
+
   if (editingMeeting) {
     document.title = 'Edit Meeting';
     title.textContent = 'Edit Meeting';
@@ -31,7 +34,7 @@ document.addEventListener('meeting:loaded', (event) => {
     locationInput.value = editingMeeting.location || '';
     descriptionInput.value = editingMeeting.description || '';
   } else {
-    dateTimeInput.value = formatLocalDateTime(new Date());
+    dateTimeInput.value = formatLocalDateTime(new Date(now.getTime() + 60 * 60 * 1000));
   }
 
   function showMessage(text, isError = false) {

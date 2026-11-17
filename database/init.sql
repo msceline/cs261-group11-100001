@@ -9,6 +9,19 @@ GO
 
 PRINT '>>> เริ่มต้นใส่ข้อมูลจำลอง (Mock Data) สำหรับ TU WorkSpace (Sprint 1)...';
 
+IF EXISTS (
+    SELECT 1
+    FROM sys.columns c
+    JOIN sys.types t ON c.user_type_id = t.user_type_id
+    WHERE c.object_id = OBJECT_ID(N'dbo.tasks')
+      AND c.name = N'task_description'
+      AND t.name = N'varchar'
+)
+BEGIN
+    ALTER TABLE dbo.tasks ALTER COLUMN task_description NVARCHAR(MAX) NULL;
+END;
+GO
+
 -- ------------------------------------------------------------------------------
 -- 1. Users (ตารางผู้ใช้)
 -- ------------------------------------------------------------------------------
@@ -25,10 +38,6 @@ IF NOT EXISTS (SELECT 1 FROM [users] WHERE [tu_id] = '6609650002')
 IF NOT EXISTS (SELECT 1 FROM [users] WHERE [tu_id] = '6609650003')
     INSERT INTO [users] ([tu_id], [role], [display_name], [email], [password], [created_at])
     VALUES ('6609650003', 'student', N'Somchart Meesuk', 'somchart.mee@dome.tu.ac.th', NULL, '2026-01-12 14:15:00');
-
-IF NOT EXISTS (SELECT 1 FROM [users] WHERE [tu_id] = 'T00001')
-    INSERT INTO [users] ([tu_id], [role], [display_name], [email], [password], [created_at])
-    VALUES ('T00001', 'teacher', N'Dr. Kanya Srichan', 'kanya.sri@tu.ac.th', NULL, '2026-01-05 08:30:00');
 GO
 
 -- ------------------------------------------------------------------------------
@@ -62,9 +71,6 @@ IF NOT EXISTS (SELECT 1 FROM [project_members] WHERE [project_id] = 1 AND [user_
 
 IF NOT EXISTS (SELECT 1 FROM [project_members] WHERE [project_id] = 1 AND [user_id] = 3)
     INSERT INTO [project_members] ([project_id], [user_id], [role_in_project], [joined_at]) VALUES (1, 3, 'member', '2026-02-01 10:30:00');
-
-IF NOT EXISTS (SELECT 1 FROM [project_members] WHERE [project_id] = 1 AND [user_id] = 4)
-    INSERT INTO [project_members] ([project_id], [user_id], [role_in_project], [joined_at]) VALUES (1, 4, 'visitor', '2026-02-02 08:30:00');
 
 IF NOT EXISTS (SELECT 1 FROM [project_members] WHERE [project_id] = 2 AND [user_id] = 2)
     INSERT INTO [project_members] ([project_id], [user_id], [role_in_project], [joined_at]) VALUES (2, 2, 'host', '2026-02-05 13:30:00');
@@ -107,10 +113,6 @@ IF NOT EXISTS (SELECT 1 FROM [notifications] WHERE [user_id] = 2 AND [title] = N
 IF NOT EXISTS (SELECT 1 FROM [notifications] WHERE [user_id] = 3 AND [title] = N'คำเชิญเข้าร่วมกลุ่มโปรเจกต์')
     INSERT INTO [notifications] ([user_id], [title], [message], [type], [is_read], [created_at])
     VALUES (3, N'คำเชิญเข้าร่วมกลุ่มโปรเจกต์', N'คุณได้รับคำเชิญให้เข้าร่วมกลุ่มโปรเจกต์ "TU-WorkSpace-Group11"', 'invite', 1, '2026-02-01 10:30:00');
-
-IF NOT EXISTS (SELECT 1 FROM [notifications] WHERE [user_id] = 4 AND [title] = N'การเข้าตรวจเยี่ยมโปรเจกต์')
-    INSERT INTO [notifications] ([user_id], [title], [message], [type], [is_read], [created_at])
-    VALUES (4, N'การเข้าตรวจเยี่ยมโปรเจกต์', N'คุณได้รับสิทธิ์เข้าดู (visitor) ในโปรเจกต์ "TU-WorkSpace-Group11"', 'invite', 0, '2026-02-02 08:35:00');
 GO
 
 PRINT '>>> ใส่ข้อมูลจำลอง (Mock Data) ครบทุกตารางตาม Schema Sprint 1 เรียบร้อยแล้ว!';

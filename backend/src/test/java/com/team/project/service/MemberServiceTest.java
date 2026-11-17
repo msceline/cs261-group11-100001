@@ -37,6 +37,7 @@ class MemberServiceTest {
     private NotificationService notificationService;
     private MemberService memberService;
     private TuStudentService tuStudentService;
+    private ProjectMember pendingInvite;
 
     private static User user(int id) {
         return new User(id, "660965000" + id, "student", "User " + id, "u" + id + "@x.com", "hash",
@@ -67,9 +68,18 @@ class MemberServiceTest {
             when(tuStudentService.findOrCreateUser(u.getTu_id())).thenReturn(Optional.of(u));
         }
 
-        when(memberRepository.findByProject_ProjectId(1)).thenReturn(List.of(
-                new ProjectMember(1, user1, project1, "host", now),
-                new ProjectMember(2, user2, project1, "member", now)));
+        ProjectMember host1 = new ProjectMember(1, user1, project1, "host", now);
+        ProjectMember member2 = new ProjectMember(2, user2, project1, "member", now);
+        ProjectMember host2 = new ProjectMember(3, user2, project2, "host", now);
+        // user 3 has been invited to project 2 but has not answered yet
+        pendingInvite = new ProjectMember(4, user3, project2, "member", ProjectMember.STATUS_PENDING, null);
+        when(memberRepository.findByProject_ProjectId(1)).thenReturn(List.of(host1, member2));
+        when(memberRepository.findAnyStatus(1, 1)).thenReturn(Optional.of(host1));
+        when(memberRepository.findAnyStatus(1, 2)).thenReturn(Optional.of(member2));
+        when(memberRepository.findAnyStatus(2, 2)).thenReturn(Optional.of(host2));
+        when(memberRepository.findAnyStatus(2, 3)).thenReturn(Optional.of(pendingInvite));
+        when(memberRepository.findByUser_UserIdAndStatus(3, ProjectMember.STATUS_PENDING))
+                .thenReturn(List.of(pendingInvite));
         when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 1)).thenReturn(true);
         when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 2)).thenReturn(true);
         when(memberRepository.existsByProject_ProjectIdAndUser_UserId(2, 2)).thenReturn(true);
@@ -132,6 +142,61 @@ class MemberServiceTest {
         assertEquals(1, saved.getValue().getUserId());
         assertEquals(2, saved.getValue().getProjectId());
         verify(notificationService).createSystemNotification(any(), any(), org.mockito.ArgumentMatchers.eq("invite"), org.mockito.ArgumentMatchers.eq(1));
+    }
+
+    @Test
+    void invitedUserIsStoredAsPendingMember() {
+        MemberResponse added = memberService.add(2, 2, new AddMemberRequest("6609650001"));
+
+        assertEquals(ProjectMember.STATUS_PENDING, added.status());
+    }
+
+    @Test
+    void invitingSomeoneAlreadyInvitedIsRejected() {
+        assertAddFails(HttpStatus.CONFLICT, 2, 2, new AddMemberRequest("6609650003"));
+    }
+
+    // ---------- accept / decline ----------
+
+    @Test
+    void acceptingAnInvitationMakesTheUserAMemberAndTellsTheHost() {
+        MemberResponse joined = memberService.accept(3, 2);
+
+        assertEquals(ProjectMember.STATUS_ACCEPTED, joined.status());
+        assertEquals(ProjectMember.STATUS_ACCEPTED, pendingInvite.getStatus());
+        verify(notificationService).createSystemNotification(any(), any(),
+                org.mockito.ArgumentMatchers.eq("invite_accepted"), org.mockito.ArgumentMatchers.eq(2));
+    }
+
+    @Test
+    void acceptWithoutInvitationIsNotFoundAndWhenAlreadyMemberIsConflict() {
+        assertEquals(HttpStatus.NOT_FOUND,
+                statusOf(assertThrows(ResponseStatusException.class, () -> memberService.accept(3, 1))));
+        assertEquals(HttpStatus.CONFLICT,
+                statusOf(assertThrows(ResponseStatusException.class, () -> memberService.accept(2, 1))));
+    }
+
+    @Test
+    void decliningRemovesThePendingInvitationAndTellsTheHost() {
+        memberService.decline(3, 2);
+
+        verify(memberRepository).delete(pendingInvite);
+        verify(notificationService).createSystemNotification(any(), any(),
+                org.mockito.ArgumentMatchers.eq("invite_declined"), org.mockito.ArgumentMatchers.eq(2));
+    }
+
+    @Test
+    void declineWithoutInvitationIsNotFoundAndWhenAlreadyMemberIsConflict() {
+        assertEquals(HttpStatus.NOT_FOUND,
+                statusOf(assertThrows(ResponseStatusException.class, () -> memberService.decline(3, 1))));
+        assertEquals(HttpStatus.CONFLICT,
+                statusOf(assertThrows(ResponseStatusException.class, () -> memberService.decline(2, 1))));
+        verify(memberRepository, never()).delete(any());
+    }
+
+    @Test
+    void pendingInvitationsListsOnlyUnansweredOnes() {
+        assertEquals(List.of(2), memberService.pendingInvitations(3).stream().map(i -> i.projectId()).toList());
     }
 
     @Test

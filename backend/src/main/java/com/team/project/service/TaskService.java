@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.team.project.dto.progress.ProjectProgressResponse;
 import com.team.project.dto.task.CreateTaskRequest;
 import com.team.project.entity.Project;
 import com.team.project.entity.Task;
@@ -85,14 +86,7 @@ public class TaskService {
     /** Updates the editable fields of an existing task; empty when the task does not exist. */
     public Optional<Task> updateTask(int userId, int taskId, CreateTaskRequest req) {
         return taskRepository.findById(taskId).map(task -> {
-            boolean updatesTaskDetails = req != null && (req.taskTitle() != null
-                    || req.taskDescription() != null || req.assigneeId() != null || req.dueDate() != null);
-            if (updatesTaskDetails || req == null || req.status() == null) {
-                requireHost(userId, task.getProject());
-            }
-            if (req != null && req.status() != null) {
-                requireAssignee(userId, task);
-            }
+            requireHostOrAssigneeStatusUpdate(userId, task, req);
             Integer oldAssigneeId = task.getAssignee() != null ? task.getAssignee().getUserId() : null;
             applyUpdate(task, req);
             Task saved = taskRepository.save(task);
@@ -124,11 +118,11 @@ public class TaskService {
         return true;
     }
 
-    /** Project progress = done tasks / all tasks * 100 (rounded down), recalculated whenever a task changes. */
+    /** Project progress = done tasks / all tasks * 100 (rounded to nearest integer), recalculated whenever a task changes. */
     private void refreshProgress(Project project) {
         long total = taskRepository.countByProject_ProjectId(project.getProjectId());
         long done = taskRepository.countByProject_ProjectIdAndStatus(project.getProjectId(), DONE);
-        project.setProgress(total == 0 ? 0 : (int) (done * 100 / total));
+        project.setProgress(ProjectProgressResponse.calculatePercentage(done, total));
         projectRepository.save(project);
     }
 
@@ -145,11 +139,26 @@ public class TaskService {
         }
     }
 
-    private void requireAssignee(int userId, Task task) {
-        if (task.getAssignee() == null || !task.getAssignee().getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Only the assigned member can update task status");
+    private void requireHostOrAssigneeStatusUpdate(int userId, Task task, CreateTaskRequest req) {
+        if (task.getProject().getHost().getUserId().equals(userId)) {
+            return;
         }
+        boolean isAssignee = task.getAssignee() != null && task.getAssignee().getUserId().equals(userId);
+        if (isAssignee && isStatusOnlyUpdate(req)) {
+            requireMember(userId, task.getProject().getProjectId());
+            return;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "Only the project host can create, edit or delete tasks");
+    }
+
+    private static boolean isStatusOnlyUpdate(CreateTaskRequest req) {
+        return req != null
+                && req.status() != null
+                && req.taskTitle() == null
+                && req.taskDescription() == null
+                && req.dueDate() == null
+                && req.assigneeId() == null;
     }
 
     private void requireMember(int userId, int projectId) {

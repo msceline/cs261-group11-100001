@@ -1,0 +1,126 @@
+<section class="resources-page">
+  <style>
+    
+    .resources-page [hidden] {
+      display: none !important;
+    }
+  </style>
+
+  <header class="course-header">
+    <div class="resource-header-container">
+      <h1 class="course-code" id="resource-course-code"></h1>
+      <h2 class="course-name" id="resource-course-name"></h2>
+    </div>
+  </header>
+
+  <section class="resources-panel" aria-labelledby="resources-heading">
+    <div class="resources-header">
+      <h2 id="resources-heading">Resource</h2>
+      <button class="upload-trigger-btn" id="openUploadBtn" type="button" aria-label="Upload resource" title="Upload resource">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="14 2 14 8 20 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="12" y1="18" x2="12" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <polyline points="9 15 12 18 15 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="resource-skeleton-list" id="resourceSkeleton" hidden>
+      <div class="resource-skeleton-card"></div>
+      <div class="resource-skeleton-card"></div>
+      <div class="resource-skeleton-card"></div>
+    </div>
+
+    <div class="resource-list" id="resourceList" aria-live="polite"></div>
+
+    <div class="resource-empty-state" id="resourceEmptyState" hidden>
+      <img class="empty-box-icon" src="../asset/image/empty cabinet.svg" alt="Empty cabinet">
+      <h3>Nothing here yet!</h3>
+      <p>Upload a file link to share with your team.</p>
+    </div>
+
+    <form class="resource-form-view" id="resourceFormView" hidden novalidate>
+      <input type="hidden" id="editingResourceId" value="">
+      <div class="link-input-box">
+        <label for="resourceLinkInput">link :</label>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input type="url" id="resourceLinkInput" placeholder="https://..." required>
+      </div>
+
+      <div class="title-textarea-box">
+        <label for="resourceTitleInput">title :</label>
+        <textarea id="resourceTitleInput" rows="7" placeholder="ระบุชื่อลิงก์ หรือรายละเอียดไฟล์..." required></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" id="cancelFormBtn">cancel</button>
+        <button type="submit" class="btn-submit" id="submitFormBtn">upload</button>
+      </div>
+    </form>
+  </section>
+
+  <div class="status-modal-backdrop" id="statusModalBackdrop" hidden>
+    
+    <div class="status-popup" id="successPopup" hidden role="dialog" aria-modal="true">
+      <img class="cat-icon" src="../asset/image/success cat.svg" alt="Success cat">
+      <h4>SUCCESS!</h4>
+      <p id="successMessageText">Your link has been updated successfully!</p>
+      <button type="button" class="popup-btn btn-continue" id="successContinueBtn">CONTINUE</button>
+    </div>
+
+    <div class="status-popup" id="errorPopup" hidden role="dialog" aria-modal="true">
+      <img class="cat-icon" src="../asset/image/error cat.svg" alt="Error cat">
+      <h4>FAILURE</h4>
+      <p id="errorMessageText">Something went wrong...</p>
+      <button type="button" class="popup-btn btn-try-again" id="errorRetryBtn">TRY AGAIN</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const listEl = document.getElementById('resourceList');
+      const emptyEl = document.getElementById('resourceEmptyState');
+      const formEl = document.getElementById('resourceFormView');
+      const openBtn = document.getElementById('openUploadBtn');
+      const cancelBtn = document.getElementById('cancelFormBtn');
+
+      if (!listEl || !formEl) return;
+
+      const syncView = () => {
+        const isFormOpen = !formEl.hidden;
+        if (isFormOpen) {
+          listEl.hidden = true;
+          if (emptyEl) emptyEl.hidden = true;
+          if (openBtn) openBtn.hidden = true;
+        } else {
+          if (openBtn) openBtn.hidden = false;
+          const hasItems = listEl.children.length > 0;
+          listEl.hidden = !hasItems;
+          if (emptyEl) emptyEl.hidden = hasItems;
+        }
+      };
+
+      
+      const observer = new MutationObserver(syncView);
+      observer.observe(formEl, { attributes: true, attributeFilter: ['hidden', 'style', 'class'] });
+
+      if (openBtn) {
+        openBtn.addEventListener('click', () => {
+          formEl.hidden = false;
+          syncView();
+        });
+      }
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          formEl.hidden = true;
+          syncView();
+        });
+      }
+    })();
+  </script>
+</section>

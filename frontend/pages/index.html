@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="../css/createTask.css">
   <link rel="stylesheet" href="../css/calendar.css?v=calendar-host-create-meeting">
   <link rel="stylesheet" href="../css/meeting.css">
+  <link rel="stylesheet" href="../css/resource.css">
   <title>Document</title>
 </head>
 <body>
@@ -52,12 +53,6 @@
           <img src="../asset/image/Profile 1.svg" alt="">
         </div>
       </div>
-      <button class="menu-item theme-button" id="theme-button" type="button" aria-pressed="false">
-        <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m14 6 4 4M4 20l4-.8L19 8a2.1 2.1 0 0 0-3-3L5 16l-1 4Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
-        </svg>
-        <span>Change Theme</span>
-      </button>
       <a class="menu-item sign-out-button" href="login.html">
         <svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
@@ -107,6 +102,13 @@
             <path d="m8 15 2.2 2.2L16 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
           </svg>
           <span>Calendar</span>
+        </button>
+        <button class="sidebar-link" type="button" data-page="resources" data-project-context hidden aria-label="Resources" title="Resources">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+            <path d="M14 2v6h6M10 13a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1-2.8 2.8l-1-1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          </svg>
+          <span>Resources</span>
         </button>
       </div>
     </aside>

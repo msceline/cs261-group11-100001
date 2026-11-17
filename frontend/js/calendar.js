@@ -240,13 +240,17 @@ document.addEventListener('calendar:loaded', async (event) => {
   calendar.querySelector('#calendar-course-code').textContent = project.subjectCode || project.subject || '';
   calendar.querySelector('#calendar-course-name').textContent = project.projectName || project.groupName || '';
 
-  function updateCreateMeetingVisibility() {
+  function isCurrentUserHost() {
     const hostId = Number(calendarProject.hostId);
-    createMeetingButton.hidden = !Number.isInteger(currentUserId)
-      || currentUserId <= 0
-      || !Number.isInteger(hostId)
-      || hostId <= 0
-      || hostId !== currentUserId;
+    return Number.isInteger(currentUserId)
+      && currentUserId > 0
+      && Number.isInteger(hostId)
+      && hostId > 0
+      && hostId === currentUserId;
+  }
+
+  function updateCreateMeetingVisibility() {
+    createMeetingButton.hidden = !isCurrentUserHost();
   }
 
   updateCreateMeetingVisibility();
@@ -315,10 +319,7 @@ document.addEventListener('calendar:loaded', async (event) => {
     }
     card.append(meta);
 
-    const isHost = Number.isInteger(currentUserId)
-      && currentUserId > 0
-      && Number(hostId) === currentUserId;
-    if (isHost) {
+    if (isCurrentUserHost()) {
       const actions = document.createElement('div');
       actions.className = 'calendar-detail-actions';
 
@@ -387,9 +388,10 @@ document.addEventListener('calendar:loaded', async (event) => {
     statusControl.className = 'calendar-task-status-control';
     const status = document.createElement('select');
     status.className = 'calendar-task-status';
+    status.hidden = true;
     status.setAttribute('aria-label', `Status for ${task.taskTitle || 'task'}`);
     [
-      ['todo', 'To do'],
+      ['todo', 'To Do'],
       ['doing', 'In progress'],
       ['done', 'Done'],
     ].forEach(([value, label]) => {
@@ -404,15 +406,136 @@ document.addEventListener('calendar:loaded', async (event) => {
       statusControl.classList.add(`is-${value}`);
     };
     updateStatusStyle(status.value);
-    const canUpdateStatus = Number.isInteger(currentUserId)
-      && currentUserId > 0
-      && Number(task.assigneeId) === currentUserId;
+
+    const currentUsername = currentUser?.username
+      || currentUser?.userName
+      || currentUser?.tu_id
+      || currentUser?.tuId
+      || currentUser?.studentId
+      || currentUser?.student_id;
+    const assignedMember = memberNames.get(String(task.assigneeId));
+    const assignedUsername = task.assigneeUsername
+      || task.assignee?.username
+      || task.assignee?.userName
+      || task.assignee?.tu_id
+      || task.assignee?.tuId
+      || task.assignee?.studentId
+      || assignedMember?.username
+      || assignedMember?.userName
+      || assignedMember?.tu_id
+      || assignedMember?.tuId
+      || assignedMember?.studentId
+      || assignedMember?.student_id;
+    const canUpdateStatus = isCurrentUserHost()
+      || (Boolean(currentUsername && assignedUsername)
+        && String(currentUsername).trim().toLowerCase()
+          === String(assignedUsername).trim().toLowerCase());
     status.disabled = !canUpdateStatus;
+
+    const trigger = document.createElement('button');
+    trigger.className = 'calendar-task-status-trigger';
+    trigger.type = 'button';
+    trigger.setAttribute('aria-haspopup', 'menu');
+    trigger.setAttribute('aria-expanded', 'false');
+
+    const selectedLabel = document.createElement('span');
+    selectedLabel.className = 'calendar-task-status-label';
     const chevron = document.createElement('span');
     chevron.className = 'calendar-task-status-chevron';
     chevron.setAttribute('aria-hidden', 'true');
     chevron.textContent = '▾';
-    statusControl.append(status, chevron);
+    trigger.append(selectedLabel, chevron);
+
+    const menu = document.createElement('div');
+    menu.className = 'calendar-task-status-menu';
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', `Status options for ${task.taskTitle || 'task'}`);
+    menu.hidden = true;
+
+    const options = Array.from(status.options).map((option) => {
+      const menuOption = document.createElement('button');
+      menuOption.className = 'calendar-task-status-option';
+      menuOption.type = 'button';
+      menuOption.setAttribute('role', 'menuitemradio');
+      menuOption.dataset.value = option.value;
+      menuOption.textContent = option.textContent;
+      menuOption.addEventListener('click', () => {
+        status.value = option.value;
+        closeMenu();
+        status.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      menu.append(menuOption);
+      return menuOption;
+    });
+
+    function syncStatusControl() {
+      const selectedOption = status.selectedOptions[0];
+      selectedLabel.textContent = selectedOption?.textContent || '';
+      trigger.dataset.status = status.value;
+      trigger.disabled = status.disabled;
+      trigger.setAttribute(
+        'aria-label',
+        `${task.taskTitle || 'Task'}: ${selectedLabel.textContent}`,
+      );
+      options.forEach((option) => {
+        const selected = option.dataset.value === status.value;
+        option.setAttribute('aria-checked', String(selected));
+        option.tabIndex = selected ? 0 : -1;
+      });
+    }
+
+    function closeMenu(restoreFocus = false) {
+      menu.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      document.removeEventListener('pointerdown', handleOutsidePointerDown, true);
+      if (restoreFocus) trigger.focus();
+    }
+
+    function handleOutsidePointerDown(event) {
+      if (!statusControl.contains(event.target)) closeMenu();
+    }
+
+    function openMenu(focusSelected = false) {
+      if (trigger.disabled) return;
+      menu.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      document.addEventListener('pointerdown', handleOutsidePointerDown, true);
+      if (focusSelected) {
+        options.find((option) => option.dataset.value === status.value)?.focus();
+      }
+    }
+
+    trigger.addEventListener('click', () => {
+      if (menu.hidden) openMenu();
+      else closeMenu();
+    });
+    trigger.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+      event.preventDefault();
+      openMenu(true);
+    });
+    menu.addEventListener('keydown', (event) => {
+      const currentIndex = options.indexOf(document.activeElement);
+      let nextIndex = currentIndex;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMenu(true);
+        return;
+      }
+      if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % options.length;
+      else if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + options.length) % options.length;
+      else if (event.key === 'Home') nextIndex = 0;
+      else if (event.key === 'End') nextIndex = options.length - 1;
+      else return;
+
+      event.preventDefault();
+      options[nextIndex].focus();
+    });
+    statusControl.addEventListener('click', (event) => event.stopPropagation());
+
+    statusControl.append(trigger, menu, status);
+    syncStatusControl();
     header.append(title, statusControl);
     card.append(header);
 
@@ -426,9 +549,15 @@ document.addEventListener('calendar:loaded', async (event) => {
 
     status.addEventListener('change', async () => {
       const previousStatus = task.status || 'todo';
+      if (!canUpdateStatus) {
+        status.value = previousStatus;
+        return;
+      }
+
       const nextStatus = status.value;
       updateStatusStyle(nextStatus);
       status.disabled = true;
+      syncStatusControl();
       showDetailMessage('');
       try {
         const updatedTask = await window.taskApi.updateTaskStatus(task.taskId, nextStatus);
@@ -443,6 +572,8 @@ document.addEventListener('calendar:loaded', async (event) => {
         showDetailMessage(error.message || 'Could not update task status.', true);
       } finally {
         status.disabled = !canUpdateStatus;
+        syncStatusControl();
+        if (canUpdateStatus && trigger.isConnected) trigger.focus();
       }
     });
     return card;

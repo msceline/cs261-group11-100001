@@ -168,9 +168,9 @@ class ProgressIntegrationTest {
 
     @Test
     void updatingCreatingAndDeletingTasksUpdatesProgressInRealTime() throws Exception {
-        // US7 TC2: Change MemberA's "doing" task (#3) to "done" -> 2/3 = 67%
+        // US7 TC2: Assignee (MemberA) changes their "doing" task (#3) to "done" -> 2/3 = 67%
         mockMvc.perform(patch("/api/tasks/3")
-                        .header("Authorization", bearer(hostUser.getUserId()))
+                        .header("Authorization", bearer(memberA.getUserId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"done\"}"))
                 .andExpect(status().isOk())

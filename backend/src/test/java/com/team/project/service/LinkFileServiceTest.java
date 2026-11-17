@@ -178,8 +178,7 @@ class LinkFileServiceTest {
 
     @Test
     void getReturnsLink() {
-        when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 1))
-                .thenReturn(true);
+        mockMember(1, 1);
 
         when(linkFileRepository.findByLinkFileIdAndProject_ProjectId(10, 1))
                 .thenReturn(Optional.of(linkFile));
@@ -191,9 +190,20 @@ class LinkFileServiceTest {
     }
 
     @Test
+    void getThrows404WhenProjectNotFound() {
+        when(projectRepository.findById(999))
+                .thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> linkFileService.get(1, 999, 10));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+    }
+
+    @Test
     void getThrows404WhenLinkNotFound() {
-        when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 1))
-                .thenReturn(true);
+        mockMember(1, 1);
 
         when(linkFileRepository.findByLinkFileIdAndProject_ProjectId(99, 1))
                 .thenReturn(Optional.empty());
@@ -207,8 +217,7 @@ class LinkFileServiceTest {
 
     @Test
     void updateSavesUpdatedLink() {
-        when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 1))
-                .thenReturn(true);
+        mockMember(1, 1);
 
         when(linkFileRepository.findByLinkFileIdAndProject_ProjectId(10, 1))
                 .thenReturn(Optional.of(linkFile));
@@ -228,8 +237,7 @@ class LinkFileServiceTest {
 
     @Test
     void updateThrows403ForNonUploader() {
-        when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 2))
-                .thenReturn(true);
+        mockMember(2, 1);
 
         when(linkFileRepository.findByLinkFileIdAndProject_ProjectId(10, 1))
                 .thenReturn(Optional.of(linkFile));
@@ -244,8 +252,7 @@ class LinkFileServiceTest {
 
     @Test
     void deleteRemovesLink() {
-        when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 1))
-                .thenReturn(true);
+        mockMember(1, 1);
 
         when(linkFileRepository.findByLinkFileIdAndProject_ProjectId(10, 1))
                 .thenReturn(Optional.of(linkFile));
@@ -257,8 +264,7 @@ class LinkFileServiceTest {
 
     @Test
     void deleteThrows403ForNonUploader() {
-        when(memberRepository.existsByProject_ProjectIdAndUser_UserId(1, 2))
-                .thenReturn(true);
+        mockMember(2, 1);
 
         when(linkFileRepository.findByLinkFileIdAndProject_ProjectId(10, 1))
                 .thenReturn(Optional.of(linkFile));

@@ -267,6 +267,21 @@ class TaskServiceTest {
                 .getStatusCode().value()));
     }
 
+    @Test
+    void assigneeMemberCanUpdateOwnTaskStatusOnly() {
+        Task task = storedTask(5);
+        task.setAssignee(user2);
+
+        Task updated = taskService.updateTask(2, 5, new CreateTaskRequest(null, null, null, null, "done", null))
+                .orElseThrow();
+        assertEquals("done", updated.getStatus());
+
+        assertEquals(HttpStatus.FORBIDDEN, statusOf(assertThrows(ResponseStatusException.class,
+                () -> taskService.updateTask(2, 5, new CreateTaskRequest(null, "Rename", null, null, "done", null)))));
+        assertEquals(HttpStatus.FORBIDDEN, statusOf(assertThrows(ResponseStatusException.class,
+                () -> taskService.updateTask(4, 5, new CreateTaskRequest(null, null, null, null, "todo", null)))));
+    }
+
     // ---------- progress ----------
 
     @Test

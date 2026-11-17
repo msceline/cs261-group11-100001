@@ -17,6 +17,9 @@ document.addEventListener('meeting:loaded', (event) => {
   const message = document.getElementById('meeting-message');
   const title = document.getElementById('meeting-page-title');
 
+  const now = new Date();
+  dateTimeInput.min = formatLocalDateTime(now);
+
   if (editingMeeting) {
     document.title = 'Edit Meeting';
     title.textContent = 'Edit Meeting';
@@ -26,7 +29,7 @@ document.addEventListener('meeting:loaded', (event) => {
     locationInput.value = editingMeeting.location || '';
     descriptionInput.value = editingMeeting.description || '';
   } else {
-    dateTimeInput.value = formatLocalDateTime(new Date());
+    dateTimeInput.value = formatLocalDateTime(new Date(now.getTime() + 60 * 60 * 1000));
   }
 
   function showMessage(text, isError = false) {

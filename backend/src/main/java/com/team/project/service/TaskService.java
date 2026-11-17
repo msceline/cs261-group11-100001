@@ -85,7 +85,7 @@ public class TaskService {
     /** Updates the editable fields of an existing task; empty when the task does not exist. */
     public Optional<Task> updateTask(int userId, int taskId, CreateTaskRequest req) {
         return taskRepository.findById(taskId).map(task -> {
-            requireHost(userId, task.getProject());
+            requireHostOrAssigneeStatusUpdate(userId, task, req);
             Integer oldAssigneeId = task.getAssignee() != null ? task.getAssignee().getUserId() : null;
             applyUpdate(task, req);
             Task saved = taskRepository.save(task);
@@ -136,6 +136,28 @@ public class TaskService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Only the project host can create, edit or delete tasks");
         }
+    }
+
+    private void requireHostOrAssigneeStatusUpdate(int userId, Task task, CreateTaskRequest req) {
+        if (task.getProject().getHost().getUserId().equals(userId)) {
+            return;
+        }
+        boolean isAssignee = task.getAssignee() != null && task.getAssignee().getUserId().equals(userId);
+        if (isAssignee && isStatusOnlyUpdate(req)) {
+            requireMember(userId, task.getProject().getProjectId());
+            return;
+        }
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "Only the project host can create, edit or delete tasks");
+    }
+
+    private static boolean isStatusOnlyUpdate(CreateTaskRequest req) {
+        return req != null
+                && req.status() != null
+                && req.taskTitle() == null
+                && req.taskDescription() == null
+                && req.dueDate() == null
+                && req.assigneeId() == null;
     }
 
     private void requireMember(int userId, int projectId) {

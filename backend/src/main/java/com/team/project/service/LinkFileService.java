@@ -82,6 +82,7 @@ public class LinkFileService {
     public LinkFileResponse get(
             int userId, int projectId, int linkFileId) {
 
+        findProject(projectId);
         checkMember(userId, projectId);
 
         LinkFile linkFile = findLink(linkFileId, projectId);
@@ -97,6 +98,7 @@ public class LinkFileService {
             int linkFileId,
             UpdateLinkFileRequest request) {
 
+        findProject(projectId);
         checkMember(userId, projectId);
 
         if (request == null) {
@@ -117,6 +119,7 @@ public class LinkFileService {
     @Transactional
     public void delete(int userId, int projectId, int linkFileId) {
 
+        findProject(projectId);
         checkMember(userId, projectId);
 
         LinkFile linkFile = findLink(linkFileId, projectId);

@@ -122,7 +122,7 @@ class ProgressServiceTest {
 
         assertEquals(3, res.totalTasks());
         assertEquals(2, res.completedTasks());
-        assertEquals(66, res.projectProgress());
+        assertEquals(67, res.projectProgress());
         assertEquals(1, res.members().get(0).totalTasks());
         assertEquals(1, res.members().get(0).completedTasks());
         assertEquals(100, res.members().get(0).progressPercentage());

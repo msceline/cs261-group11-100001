@@ -39,7 +39,7 @@ public class AuthService {
         return userService.findByTu_id(tu.username()).orElseGet(() -> {
             User u = new User();
             u.setTu_id(tu.username());
-            u.setRole("employee".equalsIgnoreCase(tu.type()) ? "teacher" : "student");
+            u.setRole("student");
             u.setDisplayName(tu.displayName());
             u.setEmail(tu.email());
             return userService.save(u);

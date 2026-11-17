@@ -36,6 +36,7 @@ const pageScriptUrls = {
 	resources: new URL('../js/resource.js', scriptUrl),
 };
 const pageApiScriptUrls = {
+	project: new URL('../api/project-api.js', scriptUrl),
 	members: new URL('../api/member-api.js', scriptUrl),
 	resources: new URL('../api/resource-api.js', scriptUrl),
 };
@@ -58,6 +59,14 @@ let projectDraft = null;
 let activeDropdown = null;
 
 document.title = pageTitles.project;
+
+function hasStoredAuthToken() {
+	try {
+		return Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+	} catch {
+		return false;
+	}
+}
 
 function positionDropdown(trigger, dropdown) {
 	if (!trigger || !dropdown || dropdown.hidden) return;
@@ -149,6 +158,18 @@ window.addEventListener('scroll', () => {
 	if (activeDropdown === 'notification') positionDropdown(notificationTrigger, notificationDropdown);
 }, true);
 
+function getProjectPageData(element) {
+	return {
+		projectId: element.dataset.projectId,
+		groupName: element.dataset.projectName,
+		subject: element.dataset.subjectCode,
+		subjectCode: element.dataset.subjectCode,
+		progress: element.dataset.progress,
+		dueDate: element.dataset.dueDate,
+		members: JSON.parse(element.dataset.members || '[]'),
+	};
+}
+
 function setProjectContextLinksVisible(visible) {
 	projectContextLinks.forEach((link) => {
 		link.hidden = !visible;
@@ -175,6 +196,7 @@ function loadPageScript(page) {
 function loadPageApiScript(page) {
 	const scriptUrl = pageApiScriptUrls[page];
 	if (!scriptUrl) return Promise.resolve();
+	if (page === 'project' && window.projectApi) return Promise.resolve();
 
 	if (!pageApiScriptPromises[page]) {
 		pageApiScriptPromises[page] = new Promise((resolve, reject) => {
@@ -300,8 +322,43 @@ document.addEventListener('addmember:back', () => {
 	loadPage('creategroup', projectDraft);
 });
 
+document.addEventListener('addmember:back-existing', () => {
+	loadPage('members', selectedProject);
+});
+
+document.addEventListener('project:created', (event) => {
+	const project = event.detail || {};
+	loadPage('dashboard', {
+		projectId: project.projectId,
+		groupName: project.projectName || '',
+		subject: project.subjectCode || '',
+		subjectCode: project.subjectCode || '',
+		progress: project.progress || 0,
+		dueDate: project.dueDate || '',
+		members: project.members || [],
+		creationWarning: project.creationWarning || '',
+	});
+});
+
+document.addEventListener('project:create-failed', (event) => {
+	document.dispatchEvent(new CustomEvent('addmember:error', {
+		detail: { message: event.detail?.message || 'ไม่สามารถสร้างโปรเจกต์ได้' },
+	}));
+});
+
 document.addEventListener('createtask:done', (event) => {
 	loadPage('task', event.detail || selectedProject);
+});
+
+document.addEventListener('dashboard:create-task', () => {
+	loadPage('createtask', selectedProject);
+});
+
+document.addEventListener('task:edit', (event) => {
+	loadPage('createtask', {
+		...(selectedProject || {}),
+		taskToEdit: event.detail,
+	});
 });
 
 document.addEventListener('meeting:created', (event) => {
@@ -324,20 +381,64 @@ document.addEventListener('meeting:updated', (event) => {
 });
 
 document.addEventListener('addmember:create', async (event) => {
+	const detail = event.detail || {};
+	if (detail.projectId) {
+		if (!hasStoredAuthToken()) {
+			if (selectedProject && String(selectedProject.projectId) === String(detail.projectId)) {
+				const members = selectedProject.members || [];
+				const memberIds = new Set(members.map((member) => String(member.studentId || member.userId)));
+				selectedProject.members = members.concat((detail.members || []).filter((member) => {
+					const memberId = String(member.studentId || member.userId);
+					if (memberIds.has(memberId)) return false;
+					memberIds.add(memberId);
+					return true;
+				}));
+			}
+			document.dispatchEvent(new CustomEvent('project:members-added', { detail }));
+			await loadPage('members', selectedProject);
+			return;
+		}
+
+		try {
+			await loadPageApiScript('project');
+			const existingMembers = await window.projectApi.getProjectMembers(detail.projectId);
+			const existingIds = new Set(existingMembers.map((member) => String(
+				member.tu_id || member.tuId || member.studentId || '',
+			)));
+			const failures = [];
+			for (const memberId of detail.invitedMemberIds || []) {
+				if (existingIds.has(String(memberId))) continue;
+				try {
+					await window.projectApi.addProjectMember(detail.projectId, memberId);
+				} catch (error) {
+					failures.push(`${memberId}: ${error.message}`);
+				}
+			}
+			if (failures.length) throw new Error(`เพิ่มสมาชิกไม่สำเร็จ - ${failures.join(' / ')}`);
+			await loadPage('members', selectedProject);
+		} catch (error) {
+			document.dispatchEvent(new CustomEvent('addmember:error', {
+				detail: { message: error.message },
+			}));
+		}
+		return;
+	}
+
 	const project = {
-		projectName: event.detail.groupName,
-		subjectCode: event.detail.subject,
-		dueDate: event.detail.dueDate,
-		members: event.detail.members || [],
+		projectName: detail.groupName,
+		subjectCode: detail.subject,
+		dueDate: detail.dueDate,
+		members: detail.members || [],
 		progress: 0,
 	};
 
 	try {
 		await loadPageScript('project');
 		document.dispatchEvent(new CustomEvent('project:create', { detail: project }));
-		await loadPage('project');
-	} catch {
-		contentBox.textContent = 'ไม่สามารถสร้าง project ได้';
+	} catch (error) {
+		document.dispatchEvent(new CustomEvent('addmember:error', {
+			detail: { message: error.message || 'ไม่สามารถสร้างโปรเจกต์ได้' },
+		}));
 	}
 });
 
@@ -372,6 +473,15 @@ contentBox?.addEventListener('click', (event) => {
 		return;
 	}
 
+	if (event.target.closest('.addMember-btn')) {
+		loadPage('addmember', {
+			...(selectedProject || {}),
+			groupName: selectedProject?.groupName || selectedProject?.projectName || '',
+			subject: selectedProject?.subject || selectedProject?.subjectCode || '',
+		});
+		return;
+	}
+
 	if (event.target.closest('#back-to-tasks')) {
 		loadPage('task', selectedProject);
 		return;
@@ -379,15 +489,7 @@ contentBox?.addEventListener('click', (event) => {
 
 	const projectCard = event.target.closest('.project-card');
 	if (projectCard) {
-		loadPage('dashboard', {
-			projectId: projectCard.dataset.projectId,
-			groupName: projectCard.dataset.projectName,
-			subject: projectCard.dataset.subjectCode,
-			subjectCode: projectCard.dataset.subjectCode,
-			progress: projectCard.dataset.progress,
-			dueDate: projectCard.dataset.dueDate,
-			members: JSON.parse(projectCard.dataset.members || '[]'),
-		});
+		loadPage('dashboard', getProjectPageData(projectCard));
 	}
 });
 
@@ -395,15 +497,7 @@ contentBox?.addEventListener('keydown', (event) => {
 	const projectCard = event.target.closest('.project-card');
 	if (!projectCard || (event.key !== 'Enter' && event.key !== ' ')) return;
 	event.preventDefault();
-	loadPage('dashboard', {
-		projectId: projectCard.dataset.projectId,
-		groupName: projectCard.dataset.projectName,
-		subject: projectCard.dataset.subjectCode,
-		subjectCode: projectCard.dataset.subjectCode,
-		progress: projectCard.dataset.progress,
-		dueDate: projectCard.dataset.dueDate,
-		members: JSON.parse(projectCard.dataset.members || '[]'),
-	});
+	loadPage('dashboard', getProjectPageData(projectCard));
 });
 
 setProjectContextLinksVisible(false);
@@ -411,6 +505,23 @@ loadPage('project');
 
 if (mainContainer && sidebar) {
 	sidebar.addEventListener('click', (event) => {
+		const projectLink = event.target.closest('.sidebar-project-link');
+		if (projectLink) {
+			loadPage('dashboard', getProjectPageData(projectLink));
+			if (window.matchMedia('(max-width: 850px)').matches) {
+				mainContainer.classList.remove('is-expanded');
+			}
+			return;
+		}
+
+		if (event.target.closest('.sidebar-projects__header')) {
+			loadPage('project');
+			if (window.matchMedia('(max-width: 850px)').matches) {
+				mainContainer.classList.remove('is-expanded');
+			}
+			return;
+		}
+
 		if (event.target.closest('.sidebar-link')) {
 			if (window.matchMedia('(max-width: 850px)').matches) {
 				mainContainer.classList.remove('is-expanded');

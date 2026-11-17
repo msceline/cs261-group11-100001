@@ -124,6 +124,27 @@ async function renderMembers(data = {}) {
         return;
     }
 
+    let hasAuthToken = false;
+    try {
+        hasAuthToken = Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+    } catch {
+        hasAuthToken = false;
+    }
+
+    if (!hasAuthToken) {
+        const previewMembers = (data.members?.length ? data.members : [
+            { userId: 1, displayName: 'สมาชิกตัวอย่าง 1', tu_id: 'sample-1', roleInProject: 'host' },
+            { userId: 2, displayName: 'สมาชิกตัวอย่าง 2', tu_id: 'sample-2', roleInProject: 'member' },
+        ]).map((member, index) => ({
+            ...member,
+            userId: member.userId || member.studentId || index + 1,
+            displayName: member.displayName || member.name || `User ${index + 1}`,
+            tu_id: member.tu_id || member.tuId || member.studentId,
+        }));
+        membersListContainer.replaceChildren(...previewMembers.map((member) => createMemberItem(member, [])));
+        return;
+    }
+
     memberRequestId += 1;
     const requestId = memberRequestId;
     setMemberListMessage(membersListContainer, 'Loading members...');

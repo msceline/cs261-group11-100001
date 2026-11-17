@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.team.project.dto.progress.ProjectProgressResponse;
 import com.team.project.dto.task.CreateTaskRequest;
 import com.team.project.entity.Project;
 import com.team.project.entity.Task;
@@ -117,11 +118,11 @@ public class TaskService {
         return true;
     }
 
-    /** Project progress = done tasks / all tasks * 100 (rounded down), recalculated whenever a task changes. */
+    /** Project progress = done tasks / all tasks * 100 (rounded to nearest integer), recalculated whenever a task changes. */
     private void refreshProgress(Project project) {
         long total = taskRepository.countByProject_ProjectId(project.getProjectId());
         long done = taskRepository.countByProject_ProjectIdAndStatus(project.getProjectId(), DONE);
-        project.setProgress(total == 0 ? 0 : (int) (done * 100 / total));
+        project.setProgress(ProjectProgressResponse.calculatePercentage(done, total));
         projectRepository.save(project);
     }
 

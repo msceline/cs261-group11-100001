@@ -365,6 +365,10 @@ document.addEventListener('meeting:created', (event) => {
 	loadPage('calendar', event.detail || selectedProject);
 });
 
+document.addEventListener('meeting:back', (event) => {
+	loadPage('calendar', event.detail || selectedProject);
+});
+
 document.addEventListener('calendar:edit-meeting', (event) => {
 	const detail = event.detail || {};
 	const project = detail.project || selectedProject || {};

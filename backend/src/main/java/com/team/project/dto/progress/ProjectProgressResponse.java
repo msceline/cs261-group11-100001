@@ -20,11 +20,11 @@ public record ProjectProgressResponse(int projectId,
         );
     }
 
-    /** Returns completed / total as an integer percentage (rounded down), or 0 when total is 0. */
+    /** Returns completed / total as an integer percentage (rounded to nearest integer), or 0 when total is 0. */
     public static int calculatePercentage(int completedTasks, int totalTasks) {
         if (totalTasks <= 0 || completedTasks <= 0) {
             return 0;
         }
-        return (int) ((long) completedTasks * 100 / totalTasks);
+        return (int) Math.round((completedTasks * 100.0) / totalTasks);
     }
 }

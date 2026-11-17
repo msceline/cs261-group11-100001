@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-@RestControllerAdvice
+import com.team.project.controller.LinkFileController;
+
+@RestControllerAdvice(assignableTypes = LinkFileController.class)
 public class GlobalExceptionHandler {
 
     // Handle Validation Error (400)

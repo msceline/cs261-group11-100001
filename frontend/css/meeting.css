@@ -39,6 +39,28 @@
   text-align: center;
 }
 
+.meeting-back {
+  justify-self: start;
+  padding: 8px 16px;
+  color: #fff;
+  background: #88483e;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.meeting-back:hover {
+  background: #f2f6fa;
+}
+
+.meeting-back:focus-visible {
+  outline: 2px solid #88483e;
+  outline-offset: 3px;
+}
+
 .meeting-form-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

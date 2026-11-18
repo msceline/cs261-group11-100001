@@ -518,13 +518,8 @@ if (mainContainer && sidebar) {
 			return;
 		}
 
-		if (event.target.closest('.sidebar-projects__header')) {
-			loadPage('project');
-			if (window.matchMedia('(max-width: 850px)').matches) {
-				mainContainer.classList.remove('is-expanded');
-			}
-			return;
-		}
+		// The "Projects" heading is only a label for the list below; it does not navigate.
+		if (event.target.closest('.sidebar-projects__header')) return;
 
 		if (event.target.closest('.sidebar-link')) {
 			if (window.matchMedia('(max-width: 850px)').matches) {

@@ -320,6 +320,12 @@
   display: none;
 }
 
+.calendar-page .calendar-meeting-meta .calendar-meeting-location {
+  display: inline;
+  margin-left: auto;
+  text-align: right;
+}
+
 .calendar-page .calendar-meeting-location:not(a) {
   color: #555;
   text-decoration: none;

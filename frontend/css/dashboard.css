@@ -10,11 +10,9 @@
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 	margin: 0 auto;
-	padding: 16px;
 	color: #000;
-	background: linear-gradient(180deg,rgba(255, 209, 186, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(202, 241, 254, 1) 100%);
+	background: none;
 	border-radius: 20px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 	font-family: "League Spartan", 'Kanit', sans-serif, -apple-system;
 }
 
@@ -33,26 +31,26 @@
 
 .dashBoardpage .subject-head {
 	margin: 0;
-	color: #000;
-	font-size: 2rem;
+	font-size: 3rem;
 	font-weight: 800;
-	letter-spacing: -0.03em;
+	letter-spacing: -0.04em;
 	text-transform: uppercase;
 	overflow-wrap: anywhere;
 
-	background: linear-gradient(135deg, #386aaf 0%, #3b82f6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+	background: #F05805;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
 }
 
 .dashBoardpage .group-name-head {
 	margin: 0;
 	font-size: 20px;
 	font-weight: 700;
-	line-height: normal;
+	line-height: 5px;
 	letter-spacing: -0.03em;
 	overflow-wrap: anywhere;
+	color: #303030;
 }
 
 .dashBoardpage .progress-container,
@@ -60,20 +58,11 @@
 .dashBoardpage .your-task-list {
 	min-width: 0;
 	padding: 20px;
-	border-radius: 21px;
-	box-shadow: 0 4px 14px -9px #000;
+	border-radius: 20px;
+	box-shadow:
+		0px 4px 6px -1px rgba(0, 0, 0, 0.1);
 
-	background: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
-
-    box-shadow:
-        0 20px 40px -15px rgba(0, 0, 0, 0.07),
-        0 0 20px 0 rgba(255, 255, 255, 0.8) inset;
+	background: #FFFFFF;
 }
 
 .dashBoardpage .progress-head,
@@ -82,7 +71,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	padding: 0 25px;
+	padding: 0 10px;
 }
 
 .dashBoardpage .progress-head,
@@ -94,6 +83,32 @@
 .dashBoardpage .progress-container {
 	display: grid;
 	gap: 18px;
+}
+
+.dashBoardpage .project-create-warning {
+	margin: 12px 0;
+	padding: 12px 16px;
+	color: #792C24;
+	background: #fff0e8;
+	border: 1px solid #e8b3a5;
+	border-radius: 12px;
+}
+
+.dashBoardpage .project-create-warning[hidden] {
+	display: none;
+}
+
+.dashBoardpage .addMember-btn svg {
+	width: 48px;
+	height: 48px;
+	flex: 0 0 48px;
+	fill: #F05805;
+}
+
+.dashBoardpage .addMember-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
 }
 
 .dashBoardpage .progress-row {
@@ -113,7 +128,7 @@
 	font-size: 1.5rem;
 	font-weight: 700;
 	line-height: 1;
-	color: #386aaf;
+	color: #303030;
 }
 
 .dashBoardpage .percent {
@@ -131,7 +146,7 @@
 	height: 15px;
 	margin-top: 0;
 	overflow: hidden;
-	background: #e8efec;
+	background: #E8E2E2;
 	border: 1px solid;
 	border-radius: 999px;
 }
@@ -169,8 +184,8 @@
 	min-height: 0;
 }
 
-.dashBoardpage .list-container > .upcoming-list,
-.dashBoardpage .list-container > .your-task-list {
+.dashBoardpage .list-container>.upcoming-list,
+.dashBoardpage .list-container>.your-task-list {
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
@@ -181,7 +196,6 @@
 	display: grid;
 	flex: 1;
 	min-height: 0;
-	margin-top: 10px;
 	padding: 16px 16px;
 	align-content: start;
 	justify-items: center;
@@ -199,39 +213,126 @@
 	display: none;
 }
 
+.dashBoardpage .addNewTask-btn {
+	border: none;
+	background: none;
+	cursor: pointer;
+}
+
+.dashBoardpage .addNewTask-btn[hidden] {
+	display: none;
+}
+
+.addNewTask-btn svg {
+	flex: 0 0 25px;
+	width: 25px;
+	height: 25px;
+}
+
 .dashBoardpage .dashboard-task-card {
+	position: relative;
 	justify-self: stretch;
 	width: 100%;
 	min-width: 0;
 	text-align: left;
 	border-radius: 28px;
-	background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+	background: #ffffff;
+	box-shadow:
+		0px 9px 13px -5px rgba(0, 0, 0, 0.5);
 	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	cursor: pointer;
 	padding: 25px 35px;
 }
 
-.dashBoardpage .dashboard-task-card:hover{
-	transform: translateY(-2px) scale(1.01);
-    background: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+.dashBoardpage .dashboard-task-card.has-open-status-menu {
+	z-index: 2;
+}
+
+.dashBoardpage .dashboard-task-card:hover {
+	transform: translateY(-0.5px) scale(1.001);
+	background: rgba(255, 255, 255, 0.75);
+}
+
+.dashBoardpage .dashboard-task-card__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.dashBoardpage .dashboard-task-card__title-date {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.dashBoardpage .dashboard-task-card__title-button {
+	min-width: 0;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	text-align: left;
+}
+
+.dashBoardpage .dashboard-task-card__title-button:focus-visible {
+	outline: 2px solid #999;
+	outline-offset: 3px;
 }
 
 .dashBoardpage .dashboard-task-card__title {
 	margin: 0;
-	font-size: 16px;
-	font-weight: 700;
+	font-size: 1.25rem;
+	font-weight: 800;
 	overflow-wrap: anywhere;
+	color: #1a1a1a;
+}
+
+.dashBoardpage .dashboard-task-card__due-date {
+	margin-top: 2px;
+	color: #52615c;
+	font-size: 15px;
+	text-align: left;
+}
+
+.dashBoardpage .dashboard-task-card__description-panel {
+	display: grid;
+	grid-template-rows: 0fr;
+	border-top: 1px solid transparent;
+	font-size: 1rem;
+	transition:
+		grid-template-rows 500ms cubic-bezier(0.22, 1, 0.36, 1),
+		border-color 500ms ease;
+}
+
+.dashBoardpage .dashboard-task-card.is-expanded .dashboard-task-card__description-panel {
+	grid-template-rows: 1fr;
+	margin-top: 10px;
+	border-top-color: rgba(0, 0, 0, 0.18);
+}
+
+.dashBoardpage .dashboard-task-card__description-content {
+	min-height: 0;
+	overflow: hidden;
+	padding: 0;
+	transition: padding 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dashBoardpage .dashboard-task-card.is-expanded .dashboard-task-card__description-content {
+	padding: 9px 0 3px;
+}
+
+.dashBoardpage .dashboard-task-card__description-panel[aria-hidden="true"] .dashboard-task-card__description-content {
+	visibility: hidden;
 }
 
 .dashBoardpage .dashboard-task-card__description {
-	margin: 6px 0 0;
-	color: #52615c;
-	font-size: 13px;
+	margin: 0;
+	color: #303030;
+	font-size: 1rem;
 	line-height: 1.4;
 	overflow-wrap: anywhere;
 }
@@ -239,31 +340,131 @@
 .dashBoardpage .dashboard-task-card__details {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: center;
 	flex-wrap: wrap;
 	gap: 8px;
-	margin-top: 12px;
 	color: #52615c;
 	font-size: 15px;
+	width: 120px;
+	flex: 0 0 120px;
 }
 
 .dashBoardpage .dashboard-task-card__status {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	box-sizing: border-box;
+	gap: 8px;
 	padding: 4px 8px;
-	color: #385447;
-	background: #e5f2e8;
-	border-radius: 999px;
-	font-weight: 700;
+	color: #000;
+	background: #FF9090;
+	border: 1px solid #000;
+	border-radius: 15px;
+
+	font: inherit;
+	font-weight: 500;
+	cursor: pointer;
+	transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.dashBoardpage .dashboard-task-card__status:hover,
+.dashBoardpage .dashboard-task-card__status[aria-expanded="true"] {
+	border-color: #777;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dashBoardpage .dashboard-task-card__status:disabled {
+	cursor: wait;
+	opacity: 0.65;
+}
+
+.dashBoardpage .dashboard-task-status-chevron {
+	flex: 0 0 auto;
+	margin-left: auto;
+	transition: transform 180ms ease;
+	transform: scale(1.3);
+}
+
+.dashBoardpage .dashboard-task-card__status[aria-expanded="true"] .dashboard-task-status-chevron {
+	transform: rotate(180deg) scale(1.3);
 }
 
 .dashBoardpage .dashboard-task-card[data-status="in_progress"] .dashboard-task-card__status {
-	color: #dfa63b;
-	background: #fff1cc;
+	color: #000;
+	background: #FEFFAB;
 }
 
-.dashBoardpage .dashboard-task-card[data-status="completed"] .dashboard-task-card__status,
 .dashBoardpage .dashboard-task-card[data-status="done"] .dashboard-task-card__status {
-	color: #245c49;
-	background: #dff3e8;
+	color: #000;
+	background: #B2FFAB;
+}
+
+.dashBoardpage .dashboard-task-card__status-error {
+	flex-basis: 100%;
+	color: #b42318;
+	font-size: 13px;
+}
+
+.dashBoardpage .dashboard-task-status-control {
+	position: relative;
+	width: 100%;
+}
+
+.dashBoardpage .dashboard-task-status-label {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.dashBoardpage .dashboard-task-status-menu {
+	position: absolute;
+	top: calc(100% + 6px);
+	right: 0;
+	z-index: 3;
+	display: grid;
+	min-width: 100%;
+	gap: 3px;
+	padding: 5px;
+	background: #fff;
+	border: 1px solid #999;
+	border-radius: 15px;
+}
+
+.dashBoardpage .dashboard-task-status-menu[hidden] {
+	display: none;
+}
+
+.dashBoardpage .dashboard-task-status-option {
+	width: 100%;
+	padding: 8px 10px;
+	color: #222;
+	background: transparent;
+	border: 0;
+	border-radius: 7px;
+	font: inherit;
+	text-align: left;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.dashBoardpage .dashboard-task-status-option:hover,
+.dashBoardpage .dashboard-task-status-option:focus-visible {
+	background: #f1f1f1;
+}
+
+.dashBoardpage .dashboard-task-status-option[aria-checked="true"] {
+	color: #F05805;
+	background: #eef0ff;
+	font-weight: 600;
+}
+
+.dashBoardpage .dashboard-task-status-option[aria-checked="true"]:hover,
+.dashBoardpage .dashboard-task-status-option[aria-checked="true"]:focus-visible {
+	background: #e2e5ff;
 }
 
 @media (max-width: 680px) {
@@ -289,7 +490,15 @@
 		padding: 12px;
 	}
 
-	.dashBoardpage .head-title{
-		font-size: 1.3rem;
+	.dashBoardpage .head-title {
+		font-size: 1.5rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.dashBoardpage .dashboard-task-card__description-panel,
+	.dashBoardpage .dashboard-task-card__description-content {
+		transition: none;
 	}
 }

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TU WorkSpace</title>
-    <link rel="icon" type="image/png" href="../asset/image/logo.svg">
+    <link rel="icon" type="image/png" href="../asset/image/logo2.png">
     <link rel="stylesheet" href="../css/login.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
@@ -14,7 +14,7 @@
 
 </head>
 <body>
-    <img src="../asset/image/logo.svg" alt="App Logo" class="my-logo">
+    <img src="../asset/image/logo2.png" alt="App Logo" class="my-logo">
     <div class="sign-in-card">
         <h1 class="title">Sign In</h1>
         <p class="subtitle">Hey, Enter your detail to get sign in<br>to your account</p>
@@ -28,6 +28,9 @@
             <div class="input-field">
                 <i class="fa-solid fa-lock input-icon"></i>
                 <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password" aria-label="Password">
+                <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password" aria-pressed="false">
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                </button>
             </div>
 
             <p id="login-message" class="login-message" role="alert" aria-live="polite"></p>
@@ -35,7 +38,7 @@
         </form>
     </div>
 
-    <script src="../client-api/auth-api.js"></script>
+    <script src="../api/auth-api.js"></script>
     <script src="../js/login.js"></script>
 
 </body>

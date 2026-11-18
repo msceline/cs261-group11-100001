@@ -39,10 +39,9 @@ class AuthServiceTest {
     void setUp() {
         User student = user(1, "6609650001", "student");
         User student2 = user(2, "6609650002", "student");
-        User teacher = user(4, "T00001", "teacher");
 
         userRepository = mock(UserRepository.class);
-        for (User u : new User[] {student, student2, teacher}) {
+        for (User u : new User[] {student, student2}) {
             when(userRepository.findByTu_id(u.getTu_id())).thenReturn(Optional.of(u));
             when(userRepository.findById(u.getUserId())).thenReturn(Optional.of(u));
         }
@@ -55,12 +54,8 @@ class AuthServiceTest {
         tuAuthClient = mock(TuAuthClient.class);
         when(tuAuthClient.verify("6609650001", "password123"))
                 .thenReturn(Optional.of(new TuUser("6609650001", "User 1", "6609650001@dome.tu.ac.th", "student")));
-        when(tuAuthClient.verify("T00001", "password123"))
-                .thenReturn(Optional.of(new TuUser("T00001", "User 4", "T00001@tu.ac.th", "employee")));
         when(tuAuthClient.verify("6609659999", "password123"))
                 .thenReturn(Optional.of(new TuUser("6609659999", "ผู้ใช้ ใหม่", "6609659999@dome.tu.ac.th", "student")));
-        when(tuAuthClient.verify("6609659998", "password123"))
-                .thenReturn(Optional.of(new TuUser("6609659998", "อาจารย์ ใหม่", "new@tu.ac.th", "employee")));
         when(tuAuthClient.verify("6609650001", "wrong")).thenReturn(Optional.empty());
 
         jwtService = new JwtService("test-secret-test-secret-test-secret", 3600);
@@ -109,11 +104,6 @@ class AuthServiceTest {
     }
 
     @Test
-    void firstLoginOfTuEmployeeCreatesTeacher() {
-        assertEquals("teacher", authService.login(new LoginRequest("6609659998", "password123")).orElseThrow().user().role());
-    }
-
-    @Test
     void loginWithMissingFieldsIsRejected() {
         assertTrue(authService.login(null).isEmpty());
         assertTrue(authService.login(new LoginRequest(null, "password123")).isEmpty());
@@ -137,6 +127,5 @@ class AuthServiceTest {
     @Test
     void loginResponseIncludesRole() {
         assertEquals("student", authService.login(new LoginRequest("6609650001", "password123")).orElseThrow().user().role());
-        assertEquals("teacher", authService.login(new LoginRequest("T00001", "password123")).orElseThrow().user().role());
     }
 }

@@ -110,7 +110,33 @@ async function markAsRead(notificationId, token) {
   });
 }
 
+// Invitations the signed-in user has not answered yet: [{ projectId, projectName, subjectCode, hostId }].
+async function getPendingInvitations(token) {
+  return requestNotification('/invitations', { token });
+}
+
+// The invited user confirms and becomes a member of the project.
+async function acceptInvitation(projectId, token) {
+  requireId(projectId, 'projectId');
+  return requestNotification(`/projects/${encodeURIComponent(projectId)}/members/accept`, {
+    method: 'POST',
+    token,
+  });
+}
+
+// The invited user refuses; the backend removes the pending invitation.
+async function declineInvitation(projectId, token) {
+  requireId(projectId, 'projectId');
+  return requestNotification(`/projects/${encodeURIComponent(projectId)}/members/decline`, {
+    method: 'POST',
+    token,
+  });
+}
+
 const notificationApi = {
+  declineInvitation,
+  getPendingInvitations,
+  acceptInvitation,
   getNotificationsByUserId,
   getNotificationById,
   createNotification,

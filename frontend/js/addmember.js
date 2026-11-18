@@ -24,7 +24,7 @@ function loadProjectApiForInvite() {
 function describeInvitedMember(memberId, displayName) {
     const name = displayName || memberId;
     return {
-        avatarText: Array.from(name).slice(0, 2).join('').toUpperCase(),
+        avatarText: Array.from(String(name).trim().split(/\s+/)[0] || '?')[0].toUpperCase(),
         name,
         role: 'Member',
     };
@@ -78,8 +78,17 @@ document.addEventListener('addmember:loaded', (event) => {
 
     const invitedIds = new Set();
     const invitedMembers = new Map();
+    const existingProjectId = projectDraft.projectId || projectDraft.existingProjectId || null;
+    const status = document.createElement('p');
+    status.className = 'addmember-status';
+    status.setAttribute('role', 'alert');
+    status.hidden = true;
+    page.querySelector('.direction')?.before(status);
 
-    if (groupName) groupName.textContent = projectDraft.groupName || '';
+    if (groupName) {
+        groupName.textContent = projectDraft.groupName || projectDraft.projectName || '';
+    }
+    if (existingProjectId && submitBtn) submitBtn.textContent = 'Add Members';
 
     inviteForm?.addEventListener('submit', async (submitEvent) => {
         submitEvent.preventDefault();
@@ -137,8 +146,13 @@ document.addEventListener('addmember:loaded', (event) => {
     });
 
     submitBtn?.addEventListener('click', () => {
+        if (submitBtn.disabled) return;
+        submitBtn.disabled = true;
+        status.hidden = true;
+        status.textContent = '';
         document.dispatchEvent(new CustomEvent('addmember:create', {
             detail: {
+                projectId: existingProjectId,
                 groupName: projectDraft.groupName || '',
                 subject: projectDraft.subject || '',
                 dueDate: projectDraft.dueDate || '',
@@ -151,9 +165,20 @@ document.addEventListener('addmember:loaded', (event) => {
                 })),
             },
         }));
-    }, { once: true });
+    });
 
     backBtn?.addEventListener('click', () => {
-        document.dispatchEvent(new Event('addmember:back'));
+        document.dispatchEvent(new Event(existingProjectId ? 'addmember:back-existing' : 'addmember:back'));
     }, { once: true });
+});
+
+document.addEventListener('addmember:error', (event) => {
+    const page = document.querySelector('#contentBox .addmember-page');
+    const status = page?.querySelector('.addmember-status');
+    const submitBtn = page?.querySelector('.submition-addmember');
+    if (!status || !submitBtn) return;
+
+    status.textContent = event.detail?.message || 'เพิ่มสมาชิกไม่สำเร็จ';
+    status.hidden = false;
+    submitBtn.disabled = false;
 });

@@ -55,10 +55,10 @@
   }
 
   /** POST /api/projects: the caller becomes the host. createdAt (yyyy-MM-dd) is optional. */
-  function createProject({ projectName, subjectCode, createdAt }, token) {
+  function createProject({ projectName, subjectCode, createdAt, dueDate }, token) {
     return request('/projects', token, {
       method: 'POST',
-      body: JSON.stringify({ projectName, subjectCode, createdAt }),
+      body: JSON.stringify({ projectName, subjectCode, createdAt, dueDate }),
     });
   }
 
@@ -102,6 +102,11 @@
     return request(`/projects/${encodeURIComponent(projectId)}`, token);
   }
 
+  /** GET /api/projects/{id}/progress */
+  function getProjectProgress(projectId, token) {
+    return request(`/projects/${encodeURIComponent(projectId)}/progress`, token);
+  }
+
   /** GET /api/tasks (every task of the user's projects), filtered to one project. */
   async function getProjectTasks(projectId, token) {
     const tasks = await request('/tasks', token);
@@ -128,7 +133,18 @@
       && project.projectName === selected.groupName) || null;
   }
 
-  const projectApi = { getProjects, createProject, addProjectMember, getProjectMembers, findUser, getProject, getProjectTasks, getCurrentUser, findProject };
+  const projectApi = {
+    getProjects,
+    createProject,
+    addProjectMember,
+    getProjectMembers,
+    findUser,
+    getProject,
+    getProjectProgress,
+    getProjectTasks,
+    getCurrentUser,
+    findProject,
+  };
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = projectApi;

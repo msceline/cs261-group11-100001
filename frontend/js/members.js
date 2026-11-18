@@ -2,24 +2,20 @@ const membersScriptUrl = document.currentScript?.src || window.location.href;
 
 let memberRequestId = 0;
 
-function getMemberInitials(name) {
-    const initials = String(name || '?')
-        .trim()
-        .split(/\s+/)
-        .map((part) => Array.from(part)[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
-    return initials || '?';
+function getMemberInitial(name) {
+    const firstName = String(name || '').trim().split(/\s+/)[0];
+    return Array.from(firstName || '?')[0].toUpperCase();
 }
 
-function createMemberItem(member) {
+function createMemberItem(member, tasks) {
     const item = document.createElement('div');
     item.className = 'member-item';
+    const memberId = member.userId;
+    item.dataset.memberId = memberId;
 
     const avatar = document.createElement('div');
     avatar.className = 'member-avatar';
-    avatar.textContent = getMemberInitials(member.displayName);
+    avatar.textContent = getMemberInitial(member.displayName);
 
     const details = document.createElement('div');
     details.className = 'member-details';
@@ -34,12 +30,55 @@ function createMemberItem(member) {
 
     details.append(name, studentId);
 
+    const memberTasks = tasks.filter((task) => String(task.assigneeId) === String(memberId));
+    const completedTasks = memberTasks.filter((task) => String(task.status).toLowerCase() === 'done').length;
+    const progressPercent = memberTasks.length === 0
+        ? 0
+        : Math.round((completedTasks / memberTasks.length) * 100);
+
+    const memberProgress = document.createElement('div');
+    memberProgress.className = 'member-progress';
+
+    const progressLabel = document.createElement('span');
+    progressLabel.className = 'member-progress-label';
+    progressLabel.textContent = `${completedTasks}/${memberTasks.length} tasks done`;
+
+    const progressBar = document.createElement('div');
+    progressBar.className = 'member-progress-bar';
+    progressBar.setAttribute('role', 'progressbar');
+    progressBar.setAttribute('aria-label', `Task progress for ${name.textContent}`);
+    progressBar.setAttribute('aria-valuemin', '0');
+    progressBar.setAttribute('aria-valuemax', '100');
+    progressBar.setAttribute('aria-valuenow', String(progressPercent));
+
+    const progressRow = document.createElement('div');
+    progressRow.className = 'member-progress-row';
+
+    const progressFill = document.createElement('div');
+    progressFill.className = 'member-progress-fill';
+    progressFill.dataset.progressBand = progressPercent < 25
+        ? 'red'
+        : progressPercent < 50
+            ? 'orange'
+            : progressPercent < 75
+                ? 'yellow'
+                : 'green';
+    progressFill.style.width = `${progressPercent}%`;
+    progressBar.append(progressFill);
+
+    const progressPercentage = document.createElement('span');
+    progressPercentage.className = 'member-progress-percentage';
+    progressPercentage.textContent = `${progressPercent}%`;
+
+    progressRow.append(progressBar, progressPercentage);
+    memberProgress.append(progressLabel, progressRow);
+
     const role = document.createElement('span');
     role.className = 'member-role';
     const roleName = member.roleInProject || 'member';
     role.textContent = roleName.charAt(0).toUpperCase() + roleName.slice(1);
 
-    item.append(avatar, details, role);
+    item.append(avatar, details, memberProgress, role);
     return item;
 }
 
@@ -85,15 +124,39 @@ async function renderMembers(data = {}) {
         return;
     }
 
+    let hasAuthToken = false;
+    try {
+        hasAuthToken = Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+    } catch {
+        hasAuthToken = false;
+    }
+
+    if (!hasAuthToken) {
+        const previewMembers = (data.members?.length ? data.members : [
+            { userId: 1, displayName: 'สมาชิกตัวอย่าง 1', tu_id: 'sample-1', roleInProject: 'host' },
+            { userId: 2, displayName: 'สมาชิกตัวอย่าง 2', tu_id: 'sample-2', roleInProject: 'member' },
+        ]).map((member, index) => ({
+            ...member,
+            userId: member.userId || member.studentId || index + 1,
+            displayName: member.displayName || member.name || `User ${index + 1}`,
+            tu_id: member.tu_id || member.tuId || member.studentId,
+        }));
+        membersListContainer.replaceChildren(...previewMembers.map((member) => createMemberItem(member, [])));
+        return;
+    }
+
     memberRequestId += 1;
     const requestId = memberRequestId;
     setMemberListMessage(membersListContainer, 'Loading members...');
 
     try {
         const api = await loadProjectApiForMembers();
-        const members = await api.getProjectMembers(projectId);
-        if (!Array.isArray(members)) {
-            throw new Error('The member service returned an invalid response.');
+        const [members, tasks] = await Promise.all([
+            api.getProjectMembers(projectId),
+            api.getProjectTasks(projectId),
+        ]);
+        if (!Array.isArray(members) || !Array.isArray(tasks)) {
+            throw new Error('The member or task service returned an invalid response.');
         }
 
         // A newer request, or another page, has taken over: drop this result.
@@ -104,7 +167,7 @@ async function renderMembers(data = {}) {
             return;
         }
 
-        membersListContainer.replaceChildren(...members.map(createMemberItem));
+        membersListContainer.replaceChildren(...members.map((member) => createMemberItem(member, tasks)));
     } catch (error) {
         if (requestId !== memberRequestId || !membersListContainer.isConnected) return;
         console.error('Failed to load project members:', error);

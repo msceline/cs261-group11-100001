@@ -3,11 +3,11 @@ const projectScriptUrl = document.currentScript?.src || window.location.href;
 
 // Shown only while nobody is logged in (no auth token), so the page can still be previewed without the backend.
 const projects = [
-	{ projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 20 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS213', progress: 55 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS221', progress: 75 },
-    { projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'TU109', progress: 85 },
-	{ projectName: 'เว็บไซต์จองห้องเรียน', subjectCode: 'CS331', progress: 100 },
+	{ projectId: 26001, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS261', progress: 25 },
+    { projectId: 26002, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS213', progress: 55 },
+    { projectId: 26003, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'CS221', progress: 75 },
+    { projectId: 26004, projectName: 'ระบบจัดการงานกลุ่ม', subjectCode: 'TU109', progress: 85 },
+	{ projectId: 26005, projectName: 'เว็บไซต์จองห้องเรียน', subjectCode: 'CS331', progress: 100 },
 ];
 
 function createProjectCard(project) {
@@ -41,6 +41,8 @@ function createProjectCard(project) {
 		const metadata = document.createElement('p');
 		metadata.className = 'project-card__meta';
 		const metadataItems = [];
+		if (project.dueDate) metadataItems.push(`กำหนดส่ง ${project.dueDate.slice(0, 10)}`);
+		if (project.members?.length) metadataItems.push(`${project.members.length} สมาชิก`);
 		metadata.textContent = metadataItems.join(' · ');
 		details.append(metadata);
 	}
@@ -78,6 +80,8 @@ function createProjectCard(project) {
 }
 
 function renderProjectCards(projectItems) {
+	renderSidebarProjects(projectItems);
+
 	const processingList = document.getElementById('processTaskList');
 	const completeList = document.getElementById('completeTaskList');
 	if (!processingList || !completeList) return;
@@ -89,6 +93,35 @@ function renderProjectCards(projectItems) {
 		const list = Number(project.progress) >= 100 ? completeList : processingList;
 		list.append(createProjectCard(project));
 	});
+}
+
+function renderSidebarProjects(projectItems) {
+	const sidebarList = document.getElementById('sidebarProjectList');
+	if (!sidebarList) return;
+
+	const processingProjects = projectItems.filter((project) => Number(project.progress) < 100);
+	if (!processingProjects.length) {
+		const emptyMessage = document.createElement('span');
+		emptyMessage.className = 'sidebar-projects__empty';
+		emptyMessage.textContent = 'No projects in progress';
+		sidebarList.replaceChildren(emptyMessage);
+		return;
+	}
+
+	sidebarList.replaceChildren(...processingProjects.map((project) => {
+		const link = document.createElement('button');
+		link.type = 'button';
+		link.className = 'sidebar-project-link';
+		link.dataset.projectId = project.projectId ?? '';
+		link.dataset.projectName = project.projectName || '';
+		link.dataset.subjectCode = project.subjectCode || '';
+		link.dataset.progress = String(Number(project.progress) || 0);
+		link.dataset.dueDate = project.dueDate || '';
+		link.dataset.members = JSON.stringify(project.members || []);
+		link.textContent = [project.subjectCode, project.projectName].filter(Boolean).join(' · ');
+		link.title = link.textContent;
+		return link;
+	}));
 }
 
 function hasStoredAuthToken() {
@@ -124,7 +157,6 @@ function showProjectMessage(text) {
 
 // A project created while logged in is saved through the backend; the project list waits for that to finish.
 let pendingCreate = Promise.resolve();
-let createError = null;
 
 // Every project the logged-in user belongs to (GET /api/projects), or the sample list without a login.
 async function loadProjects() {
@@ -146,12 +178,6 @@ async function loadProjects() {
 			renderProjectCards(items);
 		}
 
-		if (createError) {
-			const message = document.createElement('p');
-			message.textContent = createError.message;
-			document.getElementById('processTaskList').prepend(message);
-			createError = null;
-		}
 	} catch (error) {
 		if (document.getElementById('processTaskList')) showProjectMessage(error.message);
 	}
@@ -159,42 +185,95 @@ async function loadProjects() {
 
 // Creates the project, then invites every chosen member (POST /api/projects/{id}/members, host only).
 async function createProjectWithMembers(project) {
-	try {
-		const api = await loadProjectApi();
-		const created = await api.createProject({ projectName: project.projectName, subjectCode: project.subjectCode });
+	const api = await loadProjectApi();
+	const created = await api.createProject({
+		projectName: project.projectName,
+		subjectCode: project.subjectCode,
+		dueDate: project.dueDate,
+	});
+	if (created?.projectId == null) throw new Error('Project was created without an ID.');
 
-		const me = await api.getCurrentUser();
-		const ids = [...new Set((project.members || []).map((member) => member.studentId))]
-			.filter((id) => id && id !== me.tu_id && id !== me.studentId);
-
-		const failures = [];
-		for (const id of ids) {
-			try {
-				await api.addProjectMember(created.projectId, id);
-			} catch (error) {
-				failures.push(`${id}: ${error.message}`);
+	let creationWarning = '';
+	const invitedIds = [...new Set((project.members || [])
+		.map((member) => member.studentId)
+		.filter(Boolean))];
+	if (invitedIds.length) {
+		try {
+			const me = await api.getCurrentUser();
+			const ownIds = new Set([me.tu_id, me.studentId].filter(Boolean).map(String));
+			const failures = [];
+			for (const id of invitedIds.filter((memberId) => !ownIds.has(String(memberId)))) {
+				try {
+					await api.addProjectMember(created.projectId, id);
+				} catch (error) {
+					failures.push(`${id}: ${error.message}`);
+				}
 			}
+			if (failures.length) {
+				creationWarning = `สร้างโปรเจกต์แล้ว แต่เพิ่มสมาชิกบางคนไม่สำเร็จ: ${failures.join(' / ')}`;
+			}
+		} catch (error) {
+			creationWarning = `สร้างโปรเจกต์แล้ว แต่ไม่สามารถเพิ่มสมาชิกได้: ${error.message}`;
 		}
-		if (failures.length) createError = new Error(`เพิ่มสมาชิกไม่สำเร็จ - ${failures.join(' / ')}`);
-	} catch (error) {
-		createError = error;
 	}
+
+	return {
+		...created,
+		projectName: created.projectName || project.projectName,
+		subjectCode: created.subjectCode || project.subjectCode,
+		dueDate: created.dueDate || project.dueDate,
+		progress: Number(created.progress) || 0,
+		members: project.members || [],
+		creationWarning,
+	};
 }
 
 document.addEventListener('project:loaded', loadProjects);
 
 document.addEventListener('project:create', (event) => {
 	const project = event.detail || {};
-	if (!project.projectName || !project.subjectCode) return;
-
-	if (hasStoredAuthToken()) {
-		pendingCreate = createProjectWithMembers(project);
+	if (!project.projectName || !project.subjectCode) {
+		document.dispatchEvent(new CustomEvent('project:create-failed', {
+			detail: { message: 'กรุณาระบุชื่อโปรเจกต์และรหัสวิชา' },
+		}));
 		return;
 	}
 
-	projects.push({
+	if (hasStoredAuthToken()) {
+		pendingCreate = createProjectWithMembers(project).then((createdProject) => {
+			document.dispatchEvent(new CustomEvent('project:created', { detail: createdProject }));
+		}).catch((error) => {
+			document.dispatchEvent(new CustomEvent('project:create-failed', {
+				detail: { message: error.message },
+			}));
+		});
+		return;
+	}
+
+	const createdProject = {
 		...project,
 		projectId: Date.now(),
 		progress: Number(project.progress) || 0,
-	});
+	};
+	projects.push(createdProject);
+	document.dispatchEvent(new CustomEvent('project:created', { detail: createdProject }));
+});
+
+document.addEventListener('project:members-added', (event) => {
+	const detail = event.detail || {};
+	const project = projects.find((item) => String(item.projectId) === String(detail.projectId));
+	if (!project) return;
+
+	const members = project.members || [];
+	const addedIds = new Set(members.map((member) => String(member.studentId || member.userId)));
+	for (const member of detail.members || []) {
+		if (!addedIds.has(String(member.studentId || member.userId))) members.push(member);
+	}
+	project.members = members;
+	renderProjectCards(projects);
+});
+
+document.addEventListener('projects:updated', (event) => {
+	if (Array.isArray(event.detail)) renderProjectCards(event.detail);
+	else loadProjects();
 });

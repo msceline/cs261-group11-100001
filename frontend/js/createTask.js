@@ -4,6 +4,7 @@ document.addEventListener('createtask:loaded', (event) => {
   if (!form) return;
 
   const selected = event.detail || {};
+  const taskToEdit = selected.taskToEdit || null;
   const dueDateDisplay = document.getElementById('due-date-input');
   const dueDatePicker = document.getElementById('due-date-picker');
   const taskTitleInput = document.getElementById('task-title-input');
@@ -16,7 +17,15 @@ document.addEventListener('createtask:loaded', (event) => {
 
   let projectPromise = null;
   let membersLoaded = false;
-  let selectedAssigneeId = null;
+  let selectedAssigneeId = taskToEdit?.assigneeId ?? null;
+
+  function hasTaskFormAuthToken() {
+    try {
+      return Boolean(localStorage.getItem('authToken') || localStorage.getItem('token'));
+    } catch {
+      return false;
+    }
+  }
 
   function formatDueDate(dateValue) {
     if (!dateValue) return '';
@@ -37,6 +46,15 @@ document.addEventListener('createtask:loaded', (event) => {
 
   function getProject() {
     if (!projectPromise) {
+      if (!hasTaskFormAuthToken()) {
+        projectPromise = Promise.resolve({
+          projectId: selected.projectId || taskToEdit?.projectId,
+          projectName: selected.groupName || selected.projectName || '',
+          subjectCode: selected.subject || selected.subjectCode || '',
+        });
+        return projectPromise;
+      }
+
       projectPromise = taskApi.getProjects().then((projects) => {
         const project = projects.find((item) => String(item.projectId) === String(selected.projectId))
           || projects.find((item) => item.subjectCode === selected.subject
@@ -59,6 +77,7 @@ document.addEventListener('createtask:loaded', (event) => {
     radio.type = 'radio';
     radio.name = 'assigneeId';
     radio.value = String(member.userId);
+    radio.checked = selectedAssigneeId != null && String(selectedAssigneeId) === String(member.userId);
 
     const name = document.createElement('span');
     name.textContent = member.displayName || member.studentId || `User ${member.userId}`;
@@ -86,7 +105,12 @@ document.addEventListener('createtask:loaded', (event) => {
 
     try {
       const project = await getProject();
-      const members = await taskApi.getProjectMembers(project.projectId);
+      const members = hasTaskFormAuthToken()
+        ? await taskApi.getProjectMembers(project.projectId)
+        : [
+          { userId: 1, displayName: 'สมาชิกตัวอย่าง 1' },
+          { userId: 2, displayName: 'สมาชิกตัวอย่าง 2' },
+        ];
 
       if (members.length === 0) {
         showMenuMessage('No members found.');
@@ -94,6 +118,12 @@ document.addEventListener('createtask:loaded', (event) => {
       }
 
       assignmentMenu.replaceChildren(...members.map(createMemberOption));
+      if (selectedAssigneeId != null) {
+        const selectedMember = members.find((member) => String(member.userId) === String(selectedAssigneeId));
+        if (selectedMember) {
+          assignmentLabel.textContent = selectedMember.displayName || `User ${selectedMember.userId}`;
+        }
+      }
       membersLoaded = true;
     } catch (error) {
       showMenuMessage(error.message);
@@ -108,14 +138,20 @@ document.addEventListener('createtask:loaded', (event) => {
     .catch((error) => showSubmitMessage(error.message));
 
   dueDatePicker.required = true;
+  taskTitleInput.value = taskToEdit?.taskTitle || '';
+  taskDescriptionInput.value = taskToEdit?.taskDescription || '';
+  assignmentLabel.textContent = taskToEdit?.assigneeName
+    || (taskToEdit?.assigneeId ? `User ${taskToEdit.assigneeId}` : 'Select member');
+  submitButton.textContent = taskToEdit ? 'Save changes' : 'Submit';
 
   // The due date starts as today (local date, yyyy-MM-dd).
   const now = new Date();
-  dueDatePicker.value = [
+  const today = [
     now.getFullYear(),
     String(now.getMonth() + 1).padStart(2, '0'),
     String(now.getDate()).padStart(2, '0'),
   ].join('-');
+  dueDatePicker.value = taskToEdit?.dueDate?.slice(0, 10) || today;
   dueDateDisplay.value = formatDueDate(dueDatePicker.value);
   taskDescriptionInput.required = true;
 
@@ -165,20 +201,40 @@ document.addEventListener('createtask:loaded', (event) => {
 
     try {
       const project = await getProject();
-      await taskApi.createTask({
-        projectId: project.projectId,
+      const taskData = {
         taskTitle,
         taskDescription,
         assigneeId: selectedAssigneeId,
-        status: 'todo',
         dueDate: `${dueDate}T23:59:00`,
-      });
+      };
+
+      if (hasTaskFormAuthToken()) {
+        if (taskToEdit) {
+          await taskApi.updateTask(taskToEdit.taskId, taskData);
+        } else {
+          await taskApi.createTask({
+            ...taskData,
+            projectId: project.projectId,
+            status: 'todo',
+          });
+        }
+      } else {
+        document.dispatchEvent(new CustomEvent('createtask:preview-saved', {
+          detail: {
+            ...taskToEdit,
+            ...taskData,
+            taskId: taskToEdit?.taskId || `sample-task-${Date.now()}`,
+            projectId: project.projectId,
+            status: taskToEdit?.status || 'todo',
+          },
+        }));
+      }
 
       goBackToTasks();
     } catch (error) {
       showSubmitMessage(error.message);
       submitButton.disabled = false;
-      submitButton.textContent = 'Submit';
+      submitButton.textContent = taskToEdit ? 'Save' : 'Submit';
     }
   });
 });

@@ -84,6 +84,13 @@ function updateTaskStatus(taskId, status, token) {
   });
 }
 
+function deleteTask(taskId, token) {
+  return taskApiRequest(`/tasks/${encodeURIComponent(taskId)}`, {
+    method: 'DELETE',
+    token,
+  });
+}
+
 function getProjects(token) {
   return taskApiRequest('/projects', { token });
 }
@@ -98,6 +105,7 @@ const taskApi = {
   createTask,
   updateTask,
   updateTaskStatus,
+  deleteTask,
   getProjects,
   getProjectMembers,
 };

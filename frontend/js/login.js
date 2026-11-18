@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitBtn = document.querySelector('.btn-signin');
   const studentIdInput = document.querySelector('#studentId');
   const passwordInput = document.querySelector('#password');
+  const passwordToggle = document.querySelector('#passwordToggle');
   const message = document.querySelector('#login-message');
   const defaultButtonText = submitBtn?.textContent;
 
@@ -18,6 +19,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (!form || !submitBtn || !studentIdInput || !passwordInput || !message) return;
+
+  passwordToggle?.addEventListener('click', () => {
+    const isPasswordVisible = passwordInput.type === 'text';
+    passwordInput.type = isPasswordVisible ? 'password' : 'text';
+    passwordToggle.setAttribute('aria-pressed', String(!isPasswordVisible));
+    passwordToggle.setAttribute('aria-label', isPasswordVisible ? 'Show password' : 'Hide password');
+
+    const icon = passwordToggle.querySelector('i');
+    icon?.classList.toggle('fa-eye', isPasswordVisible);
+    icon?.classList.toggle('fa-eye-slash', !isPasswordVisible);
+  });
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -43,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await window.authApi.login(studentId, password);
       localStorage.setItem('authToken', result.token);
       localStorage.setItem('authUser', JSON.stringify(result.user));
-      window.location.assign('/pages/index.html');
+      window.location.replace('/pages/index.html');
     } catch (error) {
       message.textContent = error instanceof TypeError
         ? 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองอีกครั้ง'

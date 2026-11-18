@@ -404,9 +404,11 @@ document.addEventListener('calendar:loaded', async (event) => {
       statusControl.classList.add(`is-${value}`);
     };
     updateStatusStyle(status.value);
+    const isAssignee = Number(task.assigneeId) === currentUserId;
+    const isTaskHost = Number(calendarProject.hostId) === currentUserId;
     const canUpdateStatus = Number.isInteger(currentUserId)
       && currentUserId > 0
-      && Number(task.assigneeId) === currentUserId;
+      && (isAssignee || isTaskHost);
     status.disabled = !canUpdateStatus;
     const chevron = document.createElement('span');
     chevron.className = 'calendar-task-status-chevron';

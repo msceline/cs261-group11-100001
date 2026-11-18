@@ -186,7 +186,7 @@ class TaskServiceTest {
 
         assertEquals("New", updated.getTitle());
         assertEquals("desc", updated.getTaskDescription());
-        assertEquals("todo", updated.getStatus());
+        assertEquals("done", updated.getStatus());
         assertEquals(user2, updated.getAssignee());
         assertEquals(DUE, updated.getDueDate());
         assertEquals(project1, updated.getProject());
@@ -211,16 +211,16 @@ class TaskServiceTest {
     }
 
     @Test
-    void projectHostCannotUpdateStatusWhenNotAssigned() {
+    void projectHostCanUpdateStatusWhenNotAssigned() {
         Task existing = storedTask(5);
         existing.setAssignee(user2);
 
-        assertEquals(HttpStatus.FORBIDDEN,
-                statusOf(assertThrows(ResponseStatusException.class,
-                        () -> taskService.updateTask(1, 5,
-                                new CreateTaskRequest(1, null, null, null, "done", null)))));
-        assertEquals("todo", existing.getStatus());
-        verify(taskRepository, never()).save(any());
+        Task updated = taskService.updateTask(1, 5,
+                        new CreateTaskRequest(1, null, null, null, "done", null))
+                .orElseThrow();
+
+        assertEquals("done", updated.getStatus());
+        verify(taskRepository).save(existing);
     }
 
     @Test

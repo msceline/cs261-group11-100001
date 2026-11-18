@@ -22,6 +22,19 @@ BEGIN
 END;
 GO
 
+IF OBJECT_ID(N'dbo.meetings', N'U') IS NOT NULL
+   AND COL_LENGTH(N'dbo.meetings', N'type') IS NOT NULL
+BEGIN
+    DECLARE @dropTypeDefaultSql NVARCHAR(MAX);
+    SELECT @dropTypeDefaultSql = N'ALTER TABLE dbo.meetings DROP CONSTRAINT ' + QUOTENAME(dc.name) + N';'
+    FROM sys.default_constraints dc
+    JOIN sys.columns c ON dc.parent_object_id = c.object_id AND dc.parent_column_id = c.column_id
+    WHERE dc.parent_object_id = OBJECT_ID(N'dbo.meetings') AND c.name = N'type';
+    IF @dropTypeDefaultSql IS NOT NULL EXEC sp_executesql @dropTypeDefaultSql;
+    ALTER TABLE dbo.meetings DROP COLUMN [type];
+END;
+GO
+
 -- ------------------------------------------------------------------------------
 -- 1. Users (ตารางผู้ใช้)
 -- ------------------------------------------------------------------------------

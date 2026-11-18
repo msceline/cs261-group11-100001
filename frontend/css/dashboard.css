@@ -270,6 +270,7 @@
 .dashBoardpage .dashboard-task-card__title-button {
 	min-width: 0;
 	padding: 0;
+	font: inherit;
 	color: inherit;
 	background: none;
 	border: 0;
@@ -284,10 +285,10 @@
 
 .dashBoardpage .dashboard-task-card__title {
 	margin: 0;
-	font-size: 1.5rem;
-	font-weight: 700;
+	font-size: 1.25rem;
+	font-weight: 800;
 	overflow-wrap: anywhere;
-	color: #303030;
+	color: #1a1a1a;
 }
 
 .dashBoardpage .dashboard-task-card__due-date {

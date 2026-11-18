@@ -11,8 +11,21 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080';
 app.use('/api', express.static(path.join(__dirname, 'api')));
 app.use('/api', createProxyMiddleware({ target: BACKEND_URL, changeOrigin: true, pathRewrite: (p) => '/api' + p }));
 
-// Serve static assets (pages, css, js, asset)
-app.use(express.static(__dirname));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'pages', 'login.html')));
+function setNoStoreHeaders(res) {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+}
+
+// Serve static assets; disable HTTP/bfcache caching on HTML documents so Back after sign-out never shows stale account data.
+app.use(express.static(__dirname, {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith('.html')) setNoStoreHeaders(res);
+  },
+}));
+app.get('/', (req, res) => {
+  setNoStoreHeaders(res);
+  res.sendFile(path.join(__dirname, 'pages', 'login.html'), { cacheControl: false });
+});
 
 app.listen(PORT, () => console.log(`Frontend running on port ${PORT}, backend -> ${BACKEND_URL}`));

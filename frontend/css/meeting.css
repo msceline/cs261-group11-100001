@@ -53,8 +53,8 @@
 }
 
 .meeting-back:hover {
-  color: #88483e;
-  background: #f2f6fa;
+  background: #733a32;
+  transform: translateY(-1px);
 }
 
 .meeting-back:focus-visible {

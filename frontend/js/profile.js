@@ -1,10 +1,19 @@
-// Sign out: forget the token and user before the link goes to login.html.
+// Sign out: forget the token and user, then replace history so Back cannot return to this view.
 document.addEventListener('click', (event) => {
-    if (!event.target.closest('.sign-out-button')) return;
-    ['authToken', 'token', 'authUser'].forEach((key) => {
+    const signOutLink = event.target.closest('.sign-out-button');
+    if (!signOutLink) return;
+    event.preventDefault();
+    setProfile('-', '-');
+    const loginUrl = signOutLink.getAttribute('href') || 'login.html';
+    if (window.authGuard) {
+        window.authGuard.signOut(loginUrl);
+        return;
+    }
+    ['authToken', 'token', 'authUser', 'activeResourceProject'].forEach((key) => {
         try { localStorage.removeItem(key); } catch { /* storage unavailable */ }
         try { sessionStorage.removeItem(key); } catch { /* storage unavailable */ }
     });
+    window.location.replace(loginUrl);
 });
 
 const profileName = document.getElementById('profileName');
